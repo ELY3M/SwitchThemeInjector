@@ -38,9 +38,9 @@ INCLUDES	:=	include Libs
 EXEFS_SRC	:=	exefs_src
 ROMFS	:=	romfs
 
-APP_TITLE	:=	NXThemes Installer
-APP_AUTHOR	:=	exelix
-APP_VERSION := 2.6
+APP_TITLE	:=	NXThemes Installer - elys mod
+APP_AUTHOR	:=	exelix - ELY M.  
+APP_VERSION := 2.7.1
 
 GITVER ?= Unknown
 #---------------------------------------------------------------------------------
@@ -51,13 +51,13 @@ ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 CFLAGS	:=	-O2 -ffunction-sections \
 			$(ARCH) $(DEFINES)
 
-CFLAGS	+=	$(INCLUDE) -D__SWITCH__ -Wall -Werror -DGITVER=\"$(GITVER)\"
+CFLAGS	+=	$(INCLUDE) -D__SWITCH__ -Wall -Werror -DGITVER=\"$(GITVER)\" 
 
 ifneq ($(DEVBUILD),)         
 	CFLAGS	+=	-DDEVBUILD=1
 endif
 
-CXXFLAGS	:= $(CFLAGS) -std=gnu++20
+CXXFLAGS	:= $(CFLAGS) -std=gnu++20 -Wno-deprecated-enum-enum-conversion
 
 ASFLAGS	:=	 -g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map) -lstdc++fs
@@ -72,7 +72,7 @@ LIBS	:=	-lhactool $(CURDIR)/../Libs/mbedtls/lib/libmbedtls.a \
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(PORTLIBS) $(LIBNX) $(CURDIR)/Libs/hactool
+LIBDIRS	:= $(PORTLIBS) $(LIBNX) $(CURDIR)/Libs/hactool $(CURDIR)/Libs/mbedtls
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
