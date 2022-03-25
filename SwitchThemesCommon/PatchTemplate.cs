@@ -285,13 +285,16 @@ namespace SwitchThemes.Common
 			}
 		};
 
+		/* elys mod */
 		readonly static LayoutFilePatch NsoPatch = new LayoutFilePatch()
 		{
 			FileName = "blyt/RdtBtnLR.bflyt",
 			Patches = new PanePatch[]
 			{
-				new PanePatch { PaneName = "P_PictNso_00", Size = new Vector2(64,56),
+				new PanePatch { PaneName = "P_LR_00", Size = new Vector2(64,56),
 				UsdPatches = new List<UsdPatch>() { new UsdPatch() {PropName = "C_W", PropValues = new string[] { "100","100","100","100" }, type = 1 } }},
+				new PanePatch { PaneName = "P_LR_01", Visible = false } //testing - ELY M.
+								
 			}
 		};
 
@@ -356,7 +359,8 @@ namespace SwitchThemes.Common
 		readonly public static List<TextureReplacement> ResidentMenu = new List<TextureReplacement>
 		{
 			new TextureReplacement("album",     "RdtIcoPvr_00^s",   0x5050505, "blyt/RdtBtnPvr.bflyt",		"P_Pict_00",		64,56, AlbumPatch),
-			new TextureReplacement("nso",       "RdtIcoLR_00^s",    0x5050505, "blyt/RdtBtnLR.bflyt",       "P_PictNso_00",     64,56, NsoPatch),
+			/* elys mod */
+			new TextureReplacement("nso",       "RdtIcoLR_00^s",    0x5050505, "blyt/RdtBtnLR.bflyt",       "P_LR_00",     64,56, NsoPatch),
 			new TextureReplacement("news",      "RdtIcoNews_00^s",  0x5050505, "blyt/RdtBtnNtf.bflyt",		"P_PictNtf_00",		64,56, NtfPatch),
 			new TextureReplacement("shop",      "RdtIcoShop^s",     0x5050505, "blyt/RdtBtnShop.bflyt",		"P_Pict",			64,56, ShopPatch),
 			new TextureReplacement("controller","RdtIcoCtrl_00^s",  0x5050505, "blyt/RdtBtnCtrl.bflyt",		"P_Form",			64,56, CtrlPatch),

@@ -52,7 +52,7 @@ namespace SwitchThemes
 			if (Directory.Exists("Layouts"))
 			{
 				foreach (var f in Directory.GetFiles("Layouts").Where(x => x.EndsWith(".json")))
-					Layouts.Add(f,LayoutPatch.LoadTemplate(File.ReadAllText(f)));
+					Layouts.Add(f,LayoutPatch.Load(File.ReadAllText(f)));
 			}
 
 			HomeMenuPartBox.Items.AddRange(HomeMenuParts.Keys.ToArray());
@@ -66,12 +66,15 @@ namespace SwitchThemes
 		{
 			Text += " Ver. " + Info.CoreVer;
 			materialLabel10.Text = $"Switch Theme Injector Ver {Info.CoreVer} by exelix";
-#if DEBUG || CIRelease
+#if CIRelease
+			materialLabel10.Text += $" (Github build)";
+#endif
+#if DEBUG
 			lblDebug.Visible = true;
 #endif
 		}
 
-		#region AdvancedTools
+#region AdvancedTools
 		void EnableAdvanced()
 		{
 			if (!Advanced)
@@ -494,7 +497,7 @@ namespace SwitchThemes
 					builder.AddMainBg(File.ReadAllBytes(BgImage));
 
 				if (ExtraCommonLyt != null)
-					builder.AddCommonLayout(ExtraCommonLyt.AsByteArray());
+					builder.AddCommonLayout(ExtraCommonLyt);
 
 				if (target == "home")
 				{
@@ -547,7 +550,7 @@ namespace SwitchThemes
 
 		private void LayoutPatchList_OpenFile(string path, ComboBox comboBox)
 		{
-			comboBox.Items.Insert(1, LayoutPatch.LoadTemplate(File.ReadAllText(path)));
+			comboBox.Items.Insert(1, LayoutPatch.Load(File.ReadAllText(path)));
 			comboBox.SelectedIndex = 1;
 		}
 
@@ -582,13 +585,14 @@ namespace SwitchThemes
 			}
 			OpenFileDialog opn = new OpenFileDialog() { Filter = "json layout|*.json" };
 			if (opn.ShowDialog() != DialogResult.OK) return;
-			ExtraCommonLyt = LayoutPatch.LoadTemplate(File.ReadAllText(opn.FileName));
+			ExtraCommonLyt = LayoutPatch.Load(File.ReadAllText(opn.FileName));
 			lblCustomCommonLyt.Text = $"Custom common layout: {ExtraCommonLyt.ToString()}";
 			btnOpenCustomLayout.Text = "X";
 		}
 
 		private void HomeAppletIcoButtonsInit()
 		{
+			/* elys mod */
 			var btns = new List<Button> { btnApplet1, btnApplet2, btnApplet3, btnApplet4, btnApplet5, btnApplet6, btnApplet7 };
 			int i = 0;
 			foreach (var p in TextureReplacement.ResidentMenu)

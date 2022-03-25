@@ -39,8 +39,8 @@ EXEFS_SRC	:=	exefs_src
 ROMFS	:=	romfs
 
 APP_TITLE	:=	NXThemes Installer - elys mod
-APP_AUTHOR	:=	exelix - ELY M.  
-APP_VERSION := 2.7.1
+APP_AUTHOR	:=	exelix - ELY M.
+APP_VERSION := 2.6.5
 
 GITVER ?= Unknown
 #---------------------------------------------------------------------------------

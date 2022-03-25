@@ -15,7 +15,7 @@ namespace SwitchThemes.Common
 {
 	public static class Info
 	{
-		public const string CoreVer = "4.6";
+		public const string CoreVer = "4.6.5";
 		public const int NxThemeFormatVersion = 15;
 
 		public static Dictionary<string, string> PartToFileName = new Dictionary<string, string>() {
@@ -83,8 +83,11 @@ namespace SwitchThemes.Common
 			files.Add(name, data);
 		}
 
-		public void AddCommonLayout(byte[] data) => 
-			AddFile("common.json", data);
+		public void AddCommonLayout(string json) =>
+			AddFile("common.json", LayoutPatch.Load(json).AsByteArray());
+
+		public void AddCommonLayout(LayoutPatch data) =>
+			AddFile("common.json", data.AsByteArray());
 
 		public void AddMainBg(byte[] data)
 		{
@@ -94,7 +97,7 @@ namespace SwitchThemes.Common
 		}
 
 		public void AddMainLayout(string text) =>
-			AddMainLayout(LayoutPatch.LoadTemplate(text));
+			AddMainLayout(LayoutPatch.Load(text));
 
 		public void AddMainLayout(LayoutPatch l) {
 			if (l == null) return;
@@ -177,7 +180,7 @@ namespace SwitchThemes.Common
 		public bool PatchLayouts(LayoutPatch Patch) =>
 			PatchLayouts(Patch, PatchTemplate?.NXThemeName ?? "");
 		
-		public bool PatchLayouts(LayoutPatch Patch, string PartName)
+		private bool PatchLayouts(LayoutPatch Patch, string PartName)
 		{
 			var fw = FirmwareDetection.Detect(PartName, sarc);
 
@@ -222,7 +225,7 @@ namespace SwitchThemes.Common
 				AnimFilePatch[] animExtra = null;
 				if (Patch.HideOnlineBtn ?? true)
 					animExtra = NewFirmFixes.GetNoOnlineButtonFix(fw);
-				else if (!Anims.Any(x => x.FileName == "anim/RdtBase_SystemAppletPos.bflan"))
+				else if (NewFirmFixes.ShouldApplyAppletPositionFix(Anims))
 					animExtra = NewFirmFixes.GetAppletsPositionFix(fw);
 
 				if (animExtra != null)
