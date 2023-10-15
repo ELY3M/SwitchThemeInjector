@@ -6,10 +6,17 @@ using ExtensionMethods;
 using Syroot.BinaryData;
 using System.Linq;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace SwitchThemes.Common.Bflan
 {
-	public class BflanSection
+	public interface IBflanGenericCollection 
+	{
+		// The control ensures the type is correct
+		void InsertElement(object element);
+	}
+
+	public abstract class BflanSection : ICloneable
 	{
 		public string TypeName { get; set; }
 		public byte[] Data;
@@ -25,10 +32,8 @@ namespace SwitchThemes.Common.Bflan
 			Data = data;
 		}
 
-		public virtual void BuildData(ByteOrder byteOrder)
-		{
-			return;
-		}
+		public abstract void BuildData(ByteOrder byteOrder);
+		public abstract object Clone();
 
 		public virtual void Write(BinaryDataWriter bin)
 		{
@@ -119,12 +124,18 @@ namespace SwitchThemes.Common.Bflan
 			Data = mem.ToArray();
 		}
 
-		public override string ToString() => "[Pat1 section]";
+		public override object Clone()
+		{
+			BuildData(ByteOrder.LittleEndian);
+			return new Pat1Section(Data.ToArray(), ByteOrder.LittleEndian);
+		}
+
+        public override string ToString() => "[Pat1 section]";
 	}
 
 	[TypeConverter(typeof(ExpandableObjectConverter))]
-	public class Pai1Section : BflanSection
-	{
+	public class Pai1Section : BflanSection, IBflanGenericCollection
+    {
 		public UInt16 FrameSize { get; set; }
 		public byte Flags { get; set; }
 		public string[] Textures { get; set; } 
@@ -132,9 +143,17 @@ namespace SwitchThemes.Common.Bflan
 
 		public override string ToString() => "[Pai1 section]";
 
-		[TypeConverter(typeof(ExpandableObjectConverter))]
-		public class PaiEntry
-		{
+        public void InsertElement(object element)
+        {
+            if (element is PaiEntry)
+                Entries.Add((PaiEntry)element);
+            else
+                throw new Exception("Unsupported element type: " + element.GetType());
+        }
+
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+		public class PaiEntry : ICloneable, IBflanGenericCollection
+        {
 			public enum AnimationTarget : byte
 			{
 				Pane = 0,
@@ -148,7 +167,15 @@ namespace SwitchThemes.Common.Bflan
 			public List<PaiTag> Tags = new List<PaiTag>();
 			public byte[] UnkwnownData { get; set; } = new byte[0];
 
-			public PaiEntry() { }
+            public void InsertElement(object element)
+            {
+                if (element is PaiTag)
+                    Tags.Add((PaiTag)element);
+                else
+                    throw new Exception("Unsupported element type: " + element.GetType());
+            }
+
+            public PaiEntry() { }
 
 			public PaiEntry(BinaryDataReader bin)
 			{
@@ -195,11 +222,22 @@ namespace SwitchThemes.Common.Bflan
 			}
 
 			public override string ToString() => $"Pai entry: {Name} [{Target}]";
-		}
+
+            public object Clone()
+            {
+                return new PaiEntry 
+				{
+					Name = Name,
+                    Target = Target,
+                    Tags = Tags.Select(x => (PaiTag)x.Clone()).ToList(),
+                    UnkwnownData = UnkwnownData.ToArray()
+                };
+            }
+        }
 
 		[TypeConverter(typeof(ExpandableObjectConverter))]
-		public class PaiTag
-		{
+		public class PaiTag : ICloneable, IBflanGenericCollection
+        {
 			public uint Unknown { get; set; }
 			public string TagType { get; set; }
 			public List<PaiTagEntry> Entries = new List<PaiTagEntry>();
@@ -208,7 +246,15 @@ namespace SwitchThemes.Common.Bflan
 
 			public PaiTag() { }
 
-			public PaiTag(BinaryDataReader bin, byte TargetType)
+            public void InsertElement(object element)
+            {
+                if (element is PaiTagEntry)
+                    Entries.Add((PaiTagEntry)element);
+                else
+                    throw new Exception("Unsupported element type: " + element.GetType());
+            }
+
+            public PaiTag(BinaryDataReader bin, byte TargetType)
 			{
 				if (TargetType == 2)
 					Unknown = bin.ReadUInt32(); //This doesn't seem to be included in the offsets to the entries (?)
@@ -241,16 +287,26 @@ namespace SwitchThemes.Common.Bflan
 					bin.Position = EntryTable + i * 4;
 					bin.Write((uint)oldpos - sectionStart);
 					bin.Position = oldpos;
-					Entries[i].Write(bin, IsFLEU);
+                    Entries[i].Write(bin, IsFLEU);
 				}
 			}
 
 			public override string ToString() => "PaiTag: " + TagType;
-		}
+
+            public object Clone()
+            {
+				return new PaiTag
+				{
+					Unknown = Unknown,
+					TagType = TagType,
+					Entries = Entries.Select(x => (PaiTagEntry)x.Clone()).ToList()
+                };
+            }
+        }
 
 		[TypeConverter(typeof(ExpandableObjectConverter))]
-		public class PaiTagEntry
-		{
+		public class PaiTagEntry : ICloneable, IBflanGenericCollection
+        {
 			public byte Index { get; set; }
 			public byte AnimationTarget { get; set; }
 			public UInt16 DataType { get; set; }
@@ -263,7 +319,15 @@ namespace SwitchThemes.Common.Bflan
 
 			public PaiTagEntry() { }
 
-			public PaiTagEntry(BinaryDataReader bin, bool FLEU)
+            public void InsertElement(object element)
+            {
+                if (element is KeyFrame)
+                    KeyFrames.Add((KeyFrame)element);
+                else
+                    throw new Exception("Unsupported element type: " + element.GetType());
+            }
+
+            public PaiTagEntry(BinaryDataReader bin, bool FLEU)
 			{
 				uint tagStart = (uint)bin.Position;
 				Index = bin.ReadByte();
@@ -313,7 +377,21 @@ namespace SwitchThemes.Common.Bflan
 						bin.Write((byte)0);
 				}
 			}
-		}
+
+            public object Clone()
+            {
+                var clone = (PaiTagEntry)MemberwiseClone();
+				// Manually clone keyframes 
+				clone.KeyFrames = KeyFrames.Select(x => new KeyFrame
+				{
+					Blend = x.Blend,
+					Frame = x.Frame,
+					Value = x.Value,
+				}).ToList();
+
+				return clone;
+            }
+        }
 
 		[TypeConverter(typeof(ExpandableObjectConverter))]
 		public class KeyFrame
@@ -429,7 +507,13 @@ namespace SwitchThemes.Common.Bflan
 
 			Data = mem.ToArray();
 		}
-	}
+
+        public override object Clone()
+        {
+			BuildData(ByteOrder.LittleEndian);
+			return new Pai1Section(Data.ToArray(), ByteOrder.LittleEndian);
+        }
+    }
 
 	public class BflanFile
 	{

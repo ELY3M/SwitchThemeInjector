@@ -2,6 +2,7 @@
 using SwitchThemes.Common.Bflan;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using static SwitchThemes.Common.Bflan.Pai1Section;
 
@@ -79,7 +80,7 @@ namespace SwitchThemes.Common.Serializers
 		}
 	}
 
-	public struct Pat1Serializer
+	public class Pat1Serializer
 	{
 		public ushort AnimationOrder;
 		public string Name;
@@ -91,7 +92,7 @@ namespace SwitchThemes.Common.Serializers
 		public byte[] Unk_EndOfHeader;
 	}
 
-	public struct Pai1Serializer
+	public class Pai1Serializer
 	{
 		public UInt16 FrameSize;
 		public byte Flags;
@@ -126,7 +127,7 @@ namespace SwitchThemes.Common.Serializers
 		}
 	}
 
-	public struct PaiEntrySerializer
+	public class PaiEntrySerializer
 	{
 		public string Name; 
 		public byte Target;
@@ -161,7 +162,7 @@ namespace SwitchThemes.Common.Serializers
 		}
 	}
 
-	public struct PaiTagSerializer
+	public class PaiTagSerializer
 	{
 		public uint Unknown;
 		public string TagType;
@@ -194,7 +195,7 @@ namespace SwitchThemes.Common.Serializers
 		}
 	}
 
-	public struct PaiTagEntrySerializer
+	public class PaiTagEntrySerializer
 	{
 		public byte Index;
 		public byte AnimationTarget;
@@ -215,10 +216,9 @@ namespace SwitchThemes.Common.Serializers
 				FLEUUnknownInt = FLEUUnknownInt
 			};
 
-			foreach (var k in KeyFrames)
-				res.KeyFrames.Add(new KeyFrame() { Blend = k.Blend, Frame = k.Frame, Value = k.Value });
+            res.KeyFrames.AddRange(KeyFrames.Select(x => x.Deserialize()));
 
-			return res;
+            return res;
 		}
 
 		public static PaiTagEntrySerializer Serialize(PaiTagEntry entry)
@@ -240,10 +240,15 @@ namespace SwitchThemes.Common.Serializers
 		}
 	}
 
-	public struct KeyFrameSerializer
+	public class KeyFrameSerializer
 	{
 		public float Frame;
 		public float Value;
 		public float Blend;
+
+		public KeyFrame Deserialize()
+		{
+            return new KeyFrame() { Frame = Frame, Value = Value, Blend = Blend };
+        }
 	}
 }
