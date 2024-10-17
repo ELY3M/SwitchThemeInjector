@@ -65,6 +65,8 @@ namespace SwitchThemes.Common.Bflyt
 			set => flags = value ? (byte)(flags | 1) : unchecked((byte)(flags & (~1)));
 		}
 
+		public byte UnknownFlag { get; set; }
+
 		public enum BorderType : byte
 		{
 			Standard = 0,
@@ -122,7 +124,7 @@ namespace SwitchThemes.Common.Bflyt
 			TextAlign = dataReader.ReadByte();
 			LineAlignment = (LineAlign)dataReader.ReadByte();
 			flags = dataReader.ReadByte();
-			dataReader.ReadByte(); //padding
+			UnknownFlag = dataReader.ReadByte();
 			ItalicTilt = dataReader.ReadSingle();
 			uint TextOffset = dataReader.ReadUInt32();
 			FontTopColor = dataReader.ReadColorRGBA(); //+20
@@ -136,8 +138,15 @@ namespace SwitchThemes.Common.Bflyt
 			ShadowTopColor = dataReader.ReadColorRGBA(); //+64
 			ShadowBottomColor = dataReader.ReadColorRGBA();
 			ShadowItalic = dataReader.ReadSingle();
-			dataReader.Position = TextOffset - 8;
-			Text = dataReader.ReadString(TextLength, Encoding.Unicode);
+			
+			// This seems to only happen for panes that were created by us.
+			// Avoid crashing the layout editor so the file can be recovered but i don't know if TextOffset = 0 causes games to crash
+			// Adding panes is not well supported at this time anyway
+			if (TextOffset != 0)
+			{
+				dataReader.Position = TextOffset - 8;
+				Text = dataReader.ReadString(TextLength, Encoding.Unicode);
+			}
 		}
 
         protected override void ApplyChanges(BinaryDataWriter bin)
@@ -150,7 +159,7 @@ namespace SwitchThemes.Common.Bflyt
 			bin.Write((byte)TextAlign);
 			bin.Write((byte)LineAlignment);
 			bin.Write((byte)flags);
-			bin.Write((byte)0);
+			bin.Write((byte)UnknownFlag);
 			bin.Write(ItalicTilt);
 			bin.BaseStream.Position += 4; //Skip text offset
 			bin.Write(FontTopColor);
