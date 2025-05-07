@@ -327,9 +327,10 @@ namespace SwitchThemes.Common
 			FileName = "blyt/RdtBtnVgc.bflyt",
 			Patches = new PanePatch[]
 			{
-				new PanePatch { PaneName = "P_01", Size = new Vector2(64,56),
+				new PanePatch { PaneName = "P_Pict_00", Size = new Vector2(64,56),
 				UsdPatches = new List<UsdPatch>() { new UsdPatch() {PropName = "C_W", PropValues = new string[] { "100","100","100","100" }, type = 1 } }},
-				new PanePatch { PaneName = "P_00", Visible = false } //testing - ELY M.
+				new PanePatch { PaneName = "P_00", Visible = false },
+				new PanePatch { PaneName = "P_01", Visible = false } //testing - ELY M.
 								
 			}
 		};		
