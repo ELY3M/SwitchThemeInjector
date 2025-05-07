@@ -411,6 +411,8 @@ namespace SwitchThemes.Common
 			new TextureReplacement("album",     "RdtIcoPvr_00^s",   0x5050505, "blyt/RdtBtnPvr.bflyt",		"P_Pict_00",		64,56, AlbumPatch),
 			/* elys mod */
 			new TextureReplacement("nso",       "RdtIcoLR_00^s",    0x5050505, "blyt/RdtBtnLR.bflyt",       "P_LR_00",     64,56, NsoPatch),
+			new TextureReplacement("gcard",     "RdtIcoHomeVgc^s",    0x5050505, "blyt/RdtBtnLR.bflyt",       "P_00",     64,56, GCardPatch),
+			new TextureReplacement("gshare",    "RdtIcoHomeSplayFrame^s",    0x5050505, "blyt/RdtBtnLR.bflyt",       "P_Pict_00",     64,56, GSharePatch),			
 			new TextureReplacement("news",      "RdtIcoNews_00^s",  0x5050505, "blyt/RdtBtnNtf.bflyt",		"P_PictNtf_00",		64,56, NtfPatch),
 			new TextureReplacement("shop",      "RdtIcoShop^s",     0x5050505, "blyt/RdtBtnShop.bflyt",		"P_Pict",			64,56, ShopPatch),
 			new TextureReplacement("controller","RdtIcoCtrl_00^s",  0x5050505, "blyt/RdtBtnCtrl.bflyt",		"P_Form",			64,56, CtrlPatch),
