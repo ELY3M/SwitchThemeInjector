@@ -40,7 +40,7 @@ ROMFS	:=	romfs
 
 APP_TITLE	:=	NXThemes Installer - elys mod
 APP_AUTHOR	:=	exelix - ELY M.
-APP_VERSION := 2.7.1
+APP_VERSION := 2.7.3
 
 GITVER ?= Unknown
 #---------------------------------------------------------------------------------
