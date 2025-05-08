@@ -280,7 +280,7 @@ namespace Patches::textureReplacement {
 		{"nso",       "RdtIcoLR_00^s",    0x5050505, "blyt/RdtBtnLR.bflyt",      "P_LR_00",		64,56, GetPatch(NsoPatch)	},
 		{"gcard",     "RdtIcoHomeVgc^s",    0x5050505, "blyt/RdtBtnVgc.bflyt",      "P_Pict_00",		64,56, GetPatch(GCardPatch)	},
 		{"gshare",    "RdtIcoHomeSplayFrame^s",    0x5050505, "blyt/RdtBtnSplay.bflyt",      "P_Pict_00",		64,56, GetPatch(GSharePatch)	},		
-		{"news",      "RdtIcoNews_00^s",  0x5050505, "blyt/RdtBtnNtf.bflyt",     "P_PictNtf_00",64,56, GetPatch(NtfPatch)	},
+		//{"news",      "RdtIcoNews_00^s",  0x5050505, "blyt/RdtBtnNtf.bflyt",     "P_PictNtf_00",64,56, GetPatch(NtfPatch)	},
 		{"news",      "RdtIcoNews_00_Home^s",  0x5050505, "blyt/RdtBtnNtf.bflyt",     "P_PictNtf_00",64,56, GetPatch(NtfPatch)	},		
 		{"shop",      "RdtIcoShop^s",     0x5050505, "blyt/RdtBtnShop.bflyt",    "P_Pict",      64,56, GetPatch(ShopPatch)	},
 		{"controller","RdtIcoCtrl_00^s",  0x5050505, "blyt/RdtBtnCtrl.bflyt",    "P_Form",		64,56, GetPatch(CtrlPatch)	},
