@@ -5,3 +5,11 @@ GameShare = RdtBtnSplay.bflyt
 Virtual Game Card = RdtBtnVgc.bflyt 
 
 
+news icon is RdtIcoNews_00_Home^s  now  
+
+news might be broken, at least it comes out very wrong with theme "T16D0". It looks like the texture was renamed from RdtIcoNews_00^s to RdtIcoNews_00_Home^s .
+
+
+
+
+

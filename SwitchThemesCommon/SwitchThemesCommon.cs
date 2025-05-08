@@ -185,7 +185,13 @@ namespace SwitchThemes.Common
 			var fw = FirmwareDetection.Detect(PartName, sarc);
 
 			if (PartName == "home" && Patch.PatchAppletColorAttrib)
-				PatchBntxTextureAttribs(new Tuple<string, uint>("RdtIcoPvr_00^s", 0x5050505),
+				PatchBntxTextureAttribs(
+				   /* elys mod */
+				   new Tuple<string, uint>("RdtIcoLR_00^s", 0x5050505),
+				   new Tuple<string, uint>("RdtIcoHomeVgc^s", 0x5050505),
+				   new Tuple<string, uint>("RdtIcoHomeSplayFrame^s", 0x5050505),
+				   new Tuple<string, uint>("RdtIcoNews_00_Home^s", 0x5050505),	new Tuple<string, uint>("RdtIcoNews_01_Home^s", 0x5050505),			   
+				   new Tuple<string, uint>("RdtIcoPvr_00^s", 0x5050505),
 				   new Tuple<string, uint>("RdtIcoNews_00^s", 0x5050505), new Tuple<string, uint>("RdtIcoNews_01^s", 0x5050505),
 				   new Tuple<string, uint>("RdtIcoSet^s", 0x5050505), new Tuple<string, uint>("RdtIcoShop^s", 0x5050505),
 				   new Tuple<string, uint>("RdtIcoCtrl_00^s", 0x5050505), new Tuple<string, uint>("RdtIcoCtrl_01^s", 0x5050505),

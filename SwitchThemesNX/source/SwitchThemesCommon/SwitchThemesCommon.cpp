@@ -101,7 +101,11 @@ bool SzsPatcher::PatchLayouts(const LayoutPatch& patch)
 bool SzsPatcher::PatchLayouts(const LayoutPatch& patch, const string &partName)
 {
 	if (partName == "home" && patch.PatchAppletColorAttrib)
-		PatchBntxTextureAttribs({
+		PatchBntxTextureAttribs({			
+		    /* elys mod */		
+			{"RdtIcoLR_00^s",	0x2000000},
+			{"RdtIcoHomeVgc^s",	0x2000000}, {"RdtIcoHomeSplayFrame^s",	0x2000000},
+			{"RdtIcoNews_00_Home^s", 0x2000000}, {"RdtIcoNews_01_Home^s", 0x2000000},			
 			{"RdtIcoPvr_00^s",	0x2000000}, {"RdtIcoNews_00^s", 0x2000000},
 			{"RdtIcoNews_01^s", 0x2000000}, {"RdtIcoSet^s",		0x2000000},
 			{"RdtIcoShop^s",	0x2000000}, {"RdtIcoCtrl_00^s", 0x2000000},

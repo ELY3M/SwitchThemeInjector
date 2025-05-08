@@ -16,7 +16,8 @@ namespace SwitchThemes.Common
 			Fw8_0 = 4,
 			Fw9_0 = 5,
 			Fw10_0 = 6,
-			Fw11_0 = 7
+			Fw11_0 = 7,
+			Fw20_0 = 8
 		}
 
 		struct FirmInfo 
@@ -29,6 +30,10 @@ namespace SwitchThemes.Common
 		readonly static IReadOnlyDictionary<string, FirmInfo[]> FirmwareInfo = new Dictionary<string, FirmInfo[]>
 		{
 			{ "home", new FirmInfo[] {
+				new FirmInfo() {
+					Version = Firmware.Fw20_0,
+					MustContain = new string[] { @"blyt/RdtBtnSplay.bflyt", @"blyt/RdtBtnVgc.bflyt" },
+				},				
 				new FirmInfo() {
 					Version = Firmware.Fw11_0,
 					MustContain = new string[] { @"blyt/RdtBtnLR.bflyt" },
