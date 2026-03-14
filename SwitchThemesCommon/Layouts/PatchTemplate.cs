@@ -5,34 +5,34 @@ using Newtonsoft.Json;
 
 namespace SwitchThemes.Common
 {
-	/*
+    /*
 		The nxtheme format.
 		nxtheme files are a yaz0-compressed sarc archives, aka szs files but the content is fully custom.
-		A list of the allowed files follows, when a file has an alternative extension only one of the two can be in an archive:
-			info.json - this is mandatory and it contains a serialized ThemeFileManifest struct.
-				+ the Version field should be increased every time features are added
-			image.dds/jpg - The main bg image
-			layout.json - the main layout to be applied to the file, contains a serialized LayoutPatch struct
-		*at least one of these two files must be in the theme for it to be valid*
-		Home-menu only files: these files can only be present if the theme targets the home menu, all of them are optional.
-			common.json - a layout to be applied to the common.szs file
-			album.dds/png, news.dds/png, shop.dds/png, card.dds/png, controller.dds/png, nso.dds/png, settings.dds/png, share.dds/png, power.dds/png - custom applet icons
-		Lock-screen only files:
-			lock.dds/png - custom home icon
+		Starting with installer 5.0 a .nxtheme file can also be a normal zip, the content is the same.
 
-		non-DDS images are automatically converted by the installer to dds, as some algorithms may perform better than the built-in one the injector still uses dds images
+		A valid theme file should contain the info.json file which contains a serialized ThemeFileManifest struct.
 		
-		 Deprecated files:
+		A valid theme file should also contain one of the following:
+		- A wallpaper for the part it targets: image.jpg or image.dds (only one of the two. Dds images are allowed only in with the DXT1 encoding)
+		- A custom layout for the part it targets: layout.json
+
+		Each theme part may include its own specific additional resources in the form of a common.json layout or additional .png or .dds icons
+		Non-DDS images are automatically converted by the installer to dds, as some algorithms may perform better than the built-in one the dds format is to be preferred.
+		
+		Deprecated files:
 			Preview.png - an image used for previewing the dds, not supported anymore as the installer now can load the dds directly
 	*/
 
-	public class ThemeFileManifest
+    public class ThemeFileManifest
 	{
 		public int Version;
+		public string Target;
+
 		public string Author;
 		public string ThemeName;
 		public string LayoutInfo;
-		public string Target;
+
+		public string Id;
 
 		public string Serialize(bool indent = false)
 		{
@@ -73,46 +73,6 @@ namespace SwitchThemes.Common
 		public bool DirectPatchPane = false;
 		public bool NoRemovePanel = false;
 		public bool RequiresCodePatch = false;
-
-#if WIN
-#if DEBUG
-		public static void BuildTemplateFile()
-		{
-			JsonSerializerSettings settings = new JsonSerializerSettings()
-			{
-				Formatting = Formatting.Indented,
-				DefaultValueHandling = DefaultValueHandling.Ignore,
-				NullValueHandling = NullValueHandling.Ignore,
-				ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-			};
-
-			string json = JsonConvert.SerializeObject(DefaultTemplates.Templates, settings);
-			System.IO.File.WriteAllText("DefaultTemplates.json", json);
-		}
-#endif
-		public class ExtraTemplateResult 
-		{
-			public PatchTemplate[] Result;
-			public Exception Exception;
-        }
-		
-        // Returns null in case of errors
-		public static ExtraTemplateResult LoadExtraTemplates()
-		{
-			if (System.IO.File.Exists("ExtraTemplates.json"))
-			{
-				try { 
-					var res = JsonConvert.DeserializeObject<PatchTemplate[]>(System.IO.File.ReadAllText("ExtraTemplates.json"));
-					return new ExtraTemplateResult { Result = res };
-                }
-                catch (Exception e)
-                {
-                    return new ExtraTemplateResult { Exception = e };
-                }
-            }
-            return new ExtraTemplateResult { Result = new PatchTemplate[0] };
-        }
-#endif
 	}
 
 	public static class DefaultTemplates
@@ -252,7 +212,7 @@ namespace SwitchThemes.Common
 		#region Patches
 
 		/*
-		 * The C_W property is weird, it seems to affect color in some way, it has 4 values but doesn't seem to argb or similar.
+		 * The C_W property is weird, it seems to affect color in some way, it has 4 values but doesn't seem to be argb or similar.
 		 * the value [90,0,0,0] makes the eshop color.
 		 * [100,100,100,100] is the value chosen for custom icons, it makes a white-ish color using dark theme and wrks fine for replacing the color,
 		 * For some reason though the replaced color doesn't work as well when the white theme is enabled in the console settings, still not sure why.

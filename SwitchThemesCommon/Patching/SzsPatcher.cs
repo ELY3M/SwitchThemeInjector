@@ -40,26 +40,15 @@ namespace SwitchThemes.Common.Patching
                 TargetFirmware = FirmwareDetection.Detect(PatchTemplate.NXThemeName, Sarc);
             else
                 TargetFirmware = ConsoleFirmware.Invariant;
+
+            if (Sarc.Files.ContainsKey(@"timg/__Combined.bntx"))
+                bntx = new QuickBntx(Sarc.Files[@"timg/__Combined.bntx"]);
         }
 
-        void SaveBntx()
+        public void FinalizeBntx()
         {
             if (bntx == null) return;
             Sarc.Files[@"timg/__Combined.bntx"] = bntx.Write();
-            bntx = null;
-        }
-
-        QuickBntx GetBntx()
-        {
-            if (bntx != null) return bntx;
-            bntx = new QuickBntx(Sarc.Files[@"timg/__Combined.bntx"]);
-            return bntx;
-        }
-
-        public SarcData GetFinalSarc()
-        {
-            SaveBntx();
-            return Sarc;
         }
 
         private void ApplyRawPatch(LayoutPatch patch)
@@ -158,7 +147,7 @@ namespace SwitchThemes.Common.Patching
             return remove.Count;
         }
 
-        private bool PatchLayouts(LayoutPatch Patch, string PartName)
+        public bool PatchLayouts(LayoutPatch Patch, string PartName)
         {
             // Compatibility flags
             bool useLegacyFixes = false;
@@ -212,8 +201,7 @@ namespace SwitchThemes.Common.Patching
             if (useModernFixes)
                 modernFix = NewFirmFixes.GetFix(Patch, TargetFirmware);
 
-            if (CompatFixes != LayoutCompatibilityOption.DisableFixes)
-                FilterIncompatibleAnimations(Patch);
+            FilterIncompatibleAnimations(Patch);
 
             // Then json patches
             ApplyRawPatch(Patch);
@@ -230,7 +218,8 @@ namespace SwitchThemes.Common.Patching
 
         public bool PatchBntxTexture(byte[] DDS, string[] texNames, uint TexFlag = 0xFFFFFFFF)
         {
-            QuickBntx q = GetBntx();
+            QuickBntx q = bntx;
+
             if (q.Rlt.Length != 0x80)
                 return false;
             // Replace the first texture whose name in the list is present.
@@ -298,7 +287,7 @@ namespace SwitchThemes.Common.Patching
             Sarc.Files[template.MainLayoutName] = MainFile.SaveFile();
 
             //PatchBGBntx
-            QuickBntx q = GetBntx();
+            QuickBntx q = bntx;
             if (q.Rlt.Length != 0x80)
                 return false;
             q.ReplaceTex(template.MaintextureName, DDS);
@@ -326,7 +315,7 @@ namespace SwitchThemes.Common.Patching
 
         public bool PatchBntxTextureAttribs(params Tuple<string, UInt32>[] patches)
         {
-            QuickBntx q = GetBntx();
+            QuickBntx q = bntx;
             if (q.Rlt.Length != 0x80)
                 return false;
             try

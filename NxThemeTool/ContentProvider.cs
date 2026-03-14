@@ -1,7 +1,9 @@
 ﻿using SARCExt;
+using SwitchThemes.Common;
 using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NxThemeTool
 {
@@ -19,14 +21,70 @@ namespace NxThemeTool
 
     public static class ProviderHelper
     {
+        public static IContentProvider OpenFor(byte[] data)
+        {
+            if (IsSzsFormat(data))
+            {
+                var decompressed = ManagedYaz0.Decompress(data);
+                return new SarcContentProvider(SARC.Unpack(decompressed));
+            }
+            else if (IsZipFormat(data))
+            {
+                return new ZipContentProvider(new MemoryStream(data));
+            }
+
+            throw new InvalidDataException("Data is not in a recognized format (SARC or ZIP).");
+        }
+
         public static IContentProvider OpenFor(string path)
         {
             if (Directory.Exists(path))
                 return new DirectoryContentProvider(path);
+
             if (File.Exists(path))
-                return new ZipContentProvider(File.OpenRead(path));
+            {
+                var file = File.OpenRead(path);
+                var format = IdentifyFormat(file);
+                
+                if (format == Format.Sarc)
+                {
+                    file.Dispose();
+
+                    var decompressed = ManagedYaz0.Decompress(File.ReadAllBytes(path));
+                    return new SarcContentProvider(SARC.Unpack(decompressed));
+                }
+                else if (format == Format.Zip)
+                {
+                    return new ZipContentProvider(file);
+                }
+            }
 
             throw new FileNotFoundException($"Path '{path}' does not exist as a directory or file.");
+        }
+
+        public static bool IsSzsFormat(ReadOnlySpan<byte> fileHeader) => ManagedYaz0.IsYaz0(fileHeader.ToArray());
+        public static bool IsSzsFormat(byte[] fileHeader) => ManagedYaz0.IsYaz0(fileHeader);
+
+        public static bool IsZipFormat(ReadOnlySpan<byte> fileHeader) => fileHeader.Length > 4 && fileHeader[0] == 'P' && fileHeader[1] == 'K';
+        public static bool IsZipFormat(byte[] fileHeader) => IsZipFormat(fileHeader.AsSpan());
+
+        public enum Format
+        {
+            Sarc,
+            Zip,
+            Unknown
+        }
+
+        // This will rewind the stream
+        public static Format IdentifyFormat(Stream stream)
+        {
+            var bytes = new byte[10];
+            stream.Read(bytes, 0, bytes.Length);
+            stream.Seek(0, SeekOrigin.Begin);
+
+            if (IsSzsFormat(bytes)) return Format.Sarc;
+            if (IsZipFormat(bytes)) return Format.Zip;
+            return Format.Unknown;
         }
     }
 
