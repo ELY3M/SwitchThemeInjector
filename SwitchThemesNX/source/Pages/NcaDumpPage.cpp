@@ -29,12 +29,10 @@ void NcaDumpPage::Render(int X, int Y)
 
 	ImGui::TextWrapped(
 		"This page allows extracting the RomFS of the home menu and related titles.\n\n"
-		"For regular usage of the theme installer you do not need this feature, it is done automaticaly when installing a theme."
+		"This option allows extracting the common szs files (for example, ResidentMenu.szs) to your SD card so you can create custom layouts. For simply installing themes you do not need this feature, it is done automaticaly done during installation."
 	);
 
-	ImGui::NewLine();
-
-	if (ImGui::Button("Extract layout files"))
+	if (ImGui::Button("Extract szs layout files"))
 	{
 		PushFunction([]() 
 		{
@@ -61,6 +59,11 @@ void NcaDumpPage::Render(int X, int Y)
 		});
 	}
 
+	ImGui::NewLine();
+
+	ImGui::TextWrapped(
+		"If you need the complete set of files of the home menu you can extract the raw NCA. To extract this you will need hactool or similar software on your computer."
+	);
 	if (ImGui::Button("Extract raw NCA files"))
 	{
 		PushFunction([]()
