@@ -46,9 +46,19 @@ class DialogPage : public IUIControlObj
 class YesNoPage : public IUIControlObj
 {
 	public:
-		static bool Ask(const std::string &msg);
+		static bool Ask(
+			const std::string& msg,
+			const std::string& yes = "",
+			const std::string& no = ""
+		);
 	
-		YesNoPage(const std::string &msg, bool *outRes);	
+		YesNoPage(
+			const std::string &msg, 
+			bool *outRes,
+			const std::string& yes = "",
+			const std::string& no = ""
+		);	
+
 		~YesNoPage() override {};
 
 		void Render(int X, int Y) override;
@@ -57,4 +67,7 @@ class YesNoPage : public IUIControlObj
 	private:
 		bool *result;	
 		std::string text;
+		std::string yesBtn;
+		std::string noBtn;
+		bool multilineLayout;
 };

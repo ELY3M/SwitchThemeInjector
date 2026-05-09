@@ -310,9 +310,25 @@ int main(int argc, char **argv)
 
 	PatchMng::Init();
 
+	QlaunchPatchPage* patchPage = new QlaunchPatchPage();
+	bool missingPatches = patchPage->ShouldShow();
+
 	if (envHasArgv() && argc > 1)
 	{
-		PatchMng::EnsureInstalled(); // no checks here :(
+		if (missingPatches)
+		{
+			// We don't have rendering here so at most we can show a yes/no dialog.
+			if (YesNoPage::Ask(
+				"You are missing home menu patches needed for lock screen themes. If you install a theme that is not compatibile it will cause your console to crash on boot.\n\n"
+				"The theme installer can download these patches automatically.\nDo you want to open the download page?\n\n",
+				"Cancel installation and open patch settings",
+				"Continue installing anyway (not recommended)"
+			))
+			{
+				goto SKIP_ARGUMENTS;
+			}
+		}
+
 		auto paths = GetArgsInstallList(argc,argv);
 		if (paths.size() != 0)
 		{
@@ -322,13 +338,12 @@ int main(int argc, char **argv)
 	}	
 	else
 	{
+		SKIP_ARGUMENTS:
 		TabRenderer *t = new TabRenderer();
 		PushPage(t);
-		
-		QlaunchPatchPage* patchPage = new QlaunchPatchPage();
 
 		// Internally calls patchmng
-		if (patchPage->ShouldShow())
+		if (missingPatches)
 			t->AddPage(patchPage);
 
 		ThemesPage *p = new ThemesPage();
@@ -350,7 +365,6 @@ int main(int argc, char **argv)
 
 		MainLoop();
 		
-		delete patchPage;
 		delete p;
 		delete up;
 		delete dp;
@@ -359,6 +373,8 @@ int main(int argc, char **argv)
 		delete credits;
 		delete q;
 	}
+
+	delete patchPage;
 
 	while (Pages.size() != 0)
 	{

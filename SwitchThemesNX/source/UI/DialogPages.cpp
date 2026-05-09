@@ -50,9 +50,14 @@ void DialogPage::Update()
 		PopPage(this);
 }
 
-YesNoPage::YesNoPage(const string &msg, bool *outRes): text(msg) 
+YesNoPage::YesNoPage(const string& msg, bool* outRes, const std::string& yes, const std::string& no) : text(msg)
 {
 	result = outRes;
+
+	yesBtn = yes.empty() ? "      YES      " : "  " + yes + "  ";
+	noBtn = no.empty() ? "      NO      " : "  " + no + "  ";
+
+	multilineLayout = yesBtn.size() > 20 || noBtn.size() > 20;
 }
 
 void YesNoPage::Render(int X, int Y)
@@ -66,7 +71,17 @@ void YesNoPage::Render(int X, int Y)
 	ImGui::TextUnformatted(text.c_str());
 	ImGui::PopTextWrapPos();
 
-	int res = Utils::ImGuiCenterButtons({ "      YES      ", "      NO      " });
+	int res = -1;
+
+	if (multilineLayout)
+	{
+		if (Utils::ImGuiCenterButton(yesBtn)) res = 0;
+		if (Utils::ImGuiCenterButton(noBtn)) res = 1;
+	}
+	else
+	{
+		res = Utils::ImGuiCenterButtons({ yesBtn, noBtn });;
+	}
 
 	if (res == 0)
 	{
@@ -89,10 +104,10 @@ void YesNoPage::Update()
 
 }
 
-bool YesNoPage::Ask(const std::string &msg)
+bool YesNoPage::Ask(const std::string &msg, const std::string& yes, const std::string& no)
 {
 	bool result = false;
-	PushPageBlocking(new YesNoPage(msg, &result));
+	PushPageBlocking(new YesNoPage(msg, &result, yes, no));
 	return result;
 }
 
