@@ -2,7 +2,7 @@
 #include "../ViewFunctions.hpp"
 
 #include "../SwitchTools/hactool.hpp"
-#include "../SwitchTools/RomFsCache.hpp"
+#include "../SwitchTools/RomfsCache.hpp"
 #include "../fs.hpp"
 #include "../SwitchThemesCommon/NXTheme.hpp"
 
