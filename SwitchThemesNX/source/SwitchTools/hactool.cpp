@@ -195,6 +195,13 @@ private:
 	}
 };
 
+std::vector<uint8_t> hactool::GetNca(uint64_t contentId)
+{
+	auto context = hactool::Initialize();
+	std::string ncaPath = context->getNcaPath(contentId);
+	return fs::OpenFile(ncaPath);
+}
+
 std::unordered_map<std::string, std::vector<u8>> hactool::ExtractFiles(u64 contentId, std::vector<std::string> files)
 {
 	DisplayLoading("Extracting RomFS content...");

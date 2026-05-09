@@ -14,7 +14,7 @@ void UninstallPage::Render(int X, int Y)
 	Utils::ImGuiSetupPage(this, X, Y);
 	ImGui::PushFont(font30);
 
-	ImGui::TextWrapped("Use this to uninstall the currently installed themes.\nIf you have issues, you can try removing the whole LayeredFS folder and code patches.");
+	ImGui::TextWrapped("Use this to uninstall the currently installed themes.\nIf you are facing issues, you can try removing the whole LayeredFS folder and code patches.");
 
 	ImGui::PushStyleColor(ImGuiCol_Button, u32(0x6B70000ff));
 	

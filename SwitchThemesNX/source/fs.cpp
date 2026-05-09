@@ -208,6 +208,16 @@ string fs::GetParentDir(const string& path)
 	return _path.substr(0, _path.find_last_of("/\\") + 1);
 }
 
+string fs::JoinPath(const string& first, const string& second)
+{
+	string path = first;
+	if (!StrEndsWith(path, "/"))
+		path.append("/");
+
+	path.append(second);
+	return path;
+}
+
 void fs::RemoveSystemDataDir()
 {
 	RecursiveDeleteFolder(path::SystemDataFolder);

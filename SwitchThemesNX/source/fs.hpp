@@ -58,6 +58,7 @@ namespace fs {
 	std::string GetFileName(const std::string& path);
 	std::string GetPath(const std::string& path);
 	std::string GetParentDir(const std::string& path);
+	std::string JoinPath(const std::string& first, const std::string& second);
 
 	void RecursiveDeleteFolder(const std::string& path);
 
