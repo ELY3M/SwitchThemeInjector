@@ -45,8 +45,9 @@ namespace SwitchThemesCommonTests
 				patcher.PatchLayouts(l);
 			}
 
-			var final = patcher.GetFinalSarc();
-			CompareSarc(final, exp);
+			patcher.FinalizeBntx();
+
+			CompareSarc(src, exp);
 		}
 
 		[TestMethod]

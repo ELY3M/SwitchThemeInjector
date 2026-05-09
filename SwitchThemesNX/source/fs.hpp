@@ -55,7 +55,11 @@ namespace fs {
 	static inline void CreateDirectory(const std::string& path) { std::filesystem::create_directories(path); }
 	static inline void DeleteDirectory(const std::string& path) { rmdir(path.c_str()); }
 
-	std::string GetFileName(const std::string& path);
+	constexpr std::string GetFileName(const std::string& path)
+	{
+		return path.substr(path.find_last_of("/\\") + 1);
+	}
+
 	std::string GetPath(const std::string& path);
 	std::string GetParentDir(const std::string& path);
 	std::string JoinPath(const std::string& first, const std::string& second);

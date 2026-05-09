@@ -189,11 +189,6 @@ void fs::EnsureDownloadsFolderExists()
 		CreateDirectory(path::DownloadsFolder);
 }
 
-string fs::GetFileName(const string& path)
-{
-	return path.substr(path.find_last_of("/\\") + 1);
-}
-
 string fs::GetPath(const string& path)
 {
 	return path.substr(0, path.find_last_of("/\\") + 1);
