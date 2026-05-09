@@ -86,9 +86,16 @@ void ThemesPage::SetDir(const string &dir)
 		if (fs::GetPath(f) == CurrentDir)
 			DirectoryFiles.push_back(f);
 	
-	pageCount = DirectoryFiles.size() / LimitLoad + 1;
-	if (DirectoryFiles.size() % LimitLoad == 0)
-		pageCount--;
+	if (DirectoryFiles.size() == 0)
+	{
+		pageCount = 1;
+	}
+	else 
+	{
+		pageCount = DirectoryFiles.size() / LimitLoad + 1;
+		if (DirectoryFiles.size() % LimitLoad == 0)
+			pageCount--;
+	}	
 
 	pageNum = -1; //force setpage to reload the entries even if in the same page as the path changed
 	if (CursorMemory.count(dir))
@@ -108,9 +115,6 @@ void ThemesPage::SetPage(int num, int index)
 {
 	ImGui::NavMoveRequestCancel();
 
-	// There are no files, nothing to do here
-	if (DirectoryFiles.size() == 0) return;
-
 	// Reset scroll if we're changing the page or the menu index
 	ResetScroll = num != pageNum || index != menuIndex;
 
@@ -125,19 +129,27 @@ void ThemesPage::SetPage(int num, int index)
 		DisplayEntries.clear();
 		pageNum = num;
 
-		size_t baseIndex = num * LimitLoad;
-		if (baseIndex >= DirectoryFiles.size())
+		if (!DirectoryFiles.size())
 		{
-			// This shouldn't happen
-			lblPage = "Error page out of bounds";
+			lblPage = CurrentDir + " There are no files in this folder. Press B to go back.";
 			return;
 		}
+		else 
+		{
+			size_t baseIndex = num * LimitLoad;
+			if (baseIndex >= DirectoryFiles.size())
+			{
+				// This shouldn't happen
+				lblPage = "Error page out of bounds";
+				return;
+			}
 
-		int imax = DirectoryFiles.size() - baseIndex;
-		if (imax > LimitLoad) imax = LimitLoad;
+			int imax = DirectoryFiles.size() - baseIndex;
+			if (imax > LimitLoad) imax = LimitLoad;
 
-		for (int i = 0; i < imax; i++)
-			DisplayEntries.push_back(ThemeEntry::FromFile(DirectoryFiles[baseIndex + i]));
+			for (int i = 0; i < imax; i++)
+				DisplayEntries.push_back(ThemeEntry::FromFile(DirectoryFiles[baseIndex + i]));
+		}
 
 		UpdateBottomText();
 	}
@@ -154,12 +166,22 @@ void ThemesPage::Render(int X, int Y)
 	if (ImGui::GetCurrentWindow()->Appearing && fs::theme::ShouldRescanThemeList())
 		PushFunction([this]() { RefreshThemesList(); });
 
-	if (DisplayEntries.size() == 0)
-		ImGui::TextWrapped(
-			"There's nothing here, copy your themes in the themes folder on your sd and try again.\n\n"
-			"If you do have a themes folder in your sd with themes make sure that the name is all lowercase and that you don't have the archive bit issue (most likely if you use a mac) or sd corruption if you use exfat.\n\n"
-			"You can find more about those on google or ask for support on discord."
-		);
+	if (DisplayEntries.size() == 0) {
+		if (CurrentDir != fs::path::ThemesFolder)
+		{
+			ImGui::TextWrapped("This folder is empty.");
+
+			if (ImGui::Button("Go to the previous folder"))
+				SetDir(fs::GetParentDir(CurrentDir));
+		}
+		else {
+			ImGui::TextWrapped(
+				"There's nothing here, copy your themes in the themes folder on your sd and try again.\n\n"
+				"If you do have a themes folder in your sd with themes make sure that the name is all lowercase and that you don't have the archive bit issue (most likely if you use a mac) or sd corruption if you use exfat.\n\n"
+				"You can find more about those on google or ask for support on discord."
+			);
+		}
+	}
 
 	ImGui::SetCursorPosY(600);
 	Utils::ImGuiRightString(lblPage);
