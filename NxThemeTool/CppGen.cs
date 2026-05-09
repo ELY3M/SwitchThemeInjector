@@ -192,6 +192,7 @@ namespace NxThemeTool
             sb.StartLine("vector<PatchTemplate> Patches::DefaultTemplates = ");
 
             WriteCppValue(sb, DefaultTemplates.Templates);
+            sb.Append(";");
 
             File.WriteAllText(Path.Join(RootDir, "PatchTemplates.g.cpp"), sb.ToString());
         }
@@ -204,6 +205,7 @@ namespace NxThemeTool
             sb.StartLine("unordered_map<string, vector<TextureReplacement>> Patches::textureReplacement::NxNameToList = ");
 
             WriteCppValue(sb, TextureReplacement.NxNameToList);
+            sb.Append(";");
 
             File.WriteAllText(Path.Join(RootDir, "TextureReplacement.g.cpp"), sb.ToString());
         }
