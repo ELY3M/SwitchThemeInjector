@@ -1,13 +1,16 @@
 #include "hactool.hpp"
 #include "../Dialogs.hpp"
-#include "../Pages/NcaDumpPage.hpp"
+#include "../SwitchThemesCommon/NXTheme.hpp"
+#include "../fs.hpp"
 #include "key_loader.hpp"
 
+#include <algorithm>
 #include <sstream>
 #include <cstring>
 #include <hactool.h>
 #include <vector>
 #include <map>
+#include <iomanip>
 
 #if __SWITCH__
 #include <unistd.h>
@@ -17,24 +20,25 @@
 enum class ExtractionTarget
 {
 	RomFS,
+	// This is hardcoded in our hactool fork to only extract the file called "main" from the exefs
 	ExeFS,
 };
 
 class HactoolHelper
 {
 	std::unique_ptr<hactool::ExtractionContext> context;
-	std::string fiter = "";
+	std::vector<std::string> exactFilter = {};
 	std::string ncaFile;
 	ExtractionTarget target;
 
 public:
-	std::map<std::string, std::vector<u8>> ExtractedFiles;
+	std::unordered_map<std::string, std::vector<u8>> ExtractedFiles;
 
 	HactoolHelper(ExtractionTarget t) : 
 		context(hactool::Initialize()),
 		target(t) 
 	{
-		UseFilter(nullptr);
+
 	}
 
 	HactoolHelper& ContentID(u64 id)
@@ -42,12 +46,23 @@ public:
 		return NcaPath(context->getNcaPath(id));
 	}
 
-	HactoolHelper& UseFilter(const char* filter)
+	HactoolHelper& ClearFilters()
 	{
-		if (filter)
-			fiter = filter;
-		else
-			fiter = "";
+		exactFilter.clear();
+		return *this;
+	}
+
+	HactoolHelper& AddFilter(const char* filter)
+	{
+		exactFilter.push_back(filter);
+		return *this;
+	}
+
+	HactoolHelper& AddFilters(const std::vector<std::string>& vec)
+	{
+		for (const auto& filter : vec)
+			exactFilter.push_back(filter);
+
 		return *this;
 	}
 	
@@ -149,17 +164,17 @@ private:
 	{
 		HactoolHelper* helper = (HactoolHelper*)context;
 
-		if (helper->fiter.empty())
+		if (helper->exactFilter.empty())
 			return true;
 
 #if !__SWITCH__
-		std::string s(str);
-		fs::path::ToUnixSeparators(s);
-		return s.find(helper->fiter) != std::string::npos;
+		std::string path(str);
+		fs::path::ToUnixSeparators(path);
+#else
+		std::string_view path(str);
 #endif
 
-		std::string_view strView(str);
-		return strView.find(helper->fiter) != std::string_view::npos;
+		return std::find(helper->exactFilter.begin(), helper->exactFilter.end(), path) != helper->exactFilter.end();
 	}
 
 	static void OnFileDumped(void* context, const char* file_name, unsigned char* file_data, size_t length)
@@ -180,61 +195,32 @@ private:
 	}
 };
 
-//Don't use this multiple times from the same archive
-static void NcaExtractSingleFile(const std::string &file, u64 id, const std::string &targetName)
-{	
-	auto extractor = HactoolHelper{ ExtractionTarget::RomFS };
-	extractor.ContentID(id)
-		.UseFilter(file.c_str())
-		.Process();
-
-	if (extractor.ExtractedFiles.size() == 0)
-		throw std::runtime_error(file + " not found in the target nca !");
-
-	auto& data = extractor.ExtractedFiles.begin()->second;
-	fs::WriteFile(fs::path::SystemDataFolder + targetName, data);
-}
-
-void hactool::ExtractPlayerSelectMenu()
+std::unordered_map<std::string, std::vector<u8>> hactool::ExtractFiles(u64 contentId, std::vector<std::string> files)
 {
-	DisplayLoading("Extracting player select menu...");
-	NcaExtractSingleFile("lyt/Psl.szs", PslID, "Psl.szs");
-}
+	DisplayLoading("Extracting RomFS content...");
 
-void hactool::ExtractUserPage()
-{
-	DisplayLoading("Extracting user page...");
-	NcaExtractSingleFile("lyt/MyPage.szs", UserPageID, "MyPage.szs");
-}
-
-void hactool::ExtractHomeMenu()
-{	
-	DisplayLoading("Extracting home menu...");
-	
 	auto ext = HactoolHelper{ ExtractionTarget::RomFS };
-	ext.ContentID(QlaunchID)
-		.UseFilter("lyt/")
+	ext.ContentID(contentId)
+		.AddFilters(files)
 		.Process();
 
-	if (!ext.ExtractedFiles.count("/lyt/ResidentMenu.szs"))
-		throw std::runtime_error("ResidentMenu not found in the extracted NCA content");	
-
-	for (auto& file : ext.ExtractedFiles)
+	for (auto& file : files)
 	{
-		fs::WriteFile(fs::path::SystemDataFolder + fs::GetFileName(file.first), file.second);
+		if (!ext.ExtractedFiles.count(file))
+			throw std::runtime_error(file + " not found in the extracted NCA content");
 	}
-	
-	NcaDumpPage::WriteHomeNcaVersion();
+
+	return ext.ExtractedFiles;
 }
 
 std::array<u8, 32> hactool::GetTitleBuildID(u64 contentID)
 {
 	auto extractor = HactoolHelper{ ExtractionTarget::ExeFS };
-	extractor.ContentID(QlaunchID)
+	extractor.ContentID(contentID)
 		.Process();
 
 	if (extractor.ExtractedFiles.size() != 1)
-		throw std::runtime_error("Home menu main extraction error");
+		throw std::runtime_error("Title exefs should only extract the main executable");
 
 	auto& data = extractor.ExtractedFiles.begin()->second;
 
@@ -261,5 +247,5 @@ std::string hactool::BuildIDToString(std::array<u8, 32> data)
 
 std::string hactool::QlaunchBuildID()
 {
-	return BuildIDToString(GetTitleBuildID(QlaunchID));
+	return BuildIDToString(GetTitleBuildID(ThemeTargetInfo::QlaunchID));
 }

@@ -85,7 +85,12 @@ unique_ptr<ThemeEntry> ThemeEntry::FromFile(const std::string& fileName)
 	try {
 		if (filesystem::is_directory(fileName))
 		{
-			auto&& e = make_unique<DummyEntry>(fileName, fs::GetFileName(fileName), fileName, "folder");
+			// By convention all folder entries should end with a /
+			auto fullPath = fileName;
+			if (!StrEndsWith(fullPath, "/"))
+				fullPath += "/";
+
+			auto&& e = make_unique<DummyEntry>(fullPath, fs::GetFileName(fileName), fileName, "folder");
 			e->Folder = true;
 			return move(e);
 		}

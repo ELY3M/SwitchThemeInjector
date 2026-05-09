@@ -14,7 +14,4 @@ class NcaDumpPage : public IPage
 		
 		void Render(int X, int Y) override;
 		void Update() override;
-		
-		static void CheckHomeMenuVer();
-		static void WriteHomeNcaVersion();
 };

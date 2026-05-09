@@ -138,6 +138,7 @@ void hactool::LoadKeys(hactool_settings_t* settings)
 
 #else
 
+#include "../SwitchThemesCommon/NXTheme.hpp"
 #include <cstdio>
 
 hactool::ExtractionContext::ExtractionContext()
@@ -152,7 +153,7 @@ hactool::ExtractionContext::~ExtractionContext() noexcept(false)
 
 std::string hactool::ExtractionContext::getNcaPath(uint64_t id)
 {
-	return SD_PREFIX "/qlaunch.nca";
+	return std::string(SD_PREFIX "/") + ThemeTargetInfo::TitleIdToString(id) + ".nca";
 }
 
 std::unique_ptr<hactool::ExtractionContext> hactool::Initialize()

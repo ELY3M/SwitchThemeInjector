@@ -1,8 +1,6 @@
 #pragma once
 #include "API.hpp"
-#include "../../UI/UI.hpp"
 #include <vector>
-#include "../../SwitchThemesCommon/Layouts/Base64.hpp"
 #include "Worker.hpp"
 
 namespace RemoteInstall

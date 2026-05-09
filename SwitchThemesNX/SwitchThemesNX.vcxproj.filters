@@ -403,6 +403,9 @@
     <ClInclude Include="source\SwitchTools\key_loader.hpp">
       <Filter>SwitchTools</Filter>
     </ClInclude>
+    <ClInclude Include="source\SwitchTools\RomfsCache.hpp">
+      <Filter>SwitchTools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\UI\imgui\imgui_demo.cpp">
@@ -874,6 +877,9 @@
       <Filter>Libs\mbedtls</Filter>
     </ClCompile>
     <ClCompile Include="source\SwitchTools\key_loader.cpp">
+      <Filter>SwitchTools</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SwitchTools\RomfsCache.cpp">
       <Filter>SwitchTools</Filter>
     </ClCompile>
   </ItemGroup>

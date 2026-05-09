@@ -5,6 +5,7 @@
 #include "../SettingsPage.hpp"
 #include "../../SwitchThemesCommon/Bntx/DDS_conversion.hpp"
 #include "../../SwitchTools/hactool.hpp"
+#include "../../SwitchTools/RomfsCache.hpp"
 
 class NxEntry : public ThemeEntry
 {
@@ -36,30 +37,13 @@ protected:
 	{
 		auto themeInfo = ParseNXThemeFile(SData);
 
-		if (!PatchMng::ExefsCompatAsk(ThemeTargetToFileName[themeInfo.Target]))
+		if (!TargetInfo)
 			return false;
 
-		std::string BaseSzs = fs::path::SystemDataFolder + ThemeTargetToFileName[themeInfo.Target];
-		if (!fs::Exists(BaseSzs))
-		{
-			try {
-				if (themeInfo.Target == "user")
-					hactool::ExtractUserPage();
-				else if (themeInfo.Target == "psl")
-					hactool::ExtractPlayerSelectMenu();
-				
-				goto CONTINUE_INSTALL;
-			}
-			catch (std::runtime_error& err)
-			{
-				DialogBlocking("Error while extracting the requested title: " + std::string(err.what()));
-				return false;
-			}
-
-			MissingFileErrorDialog(ThemeTargetToFileName[themeInfo.Target]);
+		if (!PatchMng::ExefsCompatAsk(fs::GetFileName(TargetInfo->SzsFile)))
 			return false;
-		}
-	CONTINUE_INSTALL:
+
+		const std::vector<u8>& baseSzs = RomfsCache::GetFile(*TargetInfo);
 
 		if (ShowDialogs)
 			ThemeEntry::DisplayInstallDialog(FileName);
@@ -77,21 +61,18 @@ protected:
 
 		if (HasCommonLayout || ShouldPatchBGInCommon)
 		{
-			std::string CommonSzs = SYSTEMDATA_PATH "common.szs";
-			if (!fs::Exists(CommonSzs))
-			{
-				MissingFileErrorDialog("common.szs");
-				return false;
-			}
+			const std::vector<u8>& commonSzs = RomfsCache::GetFile(ThemeTargetInfo::QlaunchCommon);
 
 			SARC::SarcData sarc;
-			if (!SarcOpen(CommonSzs, &sarc)) return false;
+			if (!SarcOpen(commonSzs, &sarc)) 
+				return false;
+
 			SwitchThemesCommon::SzsPatcher Patcher(sarc);
 
 			if (ShouldPatchBGInCommon)
 			{
 				if (NxThemeGetBgImage().size() != 0)
-					if (!PatchBG(Patcher, NxThemeGetBgImage(), CommonSzs))
+					if (!PatchBG(Patcher, NxThemeGetBgImage(), "common.szs"))
 						return false;
 			}
 
@@ -110,33 +91,27 @@ protected:
 		bool FileHasBeenPatched = false;
 		SARC::SarcData sarc;
 		
-		if (!SarcOpen(BaseSzs, &sarc)) 
+		if (!SarcOpen(baseSzs, &sarc)) 
 			return false;
 		
 		SwitchThemesCommon::SzsPatcher Patcher(sarc);
 		
-		std::string ContentID = "0100000000001000";
-		std::string SzsName = ThemeTargetToFileName[themeInfo.Target];
+		std::string ContentID = TargetInfo->StringContentId();
+		std::string SzsName = fs::GetFileName(TargetInfo->SzsFile);
+		
 		auto patch = Patcher.DetectedSarc();
-
-		// TODO: Why is there a fallback here ? if detect sarc fails we will not be able to apply the wallaper anyway
-		if (patch)
-		{
-			ContentID = patch->TitleId;
-			SzsName = patch->SzsName;
-		}
 
 		if (!ShouldPatchBGInCommon)
 		{
 			if (!patch)
 			{
-				DialogBlocking("Couldn't find any patch for " + BaseSzs + "\nThe theme was not installed");
+				DialogBlocking("Couldn't find any patch for " + SzsName + "\nThe theme was not installed");
 				return false;
 			}
 
 			if (NxThemeGetBgImage().size() != 0)
 			{
-				if (!PatchBG(Patcher, NxThemeGetBgImage(), BaseSzs))
+				if (!PatchBG(Patcher, NxThemeGetBgImage(), SzsName))
 					return false;
 
 				FileHasBeenPatched = true;
@@ -257,6 +232,7 @@ private:
 	SARC::SarcData SData;
 	bool _HasPreview = false;
 	int NXThemeVer = 0;
+	const ThemeTargetInfo* TargetInfo = nullptr;
 
 	const std::vector<u8>& NxThemeGetBgImage()
 	{
@@ -296,6 +272,7 @@ private:
 			CannotInstallReason = "Invalid theme";
 			_CanInstall = false;
 		}
+
 		NXThemeVer = themeInfo.Version;
 		if (themeInfo.Version > SwitchThemesCommon::NXThemeVer)
 		{
@@ -303,11 +280,15 @@ private:
 			CannotInstallReason = "This theme requres a newer version of the theme installer. Download latest version from GitHub.";
 			_CanInstall = false;
 		}
+
 		if (_CanInstall) {
 			if (SData.files.count("image.dds") || SData.files.count("image.jpg"))
 				_HasPreview = true;
 		}
-		if (!ThemeTargetToName.count(themeInfo.Target))
+
+		TargetInfo = ThemeTargetInfo::Find(themeInfo.Target);
+
+		if (!TargetInfo)
 		{
 			lblLine2 = "Error: invalid target";
 			CannotInstallReason = "The target home menu part is not valid";
@@ -315,9 +296,10 @@ private:
 		}
 		else if (_CanInstall)
 		{
-			std::string targetStr = ThemeTargetToName[themeInfo.Target];
+			std::string targetStr = TargetInfo->PartName;
 			if (_HasPreview)
 				targetStr += " - press X for preview";
+
 			lblLine2 = (targetStr);
 		}
 
@@ -376,17 +358,19 @@ private:
 		return true;
 	}
 
-	static void MissingFileErrorDialog(const std::string& name)
-	{
-		DialogBlocking("Can't install this theme because the original " + name + " is missing from systemData.\n"
-			"To install theme packs (.nxtheme files) you need to dump the home menu romfs following the guide in the \"Extract home menu\" tab");
-	}
-
 	static inline bool SarcOpen(const std::string& path, SARC::SarcData* out)
 	{
 		auto f = fs::OpenFile(path);
 		if (f.size() == 0) return false;
 		f = Yaz0::Decompress(f);
+		*out = SARC::Unpack(f);
+		return true;
+	}
+
+	static inline bool SarcOpen(const std::vector<u8>& data, SARC::SarcData* out)
+	{
+		if (data.size() == 0) return false;
+		auto f = Yaz0::Decompress(data);
 		*out = SARC::Unpack(f);
 		return true;
 	}

@@ -5,6 +5,9 @@
 #include "Worker.hpp"
 #include "../ThemePage.hpp"
 
+#include "../../UI/UI.hpp"
+#include "../../SwitchThemesCommon/Layouts/Base64.hpp"
+
 #include <sstream>
 
 const ImVec2 ImageSize = { 398, 224 };
@@ -181,6 +184,7 @@ void RemoteInstall::ListPage::DownloadClicked()
 
 			size_t numFailed;			
 			std::string OutFirstFilaName = "";			
+
 			auto worker = new Worker::ActionOnItemFinish(urls, numFailed, [&folderName, &OutFirstFilaName](std::vector<u8>&& _invec, uintptr_t index) -> bool {
 				std::vector<u8> vec = _invec;
 				std::string name = folderName + std::to_string(index) + ".nxtheme";
@@ -233,8 +237,8 @@ RemoteInstall::ListPage::Result RemoteInstall::ListPage::RenderWidget(size_t ind
 	const bool selected = IsSelected(index);
 	const std::string& Name = response.Entries[index].Name;
 
-	const char* Target = ThemeTargetToName.count(response.Entries[index].Target) ? 
-		ThemeTargetToName[response.Entries[index].Target].c_str() : nullptr;
+	auto targetInfo = ThemeTargetInfo::Find(response.Entries[index].Target);
+	const char* Target = targetInfo ? targetInfo->PartName.c_str() : "Unknown part name";
 
 	const LoadedImage img = images.List[index];
 

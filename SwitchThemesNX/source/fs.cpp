@@ -72,12 +72,12 @@ static vector<string> GetThemeFilesInDirRecursive(const string &path, int level)
 		{
 			// Folders excluded from search
 			if (p.path().filename() == SYSTEMDATA_DIR || 
-				p.path().filename() == SYSTEMPATCHES_DIR ||
-				p.path().filename() == "shuffle") // I don't actually remember what's this about
+				p.path().filename() == SYSTEMPATCHES_DIR)
 					continue;
 
 			auto path = p.path().string();
 			res.push_back(fs::path::ToUnixSeparators(path));
+
 			auto v = GetThemeFilesInDirRecursive(p.path().string(), level + 1);
 			res.insert(res.end(), v.begin(), v.end());
 		}

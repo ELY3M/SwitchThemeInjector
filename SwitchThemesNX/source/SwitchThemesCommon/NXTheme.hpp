@@ -1,9 +1,8 @@
 #pragma once
-#include <iostream>
 #include <vector>
 #include <string>
+#include <format>
 #include "MyTypes.h"
-#include <unordered_map>
 #include "SarcLib/Sarc.hpp"
 
 struct ThemeFileManifest
@@ -30,7 +29,8 @@ enum class ConsoleFirmware : int
 	Fw20_0 = 20'0'0,
 };
 
-struct SystemVersion { 
+struct SystemVersion 
+{ 
 	u32 major, minor, micro;
 
 	constexpr auto operator<=>(const SystemVersion& other) const
@@ -57,42 +57,36 @@ struct SystemVersion {
 	}
 };
 
+struct ThemeTargetInfo
+{
+	u64 TitleId;
+	std::string PartName;
+	std::string SzsFile;
+
+	static std::string TitleIdToString(u64 tid)
+	{
+		return std::format("{:016x}", tid);
+	}
+
+	std::string StringContentId() const 
+	{
+		return TitleIdToString(TitleId);
+	}
+
+	static constexpr u64 QlaunchID = 0x0100000000001000;
+	static constexpr u64 PslID = 0x0100000000001007;
+	static constexpr u64 UserPageID = 0x0100000000001013;
+
+	// Not part of target names but needed for extraction
+	static const ThemeTargetInfo QlaunchCommon;
+	
+	// May be null if part name is not valid
+	static const ThemeTargetInfo* Find(std::string nxThemeName);	
+	static const ThemeTargetInfo* FindBySzsName(std::string szsName, std::string& outNxPartName);
+
+	static std::vector<std::string> GetTargetsForTitleId(u64 tid);
+};
+
 extern SystemVersion HOSVer;
-
-extern std::unordered_map<std::string,std::string> ThemeTargetToName;
-extern std::unordered_map<std::string,std::string> ThemeTargetToFileName;
-
-const std::unordered_map<std::string,std::string> ThemeTargetToName6X
-{
-	{"home","Home menu"},
-	{"lock","Lock screen"},
-	{"user","User page"},
-	{"apps","All apps menu"},
-	{"set","Settings applet"},
-	{"news","News applet" },
-	{"psl","Player selection"},
-};
-
-const std::unordered_map<std::string,std::string> ThemeTargetToFileName6X
-{
-	{"home","ResidentMenu.szs"},
-	{"lock","Entrance.szs"},
-	{"user","MyPage.szs"},
-	{"apps","Flaunch.szs"},
-	{"set","Set.szs"},
-	{"news","Notification.szs"},
-	{"psl","Psl.szs" },
-};
-
-const std::unordered_map<std::string,std::string> ThemeTargetToName5X
-{
-	{"home","Home menu"},
-	{"lock","Lock screen"},
-	{"user","User page"},
-	{"apps","All applets"},
-	{"set","All applets"},
-	{"news","All applets"},
-	{"psl","Player selection" },
-};
 
 ThemeFileManifest ParseNXThemeFile(SARC::SarcData &SData);

@@ -8,7 +8,8 @@
 
 RemoteInstall::DetailPage::DetailPage(const RemoteInstall::API::Entry& entry, LoadedImage i) : entry(entry), img(i)
 {
-	PartName = ThemeTargetToName.count(entry.Target) ? ThemeTargetToName[entry.Target] : "Unknown part name";
+	auto info = ThemeTargetInfo::Find(entry.Target);
+	PartName = info ? info->PartName : "Unknown part name";
 }
 
 void RemoteInstall::DetailPage::Update() {}

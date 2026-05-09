@@ -109,6 +109,7 @@
     <ClInclude Include="source\SwitchTools\InjectorInstall.hpp" />
     <ClInclude Include="source\SwitchTools\key_loader.hpp" />
     <ClInclude Include="source\SwitchTools\PatchMng.hpp" />
+    <ClInclude Include="source\SwitchTools\RomfsCache.hpp" />
     <ClInclude Include="source\UI\DialogPages.hpp" />
     <ClInclude Include="source\UI\glad.h" />
     <ClInclude Include="source\UI\imgui\imconfig.h" />
@@ -464,6 +465,7 @@
     <ClCompile Include="source\SwitchTools\InjectorInstall.cpp" />
     <ClCompile Include="source\SwitchTools\key_loader.cpp" />
     <ClCompile Include="source\SwitchTools\PatchMng.cpp" />
+    <ClCompile Include="source\SwitchTools\RomfsCache.cpp" />
     <ClCompile Include="source\UI\DialogPages.cpp" />
     <ClCompile Include="source\UI\glad.c" />
     <ClCompile Include="source\UI\imgui\imgui.cpp" />

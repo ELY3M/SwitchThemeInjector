@@ -37,8 +37,7 @@ SzsPatcher::SzsPatcher(SARC::SarcData& s) : sarc(s) { Initialize(); }
 
 void SzsPatcher::Initialize()
 {
-	currentFirmware = HOSVer.ToFirmwareEnum();
-	
+	currentFirmware = HOSVer.ToFirmwareEnum();	
 	currentTemplate = DetectSarc(sarc);
 	
 	if (!currentTemplate)
@@ -49,15 +48,7 @@ void SzsPatcher::Initialize()
 	{
 		// Note that the PatchTemplate class does not have an NxThemeName property here because it depends on the current firmware version, this is to support 5.0 and earlier.
 		// Since that is ancient firmware it is not supported in the injector so it's a difference to keep in mind when reasoning about the mapping between the nxtheme name and the target szs name
-		auto t = std::find_if(ThemeTargetToFileName.begin(), ThemeTargetToFileName.end(), [&](const auto& e)
-			{
-				return e.second == currentTemplate->SzsName;
-			});
-
-		if (t == ThemeTargetToFileName.end())
-			nxthemePartName = "";
-		else
-			nxthemePartName = t->first;
+		ThemeTargetInfo::FindBySzsName(currentTemplate->SzsName, nxthemePartName);
 	}
 }
 

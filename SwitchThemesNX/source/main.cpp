@@ -1,13 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <fstream>
 #include <stdexcept>
-#include <stdio.h>
 #include <filesystem>
-#include <variant>
 
-#include "Version.hpp"
 #include "UI/UIManagement.hpp"
 #include "UI/UI.hpp"
 #include "Platform/Platform.hpp"
@@ -19,7 +15,6 @@
 #include "Pages/TextPage.hpp"
 #include "Pages/ExternalInstallPage.hpp"
 #include "ViewFunctions.hpp"
-#include "SwitchThemesCommon/SwitchThemesCommon.hpp"
 #include "SwitchThemesCommon/NXTheme.hpp"
 #include "Pages/RemoteInstallPage.hpp"
 #include "Pages/SettingsPage.hpp"
@@ -293,16 +288,6 @@ static void SetupSysVer()
 #else 
 	HOSVer = { 20,0,0 };
 #endif
-	if (HOSVer.major <= 5)
-	{
-		ThemeTargetToName = ThemeTargetToName5X;
-		ThemeTargetToFileName = ThemeTargetToFileName6X; //The file names are the same
-	}
-	else //6.X
-	{
-		ThemeTargetToName = ThemeTargetToName6X;
-		ThemeTargetToFileName = ThemeTargetToFileName6X;
-	}
 	SystemVer = std::to_string(HOSVer.major) + "." + std::to_string(HOSVer.minor) + "." + std::to_string(HOSVer.micro);
 }
 
@@ -321,7 +306,6 @@ int main(int argc, char **argv)
 	DisplayLoading("Loading system info...");
 
 	fs::EnsureThemesFolderExists();
-	NcaDumpPage::CheckHomeMenuVer();
 	SetCfwFolder();
 
 	PatchMng::Init();
