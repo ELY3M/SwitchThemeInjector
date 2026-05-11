@@ -23,6 +23,12 @@ jobs:
     - uses: actions/setup-dotnet@v5
       with:
         dotnet-version: '8.0.x'
+    - name: Build symodule
+      run: |
+        cd ThemeSysmodule
+        make -j 4
+        mkdir -p ../SwitchThemesNX/romfs/sysmodule/
+        cp ThemeSysmodule.nsp toolbox.json ../SwitchThemesNX/romfs/sysmodule/
     - name: Generate C++ sources
       run: |
         cd NxThemeTool
@@ -32,8 +38,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y p7zip-full
         cd $GITHUB_WORKSPACE/SwitchThemesNX/
-        chmod +x scripts/cibuild.sh
-        scripts/cibuild.sh -j4
+        make all "GITVER=CI-$GITHUB_SHA" -j6
     - name: Package artifacts
       run: |
         cd $GITHUB_WORKSPACE/SwitchThemesNX/
