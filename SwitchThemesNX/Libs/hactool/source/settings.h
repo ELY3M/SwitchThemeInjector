@@ -162,6 +162,7 @@ enum hactool_file_type
 #define ACTION_ONLYUPDATEDROMFS (1<<7)
 #define ACTION_SAVEINIJSON (1<<8)
 #define ACTION_LISTFILES (1<<9)
+#define ACTION_MEMORYONLY (1<<10)
 
 struct nca_ctx; /* This will get re-defined by nca.h. */
 

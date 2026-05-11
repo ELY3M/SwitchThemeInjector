@@ -1621,7 +1621,8 @@ void nca_save_pfs0_section(nca_section_ctx_t* ctx) {
 				}
 			}
 
-			os_makedir(dirpath->os_path);
+			if ((ctx->tool_ctx->action & ACTION_MEMORYONLY) == 0)
+				os_makedir(dirpath->os_path);
 			for (uint32_t i = 0; i < ctx->pfs0_ctx.header->num_files; i++) {
 				nca_save_pfs0_file(ctx, i, dirpath);
 			}
@@ -1845,7 +1846,7 @@ static int nca_visit_romfs_dir(nca_section_ctx_t* ctx, uint32_t dir_offset, file
 	}
 
 	/* If we're actually extracting the romfs, make directory. */
-	if ((ctx->tool_ctx->action & ACTION_LISTROMFS) == 0) {
+	if ((ctx->tool_ctx->action & (ACTION_LISTROMFS | ACTION_MEMORYONLY)) == 0) {
 		os_makedir(cur_path->os_path);
 	}
 
@@ -1861,7 +1862,6 @@ static int nca_visit_romfs_dir(nca_section_ctx_t* ctx, uint32_t dir_offset, file
 	if (any_files == 0 && ctx->type == BKTR && (ctx->tool_ctx->action & ACTION_ONLYUPDATEDROMFS)) {
 		os_rmdir(cur_path->os_path);
 	}
-
 
 	if (entry->sibling != ROMFS_ENTRY_EMPTY) {
 		nca_visit_romfs_dir(ctx, entry->sibling, parent_path);
@@ -1885,7 +1885,7 @@ static int nca_visit_nca0_romfs_dir(nca_section_ctx_t* ctx, uint32_t dir_offset,
 	}
 
 	/* If we're actually extracting the romfs, make directory. */
-	if ((ctx->tool_ctx->action & ACTION_LISTROMFS) == 0) {
+	if ((ctx->tool_ctx->action & (ACTION_LISTROMFS | ACTION_MEMORYONLY)) == 0) {
 		os_makedir(cur_path->os_path);
 	}
 
@@ -1939,7 +1939,9 @@ void nca_save_ivfc_section(nca_section_ctx_t* ctx) {
 						}
 					}
 
-					os_makedir(dirpath->os_path);
+					if ((ctx->tool_ctx->action & ACTION_MEMORYONLY) == 0)
+						os_makedir(dirpath->os_path);
+
 					nca_visit_romfs_dir(ctx, 0, dirpath);
 				}
 				else if (ctx->tool_ctx->settings.extraction_file_stream_cb && ctx->tool_ctx->settings.extraction_romfs)
@@ -1991,7 +1993,9 @@ void nca_save_nca0_romfs_section(nca_section_ctx_t* ctx) {
 						}
 					}
 
-					os_makedir(dirpath->os_path);
+					if ((ctx->tool_ctx->action & ACTION_MEMORYONLY) == 0)
+						os_makedir(dirpath->os_path);
+
 					nca_visit_nca0_romfs_dir(ctx, 0, dirpath);
 				}
 			}
@@ -2035,7 +2039,9 @@ void nca_save_bktr_section(nca_section_ctx_t* ctx) {
 						}
 					}
 
-					os_makedir(dirpath->os_path);
+					if ((ctx->tool_ctx->action & ACTION_MEMORYONLY) == 0)
+						os_makedir(dirpath->os_path);
+
 					nca_visit_romfs_dir(ctx, 0, dirpath);
 				}
 			}

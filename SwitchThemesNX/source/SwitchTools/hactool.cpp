@@ -89,7 +89,7 @@ public:
 		nca_ctx->tool_ctx->file_type = FILETYPE_NCA;
 		base_ctx->file_type = FILETYPE_NCA;
 
-		nca_ctx->tool_ctx->action = ACTION_INFO | ACTION_EXTRACT;
+		nca_ctx->tool_ctx->action = ACTION_INFO | ACTION_EXTRACT | ACTION_MEMORYONLY;
 		pki_initialize_keyset(&tool_ctx->settings.keyset, KEYSET_RETAIL);
 
 		nca_ctx->tool_ctx->settings.extraction_file_stream_cb = OnFileDumped;
