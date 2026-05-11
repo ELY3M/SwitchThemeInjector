@@ -116,6 +116,13 @@ void DisplayLoading(std::initializer_list<std::string> lines)
 	DisplayLoading(LoadingOverlay(lines));
 }
 
+void FatalError(std::string message)
+{
+	LOGf("Fatal error: %s\n", message.c_str());
+	DialogBlocking("Fatal error: " + message + "\n\nThe application will close");
+	exit(-1);
+}
+
 #ifdef DEBUG
 double previousTime = glfwGetTime();
 int frameCount = 0;
@@ -154,17 +161,36 @@ static inline void MainLoop(bool BreakOnPop = false)
 
 		IsRendering = true;
 		GFX::StartFrame();
-		CurObj->Render(0,0);
+
+		try 
+		{
+			CurObj->Render(0, 0);
+		}
+		catch (std::exception& ex)
+		{
+			// This will likely still fail due to imgui throwing on end frame if the page was not properly popped
+			std::string msg = ex.what();
+			PushFunction([msg] {
+				FatalError(msg);
+			});
+		}
 #ifdef DEBUG
 		calcFPS();
 #endif
 		GFX::EndFrame();
 		IsRendering = false;
 
-		if (CurObj == ViewObj)
-			CurObj->Update();
-		
-		ExecuteDeferredFunctions();
+		try {
+			if (CurObj == ViewObj)
+				CurObj->Update();
+
+			ExecuteDeferredFunctions();
+		}
+		catch (std::exception& ex)
+		{
+			FatalError(ex.what());
+		}
+
 		if (PopList.size())
 		{
 			_PopPage();
