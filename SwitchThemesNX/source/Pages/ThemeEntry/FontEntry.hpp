@@ -28,7 +28,7 @@ protected:
 		fs::WriteFile(fs::path::RomfsFolder("0100000000000811") + "nintendo_udsg-r_std_003.bfttf", SwitchThemesCommon::TTF::ConvertToBFTTF(file));
 		fs::theme::CreateMitmStructure("0100000000000039");
 		fs::theme::CreateRomfsDir("0100000000000039");
-		fs::WriteFile(fs::path::RomfsFolder("0100000000000039") + "dummy.bin", { 0x70,0x61,0x70,0x65,0x20,0x53,0x61,0x74,0x61,0x6E,0x20,0x41,0x6C,0x65,0x70,0x70,0x65,0x21 });
+		fs::WriteFile(fs::path::RomfsFolder("0100000000000039") + "dummy.bin", std::vector<u8> { 0x36, 0x36, 0x36 });
 		return true;
 	}
 private:

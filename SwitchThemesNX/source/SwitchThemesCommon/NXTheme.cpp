@@ -1,10 +1,12 @@
 #include <unordered_map>
 #include <vector>
+#include <array>
 #include "../fs.hpp"
 #include "NXTheme.hpp"
 #include "json.hpp"
 
 SystemVersion HOSVer = { 0,0,0 };
+std::array<u8, 0x40> HOSVersionHash;
 
 // Info for fw 6.0+
 const std::unordered_map<std::string, ThemeTargetInfo> ThemeTargetList6

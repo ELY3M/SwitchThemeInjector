@@ -84,7 +84,11 @@ protected:
 			}
 
 			fs::theme::CreateStructure("0100000000001000");
-			fs::WriteFile(CommonDestPath, SarcPack(Patcher.GetFinalSarc()));
+
+			auto pack = SarcPack(Patcher.GetFinalSarc());
+			fs::WriteFile(CommonDestPath, pack);
+
+			fs::theme::WriteSystemVersionFile();
 		}
 
 		//Actual file patching code 
@@ -207,8 +211,13 @@ protected:
 		if (FileHasBeenPatched)
 		{			
 			fs::theme::CreateStructure(ContentID);
-			fs::WriteFile(fs::path::RomfsFolder(ContentID) +  "lyt/" + SzsName, SarcPack(Patcher.GetFinalSarc()));
+
+			auto sarc = SarcPack(Patcher.GetFinalSarc());
+			fs::WriteFile(fs::path::RomfsFolder(ContentID) +  "lyt/" + SzsName, sarc);
 		}
+
+		if (TargetInfo->TitleId == ThemeTargetInfo::QlaunchID)
+			fs::theme::WriteSystemVersionFile();
 
 		return true;
 	}

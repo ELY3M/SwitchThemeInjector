@@ -1,11 +1,8 @@
 #pragma once
 #include <iostream>
 #include <vector>
-#include <string>
-#include <filesystem>
 #include "../SwitchThemesCommon/SwitchThemesCommon.hpp"
 #include "../UI/UI.hpp"
-#include "../fs.hpp"
 
 namespace Settings {
 	extern bool UseIcons;
@@ -20,4 +17,11 @@ class SettingsPage : public IPage
 		
 		void Render(int X, int Y) override;
 		void Update() override;
+
+		static bool CheckSysmoduleInstalled();
+	private:
+		bool sysmoduleInstalled;
+
+		void InstallSysmodule();
+		void RemoveSysmodule();
 };

@@ -1,5 +1,5 @@
 #include "fs.hpp"
-#include <sys/stat.h>
+#include "SwitchThemesCommon/NXTheme.hpp"
 #include <cstring>
 #include <sstream>
 
@@ -27,6 +27,7 @@ static string TitlesFolder = "";
 static bool ThemeListDirty = true;
 
 const std::string& fs::path::CfwFolder() { return ::CfwFolder; }
+
 std::string fs::path::FsMitmFolder() { return ::CfwFolder + TitlesFolder; }
 
 std::string fs::path::RomfsFolder(const std::string& contentID)
@@ -116,7 +117,7 @@ vector<u8> fs::OpenFile(const string &name)
 	return coll;
 }
 
-void fs::WriteFile(const string &name,const vector<u8> &data)
+void fs::WriteFile(const string &name, std::span<const u8> data)
 {
 	if (filesystem::exists(name))
 		remove(name.c_str());
@@ -128,6 +129,31 @@ void fs::WriteFile(const string &name,const vector<u8> &data)
 	fwrite(data.data(),1,data.size(),f);
 	fflush(f);
 	fclose(f);
+}
+
+bool fs::Exists(const std::string& name) { return std::filesystem::exists(name); }
+
+void fs::Delete(const std::string& path) { std::filesystem::remove(path); }
+
+void fs::CreateDirectory(const std::string& path) { std::filesystem::create_directories(path); }
+
+void fs::DeleteDirectory(const std::string& path) { 
+	// remove_all fails for some reason so we must iterate manually.
+	if (!std::filesystem::is_directory(path))
+	{
+		fs::Delete(path);
+		return;
+	}
+
+	for (auto& p : std::filesystem::directory_iterator(path))
+	{
+		if (p.is_directory())
+			DeleteDirectory(p.path().string());
+		else
+			std::filesystem::remove(p.path());
+	}
+
+	std::filesystem::remove(path);
 }
 
 std::string fs::SanitizeName(const std::string& name)
@@ -277,7 +303,7 @@ void fs::theme::CreateMitmStructure(const string &id)
 	CreateDirectory(path);
 	if (!filesystem::exists(path + "fsmitm.flag"))
 	{
-		vector<u8> t; 
+		vector<u8> t = {};
 		WriteFile(path + "fsmitm.flag", t);
 	}		
 }
@@ -290,8 +316,26 @@ void fs::theme::CreateRomfsDir(const std::string &id)
 void fs::theme::CreateStructure(const string &id)
 {	
 	CreateMitmStructure(id);
-	CreateRomfsDir(id);
-	mkdir((path::RomfsFolder(id) + "lyt").c_str(), ACCESSPERMS);
+	CreateDirectory(path::RomfsFolder(id) + "lyt");
+}
+
+void fs::theme::WriteSystemVersionFile() 
+{
+	static bool VersionAlreadyWritten = false;
+
+	// The system version can't change during runtime so we can only write it once
+	if (VersionAlreadyWritten)
+		return;
+
+	try 
+	{
+		WriteFile(fs::path::FsMitmFolder() + ThemeTargetInfo::TitleIdToString(ThemeTargetInfo::QlaunchID) + "/version_hash.bin", HOSVersionHash);
+		VersionAlreadyWritten = true;
+	}
+	catch (const std::exception&) 
+	{
+		// Ignore
+	}
 }
 
 bool fs::cfw::IsAms()

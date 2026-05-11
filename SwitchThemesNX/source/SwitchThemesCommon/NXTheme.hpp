@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <format>
+#include <array>
 #include "MyTypes.h"
 #include "SarcLib/Sarc.hpp"
 
@@ -88,5 +89,6 @@ struct ThemeTargetInfo
 };
 
 extern SystemVersion HOSVer;
+extern std::array<u8, 0x40> HOSVersionHash;
 
 ThemeFileManifest ParseNXThemeFile(SARC::SarcData &SData);

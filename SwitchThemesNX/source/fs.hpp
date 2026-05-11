@@ -1,9 +1,9 @@
 #pragma once
 #include "SwitchThemesCommon/MyTypes.h"
-#include <stdio.h>
 #include <vector>
 #include <string>
 #include <filesystem>
+#include <span>
 
 #include "Platform/PlatformFs.hpp"
 
@@ -28,7 +28,6 @@ namespace fs::path
 	const std::string ThemesFolder = THEMES_PATH;
 	const std::string SystemDataFolder = SYSTEMDATA_PATH;
 	const std::string DownloadsFolder = THEMES_PATH "Downloads/";
-	const std::string NcaVersionCfg = SYSTEMDATA_PATH "ver.cfg";
 	const std::string ProvidersFile = THEMES_PATH PROVIDERS_NAME;
 	const std::string PatchesDir = SYSTEMPATCHES_PATH;
 
@@ -48,12 +47,13 @@ namespace fs::path
 
 namespace fs {
 	std::vector<u8> OpenFile(const std::string& name);
-	void WriteFile(const std::string& name, const std::vector<u8>& data);
+	
+	void WriteFile(const std::string& name, std::span<const u8> data);
 
-	static inline bool Exists(const std::string& name) { return std::filesystem::exists(name); }
-	static inline void Delete(const std::string& path) { unlink(path.c_str()); }
-	static inline void CreateDirectory(const std::string& path) { std::filesystem::create_directories(path); }
-	static inline void DeleteDirectory(const std::string& path) { rmdir(path.c_str()); }
+	bool Exists(const std::string& name);
+	void Delete(const std::string& path);
+	void CreateDirectory(const std::string& path);
+	void DeleteDirectory(const std::string& path);
 
 	constexpr std::string GetFileName(const std::string& path)
 	{
@@ -104,4 +104,5 @@ namespace fs::theme {
 	void CreateMitmStructure(const std::string& id);
 	void CreateRomfsDir(const std::string& id);
 	void CreateStructure(const std::string& id);
+	void WriteSystemVersionFile();
 }

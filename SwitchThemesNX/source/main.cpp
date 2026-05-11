@@ -270,7 +270,6 @@ static std::vector<std::string> GetArgsInstallList(int argc, char** argv)
 	}
 }	
 
-std::string SystemVer = "";
 static void SetupSysVer()
 {
 #if __SWITCH__
@@ -284,11 +283,12 @@ static void SetupSysVer()
 		return;
 	}
 	HOSVer = { firmware.major,firmware.minor,firmware.micro };
+	memcpy(HOSVersionHash.data(), firmware.version_hash, sizeof(firmware.version_hash));
 	setsysExit();
 #else 
 	HOSVer = { 20,0,0 };
+	memcpy(HOSVersionHash.data(), "fakever", sizeof("fakever"));
 #endif
-	SystemVer = std::to_string(HOSVer.major) + "." + std::to_string(HOSVer.minor) + "." + std::to_string(HOSVer.micro);
 }
 
 int main(int argc, char **argv)

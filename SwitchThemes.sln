@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SwitchThemesNXTests", "Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxThemeTool", "NxThemeTool\NxThemeTool.csproj", "{D7554314-7D97-4C4E-8351-598CFD01625B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThemeSysmodule", "ThemeSysmodule\ThemeSysmodule.vcxproj", "{4C556D1E-0F9A-4879-8424-F4DD216F765F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +36,10 @@ Global
 		{D7554314-7D97-4C4E-8351-598CFD01625B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7554314-7D97-4C4E-8351-598CFD01625B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D7554314-7D97-4C4E-8351-598CFD01625B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C556D1E-0F9A-4879-8424-F4DD216F765F}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{4C556D1E-0F9A-4879-8424-F4DD216F765F}.Debug|Any CPU.Build.0 = Debug|Win32
+		{4C556D1E-0F9A-4879-8424-F4DD216F765F}.Release|Any CPU.ActiveCfg = Debug|Win32
+		{4C556D1E-0F9A-4879-8424-F4DD216F765F}.Release|Any CPU.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

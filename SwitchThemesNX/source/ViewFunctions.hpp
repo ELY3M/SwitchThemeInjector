@@ -7,8 +7,6 @@
 #include "UI/DialogPages.hpp"
 #include "Platform/Platform.hpp"
 
-extern std::string SystemVer;
-
 void PushPage(IUIControlObj* page);
 void PopPage(IUIControlObj* page);
 

@@ -346,3 +346,6 @@ SwitchThemesOnline/html/analytics.txt
 NoFooter.json
 LeftAllGamesLayout.json
 *.a
+*.lnk
+*.nsp
+*.npdm
