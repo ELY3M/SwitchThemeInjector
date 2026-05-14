@@ -1,10 +1,11 @@
 #pragma once
 #include "../BinaryReadWrite/Buffer.hpp"
-#include <iostream>
+#include "../MyTypes.h"
+
 #include <unordered_map>
 #include <vector>
+#include <span>
 #include <string>
-#include "../MyTypes.h"
 
 class SARC
 {
@@ -23,7 +24,7 @@ public:
 	};
 
 	static PackedSarc Pack(SarcData &data, s32 _align = -1);
-	static SarcData Unpack(const std::vector<u8> &data);
+	static SarcData Unpack(std::span<const u8> data);
 
 private:
 	static u32 NameHash(const std::string &name);

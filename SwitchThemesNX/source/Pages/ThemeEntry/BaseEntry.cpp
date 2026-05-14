@@ -1,10 +1,16 @@
-#include "ThemeEntry.hpp"
-#include "../../SwitchThemesCommon/SwitchThemesCommon.hpp"
+#include <filesystem>
+#include <stdexcept>
+#include <exception>
+#include <vector>
+#include <utility>
+
 #include "../../ViewFunctions.hpp"
 #include "../../fs.hpp"
-#include <filesystem>
 #include "../../Platform/Platform.hpp"
+#include "../../UI/UI.hpp"
+#include "../../SwitchThemesCommon/MyTypes.h"
 
+#include "ThemeEntry.hpp"
 #include "ImagePreview.hpp"
 #include "FontEntry.hpp"
 #include "LegacyEntry.hpp"
@@ -95,7 +101,7 @@ unique_ptr<ThemeEntry> ThemeEntry::FromFile(const std::string& fileName)
 			return move(e);
 		}
 
-		vector<u8>&& data = fs::OpenFile(fileName);
+		auto data = fs::OpenFile(fileName);
 
 		if (data.size() == 0)
 			return make_unique<DummyEntry>(fileName, "Couldn't open this file", fileName, "ERROR");
@@ -119,15 +125,45 @@ unique_ptr<ThemeEntry> ThemeEntry::FromFile(const std::string& fileName)
 	return make_unique<DummyEntry>(fileName, "Unknown file type", fileName, "ERROR");
 }
 
-unique_ptr<ThemeEntry> ThemeEntry::FromSZS(const std::vector<u8>& RawData)
+unique_ptr<ThemeEntry> ThemeEntry::FromMemory(const std::vector<u8>& binary)
 {
-	auto &&DecompressedFile = Yaz0::Decompress(RawData);
-	auto &&sarc = SARC::Unpack(DecompressedFile);
+	std::string error = "Unknown file format";
 
-	if (sarc.files.count("info.json"))
-		return make_unique<NxEntry>("", move(sarc));
-	else
-		return make_unique<LegacyEntry>("", move(sarc));
+	// new nxtheme format
+	if (zip::IsZip(binary))
+	{
+		auto data = zip::Extract(binary);
+		if (std::holds_alternative<std::string>(data))
+		{
+			error = std::get<std::string>(data);
+			goto hande_error;
+		}
+
+		return make_unique<NxEntry>("", move(std::get<FileContainer>(data)));
+	}
+
+	if (Yaz0::IsYaz0(binary))
+	{
+		// Could also be a raw szs qlaunch file, try to load it and check if it's nxtheme.
+		auto szs = szs::Extract(binary);
+		if (std::holds_alternative<std::string>(szs))
+		{
+			error = std::get<std::string>(szs);
+			goto hande_error;
+		}
+
+		auto& data = std::get<FileContainer>(szs);
+		if (data.count("info.json"))
+			return make_unique<NxEntry>("", move(data));
+		else
+		{
+			std::vector<u8> copy = binary;
+			return make_unique<LegacyEntry>("", move(copy));
+		}
+	}	
+
+hande_error:
+	return make_unique<DummyEntry>("Error", "Failed to load", error, "");
 }
 
 using namespace ImGui;

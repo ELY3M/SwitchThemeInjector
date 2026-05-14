@@ -1,4 +1,5 @@
 #include "key_loader.hpp"
+#include "../SwitchThemesCommon/Common.hpp"
 #include <stdexcept>
 #include <string>
 

@@ -2,8 +2,9 @@
 #include <string>
 #include <vector>
 #include <optional>
+#include <unordered_map>
 #include "../MyTypes.h"
-#include "../NXTheme.hpp"
+#include "../Common.hpp"
 
 struct Vector3 { float X, Y, Z; bool operator==(Vector3 const&) const = default; };
 struct Vector2 { float X, Y; bool operator==(Vector2 const&) const = default; };

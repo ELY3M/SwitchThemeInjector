@@ -32,7 +32,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	Libs/SOIL2 Libs/stb_image \
+SOURCES		:=	Libs/SOIL2 Libs/stb_image Libs/zip \
 				source \
 				source/SwitchTools source/SwitchTools/lockpick \
 				source/UI source/UI/imgui \

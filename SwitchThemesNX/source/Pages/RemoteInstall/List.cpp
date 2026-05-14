@@ -1,12 +1,11 @@
 #include "List.hpp"
 #include "../../ViewFunctions.hpp"
-#include "../ThemeEntry/NxEntry.hpp"
 #include "../ThemeEntry/ImagePreview.hpp"
 #include "Worker.hpp"
 #include "../ThemePage.hpp"
 
 #include "../../UI/UI.hpp"
-#include "../../SwitchThemesCommon/Layouts/Base64.hpp"
+#include "../../SwitchThemesCommon/Common.hpp"
 
 #include <sstream>
 

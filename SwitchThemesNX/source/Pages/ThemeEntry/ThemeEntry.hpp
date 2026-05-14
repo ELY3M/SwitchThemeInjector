@@ -3,6 +3,7 @@
 #include "../../SwitchThemesCommon/SarcLib/Sarc.hpp"
 #include "../../UI/UI.hpp"
 #include <memory>
+#include <vector>
 
 class ThemeEntry 
 {
@@ -17,7 +18,7 @@ class ThemeEntry
 		};
 
 		static std::unique_ptr<ThemeEntry> FromFile(const std::string& fileName);
-		static std::unique_ptr<ThemeEntry> FromSZS(const std::vector<u8>& RawData);
+		static std::unique_ptr<ThemeEntry> FromMemory(const std::vector<u8>& RawData);
 
 		virtual ~ThemeEntry();
 		

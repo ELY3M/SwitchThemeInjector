@@ -2,9 +2,7 @@
 #include "../../fs.hpp"
 #include "../../SwitchTools/PatchMng.hpp"
 #include "../../SwitchThemesCommon/SarcLib/Yaz0.hpp"
-#include "../../ViewFunctions.hpp"
-#include "../../SwitchThemesCommon/SwitchThemesCommon.hpp"
-#include "../ThemePage.hpp"
+#include "../../SwitchThemesCommon/Patcher.hpp"
 
 class LegacyEntry : public ThemeEntry
 {

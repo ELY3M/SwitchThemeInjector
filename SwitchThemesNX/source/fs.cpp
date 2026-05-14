@@ -1,7 +1,8 @@
-#include "fs.hpp"
-#include "SwitchThemesCommon/NXTheme.hpp"
 #include <cstring>
 #include <sstream>
+
+#include "fs.hpp"
+#include "SwitchThemesCommon/Common.hpp"
 
 #define FS_TROUBLESHOOT_MSG \
 	"Make sure the file exists, this can also be caused by sd corruption with exfat or the archive bit, especially if you used this sd card with a mac.\n" \
@@ -329,7 +330,10 @@ void fs::theme::WriteSystemVersionFile()
 
 	try 
 	{
-		WriteFile(fs::path::FsMitmFolder() + ThemeTargetInfo::TitleIdToString(ThemeTargetInfo::QlaunchID) + "/version_hash.bin", HOSVersionHash);
+		WriteFile(
+			fs::path::FsMitmFolder() + ThemeTargetInfo::TitleIdToString(ThemeTargetInfo::QlaunchID) + "/version_hash.bin", 
+			hos::VersionHash);
+
 		VersionAlreadyWritten = true;
 	}
 	catch (const std::exception&) 

@@ -1,7 +1,5 @@
 #pragma once
-#include <iostream>
-#include <vector>
-#include "../SwitchThemesCommon/SwitchThemesCommon.hpp"
+#include "../SwitchThemesCommon/Patcher.hpp"
 #include "../UI/UI.hpp"
 
 namespace Settings {

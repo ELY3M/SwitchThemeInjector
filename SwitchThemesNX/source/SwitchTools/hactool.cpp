@@ -1,8 +1,8 @@
 #include "hactool.hpp"
-#include "../Dialogs.hpp"
-#include "../SwitchThemesCommon/NXTheme.hpp"
-#include "../fs.hpp"
 #include "key_loader.hpp"
+#include "../Dialogs.hpp"
+#include "../SwitchThemesCommon/Common.hpp"
+#include "../fs.hpp"
 
 #include <algorithm>
 #include <sstream>

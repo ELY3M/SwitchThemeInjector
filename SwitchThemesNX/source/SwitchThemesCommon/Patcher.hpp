@@ -8,11 +8,8 @@
 #include "Fonts/TTF.hpp"
 #include "Bntx/QuickBntx.hpp"
 
-namespace SwitchThemesCommon 
-{	
-	extern const std::string CoreVer;
-	extern const int NXThemeVer;
-
+namespace SwitchThemesCommon
+{
 	struct BntxTexAttribPatch
 	{
 		std::string TargetTexutre;
@@ -30,8 +27,8 @@ namespace SwitchThemesCommon
 		// Forces 11.0 layout by removing all the applet icons added with 20.0. Only the stock and the NS online one will remain.
 		Firmware11,
 	};
-	
-	class SzsPatcher 
+
+	class SzsPatcher
 	{
 	public:
 		SzsPatcher(SARC::SarcData&& s);
@@ -39,7 +36,7 @@ namespace SwitchThemesCommon
 		~SzsPatcher();
 
 		LayoutCompatibilityOption CompatFixes = LayoutCompatibilityOption::Default;
-		
+
 		bool PatchLayouts();
 		bool PatchLayouts(const LayoutPatch& patch);
 		bool PatchLayouts(const LayoutPatch& patch, const std::string& PartName);
@@ -56,7 +53,7 @@ namespace SwitchThemesCommon
 		SARC::SarcData& GetFinalSarc();
 
 		int TotalNonCompatibleFixes = 0;
-	private:		
+	private:
 		SARC::SarcData sarc;
 		ConsoleFirmware currentFirmware;
 		std::optional<PatchTemplate> currentTemplate;
@@ -67,7 +64,7 @@ namespace SwitchThemesCommon
 		QuickBntx* bntx = nullptr;
 		QuickBntx& OpenBntx();
 		void SaveBntx();
-		
+
 		bool EnableAnimations = true;
 
 		void ApplyRawPatch(const std::optional<LayoutPatch>& p);
@@ -79,6 +76,6 @@ namespace SwitchThemesCommon
 
 		int FilterIncompatibleAnimations(LayoutPatch& p);
 	};
-	
+
 	std::string GeneratePatchListString(const std::vector<PatchTemplate>& templates);
 }

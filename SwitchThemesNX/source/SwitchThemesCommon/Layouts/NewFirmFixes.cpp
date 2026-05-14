@@ -1,4 +1,4 @@
-#include "../NXTheme.hpp"
+#include "../Common.hpp"
 #include "Patches.hpp"
 #include <algorithm>
 #include <string>

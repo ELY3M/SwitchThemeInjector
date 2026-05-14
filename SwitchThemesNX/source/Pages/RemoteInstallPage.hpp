@@ -1,14 +1,10 @@
 #pragma once
-#include <iostream>
-#include <vector>
 #include <string>
-#include <filesystem>
-#include "../SwitchThemesCommon/SwitchThemesCommon.hpp"
+#include <memory>
 #include "../UI/UI.hpp"
-#include "../fs.hpp"
+#include "../SwitchTools/InjectorInstall.hpp"
 #include "ThemeEntry/ThemeEntry.hpp"
 #include "RemoteInstall/RemoteInstall.hpp"
-#include "../SwitchTools/InjectorInstall.hpp"
 
 class RemoteInstallPage : public IPage
 {

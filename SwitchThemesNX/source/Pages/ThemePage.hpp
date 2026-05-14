@@ -2,10 +2,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <filesystem>
-#include "../SwitchThemesCommon/SwitchThemesCommon.hpp"
+#include <unordered_map>
+#include <memory>
 #include "../UI/UI.hpp"
-#include "../fs.hpp"
 #include "ThemeEntry/ThemeEntry.hpp"
 
 class ThemesPage : public IPage

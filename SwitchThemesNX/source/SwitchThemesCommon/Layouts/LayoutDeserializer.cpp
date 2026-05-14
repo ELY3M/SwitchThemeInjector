@@ -1,6 +1,6 @@
 #include "Patches.hpp"
 #include "../json.hpp"
-#include "../NXTheme.hpp"
+#include "../Common.hpp"
 
 using namespace std;
 

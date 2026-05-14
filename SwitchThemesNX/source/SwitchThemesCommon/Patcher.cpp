@@ -1,33 +1,24 @@
+#include "Patcher.hpp"
+#include "Layouts/Bflan.hpp"
+#include "Layouts/Bflyt/Bflyt.hpp"
+#include "Layouts/Bflyt/BflytPatcher.hpp"
+#include "Layouts/LayoutCompatibility.hpp"
 #include <algorithm>
 #include <ranges>
 #include <unordered_set>
 
-#include "SwitchThemesCommon.hpp"
-#include "Bntx/QuickBntx.hpp"
-#include "Bntx/DDS.hpp"
-#include "Bntx/BRTI.hpp"
-#include "Layouts/Bflan.hpp"
-#include "NXTheme.hpp"
-#include "Layouts/Bflyt/Bflyt.hpp"
-#include "Layouts/Bflyt/BflytPatcher.hpp"
-#include "Layouts/LayoutCompatibility.hpp"
+#include "Common.hpp"
 
 using namespace std;
 using namespace SwitchThemesCommon;
 
-// This is the C++ implementation of SwitchThemesCommon. While this is the one that runs on switch the main one to be used as a reference and for prototyping is the C# one.
-// The C# version also has better comments on the rationale behind things like compatibility fixes and patch ordering.
-
-const string SwitchThemesCommon::CoreVer = "4.8.3 (C++)";
-const int SwitchThemesCommon::NXThemeVer = 16;
-
-string SwitchThemesCommon::GeneratePatchListString(const vector<PatchTemplate>& templates) 
+string SwitchThemesCommon::GeneratePatchListString(const vector<PatchTemplate>& templates)
 {
 	string curSection = "";
 	string FileList = "";
 	for (auto p : templates)
 	{
-		FileList += "["+ p.FirmName+"] "+ p.TemplateName +" : the file is called "+ p.SzsName+" from title "+ p.TitleId +"\n";
+		FileList += "[" + p.FirmName + "] " + p.TemplateName + " : the file is called " + p.SzsName + " from title " + p.TitleId + "\n";
 	}
 	return FileList;
 }
@@ -37,9 +28,9 @@ SzsPatcher::SzsPatcher(SARC::SarcData& s) : sarc(s) { Initialize(); }
 
 void SzsPatcher::Initialize()
 {
-	currentFirmware = HOSVer.ToFirmwareEnum();	
+	currentFirmware = hos::Version.ToFirmwareEnum();
 	currentTemplate = DetectSarc(sarc);
-	
+
 	if (!currentTemplate)
 	{
 		nxthemePartName = "";
@@ -66,7 +57,7 @@ SARC::SarcData& SzsPatcher::GetFinalSarc()
 	return sarc;
 }
 
-QuickBntx& SzsPatcher::OpenBntx() 
+QuickBntx& SzsPatcher::OpenBntx()
 {
 	if (bntx) return *bntx;
 	Buffer Reader(sarc.files["timg/__Combined.bntx"]);
@@ -180,12 +171,12 @@ int SzsPatcher::FilterIncompatibleAnimations(LayoutPatch& p)
 
 	std::erase_if(p.Anims, [&](const auto& e) {
 		return remove.count(e.FileName);
-	});
+		});
 
 	return static_cast<int>(remove.size());
 }
 
-bool SzsPatcher::PatchLayouts(const LayoutPatch& original_patch, const string &partName)
+bool SzsPatcher::PatchLayouts(const LayoutPatch& original_patch, const string& partName)
 {
 	// We must make a copy of the patch because some fix function might modify it
 	auto patch = original_patch;
@@ -208,7 +199,7 @@ bool SzsPatcher::PatchLayouts(const LayoutPatch& original_patch, const string &p
 		patch.TargetFirmware = static_cast<int>(ConsoleFirmware::Fw11_0);
 	}
 
-	if (CompatFixes != LayoutCompatibilityOption::DisableFixes) 
+	if (CompatFixes != LayoutCompatibilityOption::DisableFixes)
 	{
 		// Detect any compatibility patches we need
 		useLegacyFixes = currentFirmware != ConsoleFirmware::Invariant && patch.UsesOldFixes();
@@ -220,7 +211,7 @@ bool SzsPatcher::PatchLayouts(const LayoutPatch& original_patch, const string &p
 
 	if (partName == "home" && patch.PatchAppletColorAttrib)
 		PatchBntxTextureAttribs({
-			{"RdtIcoPvr_00^s",       0x2000000}, 
+			{"RdtIcoPvr_00^s",       0x2000000},
 			// Pre 20.0.0 news icon:
 			{"RdtIcoNews_00^s",      0x2000000}, {"RdtIcoNews_01^s",      0x2000000},
 			// 20.0.0 news icon:
@@ -229,7 +220,7 @@ bool SzsPatcher::PatchLayouts(const LayoutPatch& original_patch, const string &p
 			{"RdtIcoShop^s",         0x2000000},
 			{"RdtIcoCtrl_00^s",      0x2000000}, {"RdtIcoCtrl_01^s",      0x2000000}, {"RdtIcoCtrl_02^s",      0x2000000},
 			{"RdtIcoPwrForm^s",      0x2000000},
-		});
+			});
 
 	// Apply patches. The order here matters.
 
@@ -262,18 +253,18 @@ bool SzsPatcher::PatchLayouts(const LayoutPatch& original_patch, const string &p
 	return true;
 }
 
-static bool StrEndsWith(const std::string &str, const std::string &suffix)
+static bool StrEndsWith(const std::string& str, const std::string& suffix)
 {
 	return str.size() >= suffix.size() &&
 		str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
-static bool StrStartsWith(const std::string &str, const std::string &prefix)
+static bool StrStartsWith(const std::string& str, const std::string& prefix)
 {
 	return str.find(prefix, 0) == 0;
 }
 
-bool SzsPatcher::PatchMainBG(const vector<u8> &DDS)
+bool SzsPatcher::PatchMainBG(const vector<u8>& DDS)
 {
 	if (!currentTemplate)
 		return false;
@@ -283,10 +274,10 @@ bool SzsPatcher::PatchMainBG(const vector<u8> &DDS)
 	//Patch BG layouts
 	BflytFile _MainFile(sarc.files[templ.MainLayoutName]);
 	BflytPatcher MainFile(_MainFile);
-	
+
 	auto res = MainFile.PatchBgLayout(templ);
 	if (!res) return res;
-	
+
 	//Patch bntx
 	QuickBntx& q = OpenBntx();
 	if (q.Rlt.size() != 0x80)
@@ -294,18 +285,18 @@ bool SzsPatcher::PatchMainBG(const vector<u8> &DDS)
 
 	auto dds = DDSEncoder::LoadDDS(DDS);
 	q.ReplaceTex(templ.MaintextureName, dds);
-	
+
 	// Remove references to the texture we replaced from other layouts
 	auto replaceWith = q.FindTex(templ.SecondaryTexReplace) ? templ.SecondaryTexReplace : "";
-	
+
 	if (replaceWith == "") {
 		auto v = q.Textures | std::views::filter([](const auto& d) { return d.Name().starts_with("White"); });
 		if (v.empty())
 			return false;
-		
+
 		replaceWith = v.front().Name();
 	}
-	
+
 	sarc.files[templ.MainLayoutName] = _MainFile.SaveFile();
 	for (const auto& t : sarc.files)
 	{
@@ -315,12 +306,12 @@ bool SzsPatcher::PatchMainBG(const vector<u8> &DDS)
 		BflytPatcher curTarget(_curTarget);
 		if (curTarget.PatchTextureName(templ.MaintextureName, replaceWith))
 			sarc.files[f] = _curTarget.SaveFile();
-	}	
+	}
 
 	return true;
 }
 
-bool SzsPatcher::PatchBntxTexture(const vector<u8> &DDS, const vector<string> &texNames, u32 ChannelData)
+bool SzsPatcher::PatchBntxTexture(const vector<u8>& DDS, const vector<string>& texNames, u32 ChannelData)
 {
 	QuickBntx& q = OpenBntx();
 	if (q.Rlt.size() != 0x80)
@@ -332,7 +323,7 @@ bool SzsPatcher::PatchBntxTexture(const vector<u8> &DDS, const vector<string> &t
 		for (const auto& texName : texNames)
 		{
 			auto tex = q.FindTex(texName);
-			if(!tex) continue;
+			if (!tex) continue;
 
 			auto dds = DDSEncoder::LoadDDS(DDS);
 			q.ReplaceTex(texName, dds);
@@ -358,10 +349,10 @@ bool SzsPatcher::PatchAppletIcon(const std::vector<u8>& DDS, const std::string& 
 
 	const auto& list = Patches::textureReplacement::NxNameToList[nxthemePartName];
 	auto replacement = find_if(list.begin(), list.end(), [&texName](const TextureReplacement& t) {
-		return t.NxThemeName == texName; 
-	});
+		return t.NxThemeName == texName;
+		});
 
-	if (replacement == list.end()) 
+	if (replacement == list.end())
 		return false;
 
 	// If this is not the right firmware, skip it
@@ -382,7 +373,7 @@ bool SzsPatcher::PatchAppletIcon(const std::vector<u8>& DDS, const std::string& 
 	return true;
 }
 
-bool SzsPatcher::PatchBntxTextureAttribs(const vector<BntxTexAttribPatch> &patches)
+bool SzsPatcher::PatchBntxTextureAttribs(const vector<BntxTexAttribPatch>& patches)
 {
 	QuickBntx& q = OpenBntx();
 	if (q.Rlt.size() != 0x80)
@@ -390,7 +381,7 @@ bool SzsPatcher::PatchBntxTextureAttribs(const vector<BntxTexAttribPatch> &patch
 
 	try
 	{
-		for (const auto& patch : patches) 
+		for (const auto& patch : patches)
 		{
 			auto tex = q.FindTex(patch.TargetTexutre);
 			if (tex) tex->ChannelTypes = patch.ChannelData;

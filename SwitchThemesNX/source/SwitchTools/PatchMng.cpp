@@ -1,13 +1,10 @@
-#include "PatchMng.hpp"
-#include <string>
-#include "../fs.hpp"
-#include "../SwitchThemesCommon/NXTheme.hpp"
-#include <filesystem>
-#include "../Platform/Platform.hpp"
 #include <unordered_map>
-#include "../UI/DialogPages.hpp"
+#include <string>
+#include "PatchMng.hpp"
 #include "hactool.hpp"
-#include "../Dialogs.hpp"
+#include "../fs.hpp"
+#include "../SwitchThemesCommon/Common.hpp"
+#include "../UI/DialogPages.hpp"
 
 using namespace std;
 
@@ -60,12 +57,12 @@ const std::string& PatchMng::QlaunchBuildId()
 
 bool PatchMng::CanInstallTheme(const string& FileName)
 {
-	if (HOSVer.major < 9) return true;
+	if (hos::Version.major < 9) return true;
 	if (!PartsRequiringPatch.count(FileName)) return true;
 	
 	const auto& ver = PartsRequiringPatch.at(FileName);
 
-	if (HOSVer >= ver)
+	if (hos::Version >= ver)
 		return HasLatestPatches;
 	else return true;
 
@@ -87,7 +84,7 @@ void PatchMng::RemoveAll()
 
 PatchMng::InstallResult PatchMng::EnsureInstalled()
 {
-	if (HOSVer.major < 9) return InstallResult::Ok;
+	if (hos::Version.major < 9) return InstallResult::Ok;
 
 	auto exefsDir = GetExefsPatchesPath();
 	if (exefsDir == "")

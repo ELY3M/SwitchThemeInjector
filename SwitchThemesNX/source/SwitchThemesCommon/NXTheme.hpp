@@ -1,10 +1,28 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <format>
-#include <array>
+#include <optional>
+#include <unordered_map>
+#include <variant>
+#include <span>
+#include <string_view>
+
 #include "MyTypes.h"
-#include "SarcLib/Sarc.hpp"
+#include "Common.hpp"
+
+using FileResult = std::variant<FileData, std::string>;
+using ContainerResult = std::variant<FileContainer, std::string>;
+
+namespace zip
+{
+	bool IsZip(std::span<const u8> data);
+	ContainerResult Extract(std::span<const u8> data);
+}
+
+namespace szs
+{
+	ContainerResult Extract(const std::vector<u8>& data);
+}
 
 struct ThemeFileManifest
 {
@@ -13,82 +31,40 @@ struct ThemeFileManifest
 	std::string ThemeName;
 	std::string LayoutInfo;
 	std::string Target;
+
+	static ThemeFileManifest FromJson(std::string_view json);
 };
 
-// This enum defines the compatibility level of layouts, it is not meant to map exactly to HOS versions. New versions are only added when there are breaking changes to address via the NewFirmFixes feature
-enum class ConsoleFirmware : int
+class NxTheme 
 {
-	// Default value
-	Invariant = 0,
-	// Firmware versions in the format A.B.C => A_B_C
-	// These should be set in a way that makes them chronologically comparable with < and > operators
-	Fw5_0 = 5'0'0,
-	Fw6_0 = 6'0'0,
-	Fw8_0 = 8'0'0,
-	Fw9_0 = 9'0'0,
-	Fw11_0 = 11'0'0,
-	Fw20_0 = 20'0'0,
-};
+private:
+	void initialize();
 
-struct SystemVersion 
-{ 
-	u32 major, minor, micro;
+public:
+	FileContainer files;
+	std::optional<std::string> error;
+	std::optional<ThemeFileManifest> manifest;
 
-	constexpr auto operator<=>(const SystemVersion& other) const
-	{
-		auto m = major <=> other.major;
-		if (m == std::strong_ordering::equal)
-			m = minor <=> other.minor;
-		if (m == std::strong_ordering::equal)
-			m = micro <=> other.micro;
-		return m;
-	}
-
-	ConsoleFirmware ToFirmwareEnum() const
-	{
-		if (major < 5) return ConsoleFirmware::Invariant;
-		if (major == 5) return ConsoleFirmware::Fw5_0;
-		if (major == 6 || major == 7) return ConsoleFirmware::Fw6_0;
-		if (major == 8) return ConsoleFirmware::Fw8_0;
-		if (major == 9 || major == 10) return ConsoleFirmware::Fw9_0;
-		if (major >= 11 && major < 20) return ConsoleFirmware::Fw11_0;
-		if (major >= 20) return ConsoleFirmware::Fw20_0;
-
-		return ConsoleFirmware::Invariant;
-	}
-};
-
-struct ThemeTargetInfo
-{
-	u64 TitleId;
-	std::string PartName;
-	std::string SzsFile;
-
-	static std::string TitleIdToString(u64 tid)
-	{
-		return std::format("{:016x}", tid);
-	}
-
-	std::string StringContentId() const 
-	{
-		return TitleIdToString(TitleId);
-	}
-
-	static constexpr u64 QlaunchID = 0x0100000000001000;
-	static constexpr u64 PslID = 0x0100000000001007;
-	static constexpr u64 UserPageID = 0x0100000000001013;
-
-	// Not part of target names but needed for extraction
-	static const ThemeTargetInfo QlaunchCommon;
+	bool IsValid() const { return !error.has_value() && manifest.has_value(); }
 	
-	// May be null if part name is not valid
-	static const ThemeTargetInfo* Find(std::string nxThemeName);	
-	static const ThemeTargetInfo* FindBySzsName(std::string szsName, std::string& outNxPartName);
+	NxTheme(FileContainer&& f) : files(std::move(f)) { initialize(); }
+	NxTheme(const FileContainer& f) : files(f) { initialize(); }
 
-	static std::vector<std::string> GetTargetsForTitleId(u64 tid);
+	// All images are always returned in DDS format
+	static FileResult ConvertToDDS(const FileData& image, bool transparent, int width, int height);
+
+	bool HasMainImage() const { return files.count("image.dds") || files.count("image.jpg"); }
+	FileResult GetMainImage() const;
+
+	bool HasMainLayout() const { return files.count("layout.json"); }
+	std::string_view GetMainLayout() const;
+	
+	bool HasCommonLayout() const { return files.count("common.json"); }
+	std::string_view GetCommonLayout() const;
+		
+	bool HasImagePart(std::string_view partName) const;
+	FileResult GetImagePart(std::string_view partName, int width, int height) const;
+
+	static NxTheme FromError(std::string message);
+	static NxTheme TryLoad(const std::vector<u8>& data);
 };
-
-extern SystemVersion HOSVer;
-extern std::array<u8, 0x40> HOSVersionHash;
-
-ThemeFileManifest ParseNXThemeFile(SARC::SarcData &SData);

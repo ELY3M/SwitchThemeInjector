@@ -1,7 +1,7 @@
 #pragma once
-#include <vector>  // buffers
-#include <sstream> // strings, byteStr()
-#include <memory>
+#include <vector>
+#include <span>
+#include <string>
 
 enum class Endianness : unsigned char
 {
@@ -21,7 +21,12 @@ public:
 	Endianness ByteOrder = Endianness::LittleEndian;
 
     Buffer() ;
+    
+    // This copies the data
     Buffer(const std::vector<unsigned char>&) ;
+    
+    // This copies the data
+    Buffer(std::span<const unsigned char>) ;
 
     void setBuffer(std::vector<unsigned char>&) ;
     const std::vector<unsigned char> &getBuffer() const ;

@@ -64,6 +64,9 @@
     <Filter Include="Libs\hactool">
       <UniqueIdentifier>{533c2a6d-54dd-4d95-826e-7f132c98ce6d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libs\zip">
+      <UniqueIdentifier>{a2bd7bc3-ddd2-41f8-986f-6b0e75b9fc35}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\UI\imgui\imgui.h">
@@ -123,7 +126,7 @@
     <ClInclude Include="source\SwitchThemesCommon\NXTheme.hpp">
       <Filter>SwitchThemesCommon</Filter>
     </ClInclude>
-    <ClInclude Include="source\SwitchThemesCommon\SwitchThemesCommon.hpp">
+    <ClInclude Include="source\SwitchThemesCommon\Common.hpp">
       <Filter>SwitchThemesCommon</Filter>
     </ClInclude>
     <ClInclude Include="source\SwitchThemesCommon\MyTypes.h">
@@ -406,6 +409,15 @@
     <ClInclude Include="source\SwitchTools\RomfsCache.hpp">
       <Filter>SwitchTools</Filter>
     </ClInclude>
+    <ClInclude Include="source\SwitchThemesCommon\Patcher.hpp">
+      <Filter>SwitchThemesCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\zip\zip.h">
+      <Filter>Libs\zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\zip\miniz.h">
+      <Filter>Libs\zip</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\UI\imgui\imgui_demo.cpp">
@@ -465,7 +477,7 @@
     <ClCompile Include="source\Pages\ExternalInstallPage.cpp">
       <Filter>Pages</Filter>
     </ClCompile>
-    <ClCompile Include="source\SwitchThemesCommon\SwitchThemesCommon.cpp">
+    <ClCompile Include="source\SwitchThemesCommon\Common.cpp">
       <Filter>SwitchThemesCommon</Filter>
     </ClCompile>
     <ClCompile Include="source\SwitchThemesCommon\NXTheme.cpp">
@@ -881,6 +893,12 @@
     </ClCompile>
     <ClCompile Include="source\SwitchTools\RomfsCache.cpp">
       <Filter>SwitchTools</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SwitchThemesCommon\Patcher.cpp">
+      <Filter>SwitchThemesCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\zip\zip.c">
+      <Filter>Libs\zip</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

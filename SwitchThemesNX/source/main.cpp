@@ -15,7 +15,7 @@
 #include "Pages/TextPage.hpp"
 #include "Pages/ExternalInstallPage.hpp"
 #include "ViewFunctions.hpp"
-#include "SwitchThemesCommon/NXTheme.hpp"
+#include "SwitchThemesCommon/Common.hpp"
 #include "Pages/RemoteInstallPage.hpp"
 #include "Pages/SettingsPage.hpp"
 #include "Pages/RebootPage.cpp"
@@ -299,6 +299,8 @@ static std::vector<std::string> GetArgsInstallList(int argc, char** argv)
 static void SetupSysVer()
 {
 #if __SWITCH__
+	static_assert(sizeof(firmware.version_hash) == sizeof(hos::VersionHash), "Version hash size mismatch");
+
 	setsysInitialize();
 	SetSysFirmwareVersion firmware;
 	auto res = setsysGetFirmwareVersion(&firmware);
@@ -308,12 +310,14 @@ static void SetupSysVer()
 		DialogBlocking("Could not get sys ver res=" + std::to_string(res));
 		return;
 	}
-	HOSVer = { firmware.major,firmware.minor,firmware.micro };
-	memcpy(HOSVersionHash.data(), firmware.version_hash, sizeof(firmware.version_hash));
+	
+	hos::Version = { firmware.major,firmware.minor,firmware.micro };
+	memcpy(hos::VersionHash.data(), firmware.version_hash, sizeof(firmware.version_hash));
+
 	setsysExit();
 #else 
-	HOSVer = { 20,0,0 };
-	memcpy(HOSVersionHash.data(), "fakever", sizeof("fakever"));
+	hos::Version = { 20,0,0 };
+	memcpy(hos::VersionHash.data(), "fakever", sizeof("fakever"));
 #endif
 }
 

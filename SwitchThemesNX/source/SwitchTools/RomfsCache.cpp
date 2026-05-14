@@ -9,10 +9,10 @@
 #include <stdexcept>
 
 namespace {
-	std::unordered_map<u64, RomfsCache::Dir> Cache;
+	std::unordered_map<u64, FileContainer> Cache;
 }
 
-const RomfsCache::Dir& RomfsCache::GetContent(u64 contentId)
+const FileContainer& RomfsCache::GetContent(u64 contentId)
 {
 	if (!Cache.count(contentId))
 	{
@@ -27,7 +27,7 @@ const RomfsCache::Dir& RomfsCache::GetContent(u64 contentId)
 	return Cache[contentId];
 }
 
-const RomfsCache::File& RomfsCache::GetFile(u64 contentId, const std::string& filePath)
+const FileData& RomfsCache::GetFile(u64 contentId, const std::string& filePath)
 {
 	const auto& cache = GetContent(contentId);
 
@@ -37,7 +37,7 @@ const RomfsCache::File& RomfsCache::GetFile(u64 contentId, const std::string& fi
 	return cache.at(filePath);
 }
 
-const RomfsCache::File& RomfsCache::GetFile(const ThemeTargetInfo& info)
+const FileData& RomfsCache::GetFile(const ThemeTargetInfo& info)
 {
 	return GetFile(info.TitleId, info.SzsFile);
 }

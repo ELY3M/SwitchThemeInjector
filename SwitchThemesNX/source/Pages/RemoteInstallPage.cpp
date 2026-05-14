@@ -226,7 +226,7 @@ void RemoteInstallPage::UpdateServer()
 		server.HostUpdate();
 		if (server.HasFinished())
 		{
-			RemoteInstallFile = ThemeEntry::FromSZS(server.Buffer());
+			RemoteInstallFile = ThemeEntry::FromMemory(server.Buffer());
 			server.Clear();
 			StopServer();
 		}

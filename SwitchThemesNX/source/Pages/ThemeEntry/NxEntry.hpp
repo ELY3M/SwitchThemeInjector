@@ -2,25 +2,31 @@
 #include "../../fs.hpp"
 #include "../../SwitchTools/PatchMng.hpp"
 #include "../../SwitchThemesCommon/NXTheme.hpp"
-#include "../SettingsPage.hpp"
-#include "../../SwitchThemesCommon/Bntx/DDS_conversion.hpp"
-#include "../../SwitchTools/hactool.hpp"
+#include "../../SwitchThemesCommon/Common.hpp"
 #include "../../SwitchTools/RomfsCache.hpp"
+#include "../../SwitchThemesCommon/MyTypes.h"
+#include "../SettingsPage.hpp"
+#include <string>
+#include <vector>
+#include <utility>
+#include <variant>
+#include <optional>
 
 class NxEntry : public ThemeEntry
 {
 public:
-	NxEntry(const std::string& fileName, std::vector<u8>&& RawData)
+	NxEntry(const std::string& fileName, std::vector<u8>&& RawData) :
+		theme(NxTheme::TryLoad(std::move(RawData)))
 	{
 		FileName = fileName;
-		auto DecompressedFile = Yaz0::Decompress(RawData);
-		ParseNxTheme(SARC::Unpack(DecompressedFile));
+		Initialize();
 	}
 
-	NxEntry(const std::string& fileName, SARC::SarcData&& _SData)
+	NxEntry(const std::string& fileName, FileContainer&& container) :
+		theme(NxTheme(std::move(container)))
 	{
 		FileName = fileName;
-		ParseNxTheme(std::move(_SData));
+		Initialize();
 	}
 
 	bool IsFolder() override { return false; }
@@ -28,21 +34,15 @@ public:
 	bool HasPreview() override { return _HasPreview; }
 protected:
 
-	const std::string_view StringFromVec(const std::vector<u8>& vec)
-	{
-		return std::string_view(reinterpret_cast<const char*>(vec.data()), vec.size());
-	}
-
 	bool DoInstall(bool ShowDialogs = true) override
 	{
-		auto themeInfo = ParseNXThemeFile(SData);
-
-		if (!TargetInfo)
+		if (!TargetInfo || !_CanInstall)
 			return false;
 
 		if (!PatchMng::ExefsCompatAsk(fs::GetFileName(TargetInfo->SzsFile)))
 			return false;
 
+		auto targetPart = theme.manifest->Target;
 		const std::vector<u8>& baseSzs = RomfsCache::GetFile(*TargetInfo);
 
 		if (ShowDialogs)
@@ -50,36 +50,35 @@ protected:
 
 		const std::string CommonDestPath = fs::path::RomfsFolder("0100000000001000") + "lyt/common.szs";
 		// If we're installing a resident menu theme delete the common.szs file that could be a leftover from a previous theme
-		if (themeInfo.Target == "home" && fs::Exists(CommonDestPath))
+		if (targetPart == "home" && fs::Exists(CommonDestPath))
 			fs::Delete(CommonDestPath);
 
 		// common.szs is patched in the following cases: 
 		//	On <= 5.0 apply the background image for the applets
-		bool ShouldPatchBGInCommon = HOSVer.major <= 5 && (themeInfo.Target == "news" || themeInfo.Target == "apps" || themeInfo.Target == "set");
+		bool ShouldPatchBGInCommon = hos::Version.major <= 5 && (targetPart == "news" || targetPart == "apps" || targetPart == "set");
 		//	If we have a common layout and it's enabled in the settings 
-		bool HasCommonLayout = themeInfo.Target == "home" && SData.files.count("common.json") && Settings::UseCommon;
+		bool HasCommonLayout = targetPart == "home" && theme.HasCommonLayout() && Settings::UseCommon;
 
 		if (HasCommonLayout || ShouldPatchBGInCommon)
 		{
 			const std::vector<u8>& commonSzs = RomfsCache::GetFile(ThemeTargetInfo::QlaunchCommon);
 
 			SARC::SarcData sarc;
-			if (!SarcOpen(commonSzs, &sarc)) 
+			if (!SarcOpen(commonSzs, &sarc))
 				return false;
 
 			SwitchThemesCommon::SzsPatcher Patcher(sarc);
 
 			if (ShouldPatchBGInCommon)
 			{
-				if (NxThemeGetBgImage().size() != 0)
-					if (!PatchBG(Patcher, NxThemeGetBgImage(), "common.szs"))
+				if (auto image = GetBackgroundImage())
+					if (!PatchBG(Patcher, *image, "common.szs"))
 						return false;
 			}
 
 			if (HasCommonLayout)
 			{
-				auto JsonBinary = SData.files["common.json"];
-				if (!PatchLayout(Patcher, StringFromVec(JsonBinary), "common.szs"))
+				if (!PatchLayout(Patcher, theme.GetCommonLayout(), "common.szs"))
 					return false;
 			}
 
@@ -94,15 +93,15 @@ protected:
 		//Actual file patching code 
 		bool FileHasBeenPatched = false;
 		SARC::SarcData sarc;
-		
-		if (!SarcOpen(baseSzs, &sarc)) 
+
+		if (!SarcOpen(baseSzs, &sarc))
 			return false;
-		
+
 		SwitchThemesCommon::SzsPatcher Patcher(sarc);
-		
+
 		std::string ContentID = TargetInfo->StringContentId();
 		std::string SzsName = fs::GetFileName(TargetInfo->SzsFile);
-		
+
 		auto patch = Patcher.DetectedSarc();
 
 		if (!ShouldPatchBGInCommon)
@@ -113,9 +112,9 @@ protected:
 				return false;
 			}
 
-			if (NxThemeGetBgImage().size() != 0)
+			if (auto image = GetBackgroundImage()) 
 			{
-				if (!PatchBG(Patcher, NxThemeGetBgImage(), SzsName))
+				if (!PatchBG(Patcher, *image, SzsName))
 					return false;
 
 				FileHasBeenPatched = true;
@@ -127,32 +126,30 @@ protected:
 			to let layouts edit the built-in patches that are applied to the panes. To avoid breaking old layouts
 			patches from pre 9 nxthemes will still be applied first
 		*/
-		const auto applyLayoutPatch = [&](){
-			if (SData.files.count("layout.json"))
+		const auto applyLayoutPatch = [&]() {
+			if (theme.HasMainLayout())
 			{
-				auto JsonBinary = SData.files["layout.json"]; 
-				
-				if (!PatchLayout(Patcher, StringFromVec(JsonBinary), themeInfo.Target))	
-					return false; 
-				
-				FileHasBeenPatched = true; 
-			} 
+				if (!PatchLayout(Patcher, theme.GetMainLayout(), targetPart))
+					return false;
+
+				FileHasBeenPatched = true;
+			}
 			else if (
-				Settings::HomeMenuCompat == SwitchThemesCommon::LayoutCompatibilityOption::Firmware10 || 
+				Settings::HomeMenuCompat == SwitchThemesCommon::LayoutCompatibilityOption::Firmware10 ||
 				Settings::HomeMenuCompat == SwitchThemesCommon::LayoutCompatibilityOption::Firmware11
-			)
+				)
 			{
- 				// Special case: this theme has no layout but the user requested to force compatibility fixes
-				if (!PatchLayout(Patcher, "", themeInfo.Target))
+				// Special case: this theme has no layout but the user requested to force compatibility fixes
+				if (!PatchLayout(Patcher, "", targetPart))
 					return false;
 
 				FileHasBeenPatched = true;
 			}
 
 			return true;
-		};
+			};
 
-		if (NXThemeVer <= 8)
+		if (theme.manifest->Version <= 8)
 		{
 			if (!applyLayoutPatch())
 				return false;
@@ -161,59 +158,57 @@ protected:
 		//Applet icons patching
 		if (Settings::UseIcons)
 		{
-			if (NXThemeVer >= 8) {
+			if (theme.manifest->Version >= 8)
+			{
 				//New applet texture patching method
-				if (Settings::UseIcons && Patches::textureReplacement::NxNameToList.count(themeInfo.Target))
+				if (Settings::UseIcons && Patches::textureReplacement::NxNameToList.count(targetPart))
 				{
-					for (const TextureReplacement& p : Patches::textureReplacement::NxNameToList[themeInfo.Target])
+					for (const TextureReplacement& p : Patches::textureReplacement::NxNameToList[targetPart])
 					{
-						auto pResult = false;
-						if (SData.files.count(p.NxThemeName + ".dds"))
-							pResult = Patcher.PatchAppletIcon(SData.files[p.NxThemeName + ".dds"], p.NxThemeName);
-						else if (SData.files.count(p.NxThemeName + ".png"))
-						{
-							auto dds = DDSConv::ConvertImage(SData.files[p.NxThemeName + ".png"], true, p.W, p.H);
-							if (dds.IsSuccess())
-								pResult = Patcher.PatchAppletIcon(dds.Data, p.NxThemeName);
-							else
-							{
-								DialogBlocking("Failed to convert the image for: " + p.NxThemeName + "\n" + dds.ErrorMessage);
-								continue;
-							}
-						}
-						else continue;
+						if (!theme.HasImagePart(p.NxThemeName))
+							continue;
 
-						if (!pResult)
-							DialogBlocking(p.NxThemeName + " icon patch failed for " + SzsName + "\nThe theme will be installed anyway but may crash.");
+						auto data = theme.GetImagePart(p.NxThemeName, p.W, p.H);
+						if (std::holds_alternative<std::string>(data))
+						{
+							DialogBlocking("Failed to convert the image for: " + p.NxThemeName + "\n" + std::get<std::string>(data));
+						}
 						else
-							FileHasBeenPatched = true;
+						{
+							auto patched = Patcher.PatchAppletIcon(std::get<FileData>(data), p.NxThemeName);
+
+							if (!patched)
+								DialogBlocking(p.NxThemeName + " icon patch failed for " + SzsName + "\nThe theme will be installed anyway but may crash.");
+							else
+								FileHasBeenPatched = true;
+						}
 					}
 				}
 			}
 			else
 			{
 				//Old album.szs patching to avoid breaking old themes
-				if (themeInfo.Target == "home" && SData.files.count("album.dds"))
+				if (targetPart == "home" && theme.files.count("album.dds"))
 				{
 					FileHasBeenPatched = true;
-					if (!Patcher.PatchBntxTexture(SData.files["album.dds"], {"RdtIcoPvr_00^s"}, 0x02000000))
+					if (!Patcher.PatchBntxTexture(theme.files.at("album.dds"), { "RdtIcoPvr_00^s" }, 0x02000000))
 						DialogBlocking("Album icon patch failed for " + SzsName + "\nThe theme will be installed anyway but may crash.");
 				}
 			}
 		}
 
-		if (NXThemeVer >= 9)
+		if (theme.manifest->Version >= 9)
 		{
 			if (!applyLayoutPatch())
 				return false;
 		}
 
 		if (FileHasBeenPatched)
-		{			
+		{
 			fs::theme::CreateStructure(ContentID);
 
 			auto sarc = SarcPack(Patcher.GetFinalSarc());
-			fs::WriteFile(fs::path::RomfsFolder(ContentID) +  "lyt/" + SzsName, sarc);
+			fs::WriteFile(fs::path::RomfsFolder(ContentID) + "lyt/" + SzsName, sarc);
 		}
 
 		if (TargetInfo->TitleId == ThemeTargetInfo::QlaunchID)
@@ -225,107 +220,95 @@ protected:
 	LoadedImage GetPreview() override
 	{
 		if (!_HasPreview) return 0;
-		auto& image = NxThemeGetBgImage();
-		if (image.size() == 0) return 0;
-		auto Preview = ImageCache::LoadDDS(image, FileName);
+		auto image = GetBackgroundImage();
+		if (!image) return 0;
+
+		auto Preview = ImageCache::LoadDDS(*image, FileName);
 		if (!Preview)
 		{
 			_HasPreview = false;
 			DialogBlocking("Failed to load the preview image");
 		}
+
 		return Preview;
 	}
 
 private:
 	bool _CanInstall = true;
-	SARC::SarcData SData;
 	bool _HasPreview = false;
-	int NXThemeVer = 0;
+	NxTheme theme;
 	const ThemeTargetInfo* TargetInfo = nullptr;
 
-	const std::vector<u8>& NxThemeGetBgImage()
+	std::optional<FileData> GetBackgroundImage()
 	{
-		if (!_HasPreview || !CanInstall()) return ThemeEntry::_emtptyVec;
-		if (SData.files.count("image.dds"))
-			return SData.files["image.dds"];
-		else if (SData.files.count("image.jpg"))
+		if (!theme.HasMainImage()) 
+			return std::nullopt;
+
+		auto image = theme.GetMainImage();
+		if (std::holds_alternative<std::string>(image))
 		{
-			auto res = DDSConv::ConvertImage(SData.files["image.jpg"], false, 1280, 720);
-			if (res.IsSuccess())
-			{
-				//HACK: don't save the nxtheme after this
-				SData.files["image.dds"] = std::move(res.Data);
-				_HasPreview = true;
-				return SData.files["image.dds"];
-			}
-			else
-			{
-				_HasPreview = false;
-				_CanInstall = false;
-				lblLine2 = res.ErrorMessage;
-				CannotInstallReason = "Couldn't convert the included image " + lblLine2;
-				return ThemeEntry::_emtptyVec;
-			}
+			_HasPreview = false;
+			_CanInstall = false;
+
+			lblLine2 = std::get<std::string>(image);
+			CannotInstallReason = "Failed to load the background image: " + lblLine2;
+			DialogBlocking(CannotInstallReason);
+
+			return std::nullopt;
 		}
-		return ThemeEntry::_emtptyVec;
+
+		return std::get<FileData>(image);
 	}
 
-	void ParseNxTheme(SARC::SarcData&& _Sdata)
+	void Initialize()
 	{
-		SData = std::move(_Sdata);
-		file.clear(); //we don't need the full file for nxthemes
-		auto themeInfo = ParseNXThemeFile(SData);
-		if (themeInfo.Version == -1)
+		// In case of errors, initialize the first line with the file name.
+		// If not needed this will be overwritten later
+		lblLine1 = FileName;
+
+		if (!theme.IsValid())
 		{
-			lblLine1 = "Invalid theme";
-			CannotInstallReason = "Invalid theme";
+			lblLine2 = "Invalid theme";
+			CannotInstallReason = theme.error.value();
 			_CanInstall = false;
+			return;
 		}
 
-		NXThemeVer = themeInfo.Version;
-		if (themeInfo.Version > SwitchThemesCommon::NXThemeVer)
+		if (theme.manifest->Version > SwitchThemesCommon::NXThemeVer)
 		{
 			lblLine2 = "New version, update the installer !";
 			CannotInstallReason = "This theme requres a newer version of the theme installer. Download latest version from GitHub.";
 			_CanInstall = false;
+			return;
 		}
 
-		if (_CanInstall) {
-			if (SData.files.count("image.dds") || SData.files.count("image.jpg"))
-				_HasPreview = true;
-		}
-
-		TargetInfo = ThemeTargetInfo::Find(themeInfo.Target);
+		_HasPreview = theme.HasMainImage();
+		TargetInfo = ThemeTargetInfo::Find(theme.manifest->Target);
 
 		if (!TargetInfo)
 		{
 			lblLine2 = "Error: invalid target";
 			CannotInstallReason = "The target home menu part is not valid";
 			_CanInstall = false;
-		}
-		else if (_CanInstall)
-		{
-			std::string targetStr = TargetInfo->PartName;
-			if (_HasPreview)
-				targetStr += " - press X for preview";
-
-			lblLine2 = (targetStr);
+			return;
 		}
 
-		lblFname = (themeInfo.ThemeName);
-		std::string l1 = "";
-		if (themeInfo.Author != "")
-			l1 += "by " + themeInfo.Author;
-		if (themeInfo.LayoutInfo != "")
-		{
-			l1 += " - " + themeInfo.LayoutInfo;
-		}
+		lblFname = theme.manifest->ThemeName;
+		lblLine2 = TargetInfo->PartName;
+		if (_HasPreview)
+			lblLine2 += " - press X for preview";
 
-		if (l1 == "") //if meta is missing
-			lblLine1 = (FileName);
-		lblLine1 = (l1);
+		lblLine1 = "";
+		if (theme.manifest->Author != "")
+			lblLine1 += "by " + theme.manifest->Author;
+
+		if (theme.manifest->LayoutInfo != "")
+			lblLine1 += " - " + theme.manifest->LayoutInfo;
+
+		// In case all metadata is missing
+		if (lblLine1 == "")
+			lblLine1 = FileName;
 	}
-
 
 	static bool PatchBG(SwitchThemesCommon::SzsPatcher& Patcher, const std::vector<u8>& data, const std::string& SzsName)
 	{

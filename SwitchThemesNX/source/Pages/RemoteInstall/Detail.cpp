@@ -1,8 +1,8 @@
 #include "Detail.hpp"
-#include "../../ViewFunctions.hpp"
-#include "../../SwitchThemesCommon/NXTheme.hpp"
-#include "../ThemeEntry/ImagePreview.hpp"
 #include "Worker.hpp"
+#include "../../ViewFunctions.hpp"
+#include "../../SwitchThemesCommon/common.hpp"
+#include "../ThemeEntry/ImagePreview.hpp"
 #include "../ThemeEntry/ThemeEntry.hpp"
 #include "../ThemePage.hpp"
 
@@ -61,10 +61,10 @@ RemoteInstall::DetailPage::~DetailPage()
 void RemoteInstall::DetailPage::UserDownload(Action action)
 {
 	PushFunction([this, action]() {
-		auto&& theme = DownloadData();
+		auto theme = DownloadData();
 		if (theme.size() == 0) return;
 		
-		auto entry = ThemeEntry::FromSZS(theme);
+		auto entry = ThemeEntry::FromMemory(theme);
 		if (!entry->CanInstall())
 		{
 			DialogBlocking("This theme is not valid");

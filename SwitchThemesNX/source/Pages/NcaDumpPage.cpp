@@ -1,12 +1,14 @@
+#include <string>
+
 #include "NcaDumpPage.hpp"
 #include "../ViewFunctions.hpp"
 
 #include "../SwitchTools/hactool.hpp"
 #include "../SwitchTools/RomfsCache.hpp"
 #include "../fs.hpp"
-#include "../SwitchThemesCommon/NXTheme.hpp"
+#include "../SwitchThemesCommon/Common.hpp"
 
-static void WriteExtracted(const std::string& basePath, const RomfsCache::Dir& files)
+static void WriteExtracted(const std::string& basePath, const FileContainer& files)
 {
 	for (const auto& [name, data] : files)
 	{

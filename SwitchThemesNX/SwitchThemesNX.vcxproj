@@ -56,6 +56,8 @@
     <ClInclude Include="Libs\SOIL2\wfETC.h" />
     <ClInclude Include="Libs\stb_image\stb_dxt.h" />
     <ClInclude Include="Libs\stb_image\stb_image_resize2.h" />
+    <ClInclude Include="Libs\zip\miniz.h" />
+    <ClInclude Include="Libs\zip\zip.h" />
     <ClInclude Include="source\Pages\QlaunchPatchPage.hpp" />
     <ClInclude Include="source\Dialogs.hpp" />
     <ClInclude Include="source\fs.hpp" />
@@ -102,9 +104,10 @@
     <ClInclude Include="source\SwitchThemesCommon\Layouts\Patches.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\MyTypes.h" />
     <ClInclude Include="source\SwitchThemesCommon\NXTheme.hpp" />
+    <ClInclude Include="source\SwitchThemesCommon\Patcher.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\SarcLib\Sarc.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\SarcLib\Yaz0.hpp" />
-    <ClInclude Include="source\SwitchThemesCommon\SwitchThemesCommon.hpp" />
+    <ClInclude Include="source\SwitchThemesCommon\Common.hpp" />
     <ClInclude Include="source\SwitchTools\hactool.hpp" />
     <ClInclude Include="source\SwitchTools\InjectorInstall.hpp" />
     <ClInclude Include="source\SwitchTools\key_loader.hpp" />
@@ -419,6 +422,7 @@
     <ClCompile Include="Libs\SOIL2\SOIL2.c" />
     <ClCompile Include="Libs\SOIL2\wfETC.c" />
     <ClCompile Include="Libs\stb_image\stb_image_impl.c" />
+    <ClCompile Include="Libs\zip\zip.c" />
     <ClCompile Include="source\Pages\QlaunchPatchPage.cpp" />
     <ClCompile Include="source\fs.cpp" />
     <ClCompile Include="source\main.cpp" />
@@ -458,9 +462,10 @@
     <ClCompile Include="source\SwitchThemesCommon\Layouts\LayoutCompatibility.cpp" />
     <ClCompile Include="source\SwitchThemesCommon\Layouts\NewFirmFixes.cpp" />
     <ClCompile Include="source\SwitchThemesCommon\NXTheme.cpp" />
+    <ClCompile Include="source\SwitchThemesCommon\Patcher.cpp" />
     <ClCompile Include="source\SwitchThemesCommon\SarcLib\Sarc.cpp" />
     <ClCompile Include="source\SwitchThemesCommon\SarcLib\Yaz0.cpp" />
-    <ClCompile Include="source\SwitchThemesCommon\SwitchThemesCommon.cpp" />
+    <ClCompile Include="source\SwitchThemesCommon\Common.cpp" />
     <ClCompile Include="source\SwitchTools\hactool.cpp" />
     <ClCompile Include="source\SwitchTools\InjectorInstall.cpp" />
     <ClCompile Include="source\SwitchTools\key_loader.cpp" />

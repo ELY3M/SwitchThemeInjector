@@ -1,7 +1,7 @@
 #include "TextPage.hpp"
 #include "../Version.hpp"
 #include "../ViewFunctions.hpp"
-#include "../UI/imgui/imgui_internal.h"
+#include "../SwitchThemesCommon/Common.hpp"
 
 using namespace std;
 

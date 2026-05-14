@@ -81,7 +81,11 @@ namespace NxThemeTool
         {
             sb.AppendFullLine("#include \"../Layouts/Patches.hpp\"");
             sb.AppendFullLine("#include \"../json.hpp\"");
-            sb.AppendFullLine("#include \"../NXTheme.hpp\"");
+            sb.AppendFullLine("#include \"../Common.hpp\"");
+            
+            sb.AppendFullLine("#include <string>");
+            sb.AppendFullLine("#include <vector>");
+            sb.AppendFullLine("#include <unordered_map>");
 
             sb.AppendFullLine();
             sb.AppendFullLine("using namespace std;");
