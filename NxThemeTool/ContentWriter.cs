@@ -63,9 +63,9 @@ namespace NxThemeTool
     {
         private readonly ZipArchive zip;
 
-        public ZipContentWriter(Stream outputStream)
+        public ZipContentWriter(Stream outputStream, bool leaveOpen = false)
         {
-            zip = new ZipArchive(outputStream, ZipArchiveMode.Create, leaveOpen: true);
+            zip = new ZipArchive(outputStream, ZipArchiveMode.Create, leaveOpen: leaveOpen);
         }
 
         public void WriteFile(string name, byte[] data)

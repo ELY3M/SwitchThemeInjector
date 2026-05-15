@@ -21,7 +21,7 @@ if (args[0] == "list")
 }
 if (args[0] == "new")
 {
-    if (args.Length < 2)
+    if (args.Length < 3)
     {
         Console.WriteLine("Not enough arguments.");
         return 1;
