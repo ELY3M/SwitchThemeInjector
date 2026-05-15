@@ -85,7 +85,10 @@ static vector<string> GetThemeFilesInDirRecursive(const string &path, int level)
 		}
 		else if (p.is_regular_file())
 		{
-			if (StrEndsWith(p.path().string(), ".szs") || StrEndsWith(p.path().string(), ".nxtheme") || StrEndsWith(p.path().string(), ".ttf")) {
+			if (StrEndsWith(p.path().string(), ".szs") || 
+				StrEndsWith(p.path().string(), ".nxtheme") || 
+				StrEndsWith(p.path().string(), ".zip") || 
+				StrEndsWith(p.path().string(), ".ttf")) {
 				auto str = p.path().string();
 				res.push_back(fs::path::ToUnixSeparators(str));
 			}

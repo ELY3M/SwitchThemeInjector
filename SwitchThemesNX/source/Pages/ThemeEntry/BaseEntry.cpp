@@ -12,9 +12,6 @@
 
 #include "ThemeEntry.hpp"
 #include "ImagePreview.hpp"
-#include "FontEntry.hpp"
-#include "LegacyEntry.hpp"
-#include "NxEntry.hpp"
 
 using namespace std;
 using namespace SwitchThemesCommon;
@@ -110,7 +107,7 @@ unique_ptr<ThemeEntry> ThemeEntry::FromFile(const std::string& fileName)
 			return make_unique<FontEntry>(fileName, move(data));
 		if (StrEndsWith(fileName, ".szs"))
 			return make_unique<LegacyEntry>(fileName, move(data));
-		if (StrEndsWith(fileName, ".nxtheme"))
+		if (StrEndsWith(fileName, ".nxtheme") || StrEndsWith(fileName, ".zip"))
 			return make_unique<NxEntry>(fileName, move(data));
 	}
 	catch (std::exception &ex)

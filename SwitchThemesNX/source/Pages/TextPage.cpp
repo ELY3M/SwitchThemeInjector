@@ -63,8 +63,6 @@ void CreditsPage::Render(int X, int Y)
 		"Everyone from the DearImgui github repo"
 	);
 
-	PAGE_RESET_FOCUS;
-
 	ImGui::PopFont();
 	Utils::ImGuiSetWindowScrollable();
 	Utils::ImGuiCloseWin();

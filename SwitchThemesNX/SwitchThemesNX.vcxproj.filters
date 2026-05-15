@@ -203,17 +203,11 @@
     <ClInclude Include="source\SwitchTools\PatchMng.hpp">
       <Filter>SwitchTools</Filter>
     </ClInclude>
-    <ClInclude Include="source\Pages\ThemeEntry\NxEntry.hpp">
-      <Filter>Pages\ThemeEntry</Filter>
-    </ClInclude>
     <ClInclude Include="source\Pages\ThemeEntry\ThemeEntry.hpp">
       <Filter>Pages\ThemeEntry</Filter>
     </ClInclude>
     <ClInclude Include="source\SwitchThemesCommon\Layouts\Bflyt\Txt1Pane.hpp">
       <Filter>SwitchThemesCommon\Layouts\Bflyt</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Pages\ThemeEntry\ImagePreview.hpp">
-      <Filter>Pages\ThemeEntry</Filter>
     </ClInclude>
     <ClInclude Include="source\Pages\RemoteInstall\ApiUtil.hpp">
       <Filter>Pages\RemoteInstall</Filter>
@@ -540,12 +534,6 @@
       <Filter>SwitchTools</Filter>
     </ClCompile>
     <ClCompile Include="source\Pages\ThemeEntry\BaseEntry.cpp">
-      <Filter>Pages\ThemeEntry</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Pages\ThemeEntry\FontEntry.hpp">
-      <Filter>Pages\ThemeEntry</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Pages\ThemeEntry\LegacyEntry.hpp">
       <Filter>Pages\ThemeEntry</Filter>
     </ClCompile>
     <ClCompile Include="source\Pages\RemoteInstall\Worker.cpp">
@@ -899,6 +887,18 @@
     </ClCompile>
     <ClCompile Include="Libs\zip\zip.c">
       <Filter>Libs\zip</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Pages\ThemeEntry\ImagePreview.hpp">
+      <Filter>Pages\ThemeEntry</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Pages\ThemeEntry\LegacyEntry.cpp">
+      <Filter>Pages\ThemeEntry</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Pages\ThemeEntry\NxEntry.cpp">
+      <Filter>Pages\ThemeEntry</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Pages\ThemeEntry\FontEntry.cpp">
+      <Filter>Pages\ThemeEntry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

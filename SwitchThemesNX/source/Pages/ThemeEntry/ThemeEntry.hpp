@@ -1,9 +1,13 @@
 #pragma once
-#include "../../SwitchThemesCommon/MyTypes.h"
-#include "../../SwitchThemesCommon/SarcLib/Sarc.hpp"
-#include "../../UI/UI.hpp"
+#include <optional>
 #include <memory>
 #include <vector>
+#include "../../UI/UI.hpp"
+#include "../../SwitchThemesCommon/MyTypes.h"
+#include "../../SwitchThemesCommon/NXTheme.hpp"
+#include "../../SwitchThemesCommon/Common.hpp"
+#include "../../SwitchThemesCommon/Patcher.hpp"
+#include "../../SwitchThemesCommon/SarcLib/Sarc.hpp"
 
 class ThemeEntry 
 {
@@ -26,8 +30,9 @@ class ThemeEntry
 
 		virtual bool IsFolder() = 0;
 		virtual bool CanInstall() = 0;		
+		virtual bool HasPreview() { return false; }
+		
 		bool Install(bool ShowDialogs = true);
-		virtual bool HasPreview() = 0;
 
 		bool IsHighlighted();
 		std::string GetPath() {return FileName;}
@@ -37,7 +42,11 @@ class ThemeEntry
 		std::string InstallLog;
 	protected:
 		virtual bool DoInstall(bool ShowDialogs = true) = 0;
-		virtual LoadedImage GetPreview() = 0;
+		
+		virtual LoadedImage GetPreview()
+		{
+			throw std::runtime_error("Preview is not available");
+		}
 
 		void AppendInstallMessage(const std::string& msg)
 		{
@@ -58,4 +67,62 @@ class ThemeEntry
 
 		//Used to return by reference for the background image
 		const static std::vector<u8> _emtptyVec;
+};
+
+class NxEntry : public ThemeEntry
+{
+public:
+	NxEntry(const std::string& fileName, std::vector<u8>&& RawData);
+	NxEntry(const std::string& fileName, FileContainer&& container);
+
+	bool IsFolder() override { return false; }
+	bool CanInstall() override { return _CanInstall; }
+	bool HasPreview() override { return _HasPreview; }
+
+protected:
+	bool DoInstall(bool ShowDialogs = true) override;
+	LoadedImage GetPreview() override;
+
+private:
+	bool _CanInstall = true;
+	bool _HasPreview = false;
+	NxTheme theme;
+	const ThemeTargetInfo* TargetInfo = nullptr;
+
+	void Initialize();
+	std::optional<FileData> GetBackgroundImage();
+	bool PatchLayout(SwitchThemesCommon::SzsPatcher& patcher, std::string_view JSON, const std::string& PartName);
+};
+
+class LegacyEntry : public ThemeEntry
+{
+public:
+	LegacyEntry(const std::string& fileName, std::vector<u8>&& RawData);
+	LegacyEntry(const std::string& fileName, SARC::SarcData&& _SData);
+
+	bool IsFolder() override { return false; }
+	bool CanInstall() override { return _CanInstall; }
+protected:
+	bool DoInstall(bool ShowDialogs = true) override;
+
+private:
+	bool _CanInstall = true;
+	SARC::SarcData SData;
+
+	void ParseLegacyTheme(SARC::SarcData&& _Sdata);
+};
+
+class FontEntry : public ThemeEntry
+{
+public:
+	FontEntry(const std::string& fileName, std::vector<u8>&& RawData);
+
+	bool IsFolder() override { return false; }
+	bool CanInstall() override { return _CanInstall; }
+protected:
+	bool DoInstall(bool ShowDialogs = true) override;
+
+private:
+	bool _CanInstall = true;
+	void ParseFont();
 };

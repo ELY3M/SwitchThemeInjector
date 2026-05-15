@@ -32,11 +32,14 @@ bool zip::IsZip(std::span<const u8> data)
 ContainerResult zip::Extract(std::span<const u8> data)
 {
 	zip_t* zip = zip_stream_open((const char*)data.data(), data.size(), 0, 'r');
+	if (!zip)
+		return "Failed to open zip archive";
+
 	FileContainer res = {};
 
 	int entries = zip_entries_total(zip);
 	for (int i = 0; i < entries; ++i) {
-		zip_entry_openbyindex(zip, entries);
+		zip_entry_openbyindex(zip, i);
 		if (!zip_entry_isdir(zip))
 		{
 			const char* name = zip_entry_name(zip);
