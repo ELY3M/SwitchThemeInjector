@@ -160,11 +160,15 @@ FileResult NxTheme::ConvertToDDS(const FileData& image, bool transparent, int wi
 {
 	try
 	{
+#ifndef SWITCHTHEMESCOMMON_TESTS
 		auto dds = DDSConv::ConvertImage(image, transparent, width, height);
 		if (dds.IsSuccess())
 			return dds.Data;
 
 		return dds.ErrorMessage;
+#else
+		return "Not implemented";
+#endif
 	}
 	catch (const std::exception& e)
 	{

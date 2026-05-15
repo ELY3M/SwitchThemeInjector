@@ -1,7 +1,5 @@
-#pragma once
 #ifndef SWITCHTHEMESCOMMON_TESTS
-//This is not properly part of SwitchThemesCommon but it's needed for installing since support for png background instead of dds
-//The image must be converted to DDS so it can go through the already existing lib
+#pragma once
 
 #include <vector>
 #include <string>
