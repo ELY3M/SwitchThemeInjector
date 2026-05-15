@@ -12,6 +12,9 @@
 #ifndef ZIP_H
 #define ZIP_H
 
+#define ZIP_HAVE_SYMLINK 0
+#define ZIP_ENABLE_DEFLATE 0
+
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>

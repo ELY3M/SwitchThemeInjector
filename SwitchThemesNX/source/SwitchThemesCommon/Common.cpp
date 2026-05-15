@@ -10,8 +10,8 @@
 
 namespace SwitchThemesCommon 
 {
-	const std::string SwitchThemesCommon::CoreVer = "4.8.3 (C++)";
-	const int SwitchThemesCommon::NXThemeVer = 16;
+	const std::string CoreVer = "4.9 (C++)";
+	const int NXThemeVer = 17;
 }
 
 namespace hos {

@@ -28,15 +28,6 @@ namespace
 		return true;
 	}
 
-	bool SarcOpen(const std::string& path, SARC::SarcData* out)
-	{
-		auto f = fs::OpenFile(path);
-		if (f.size() == 0) return false;
-		f = Yaz0::Decompress(f);
-		*out = SARC::Unpack(f);
-		return true;
-	}
-
 	bool SarcOpen(const std::vector<u8>& data, SARC::SarcData* out)
 	{
 		if (data.size() == 0) return false;

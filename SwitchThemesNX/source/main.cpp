@@ -3,6 +3,7 @@
 #include <string>
 #include <stdexcept>
 #include <filesystem>
+#include <algorithm>
 
 #include "UI/UIManagement.hpp"
 #include "UI/UI.hpp"
@@ -299,10 +300,11 @@ static std::vector<std::string> GetArgsInstallList(int argc, char** argv)
 static void SetupSysVer()
 {
 #if __SWITCH__
-	static_assert(sizeof(firmware.version_hash) == sizeof(hos::VersionHash), "Version hash size mismatch");
-
 	setsysInitialize();
 	SetSysFirmwareVersion firmware;
+
+	static_assert(sizeof(firmware.version_hash) == sizeof(hos::VersionHash), "Version hash size mismatch");
+
 	auto res = setsysGetFirmwareVersion(&firmware);
 	if (R_FAILED(res))
 	{

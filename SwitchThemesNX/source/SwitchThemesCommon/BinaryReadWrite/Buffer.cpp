@@ -5,6 +5,7 @@
 #include <memory>
 #include <span>
 #include <string>
+#include <cstring>
 
 /************************* WRITING *************************/
 
@@ -155,13 +156,13 @@ void Buffer::writeInt64_BE(long long val)  {
     writeBytes<long long>(val, false);
 }
 
-void Buffer::Write(unsigned long long val)  {
+void Buffer::Write(uint64_t val)  {
     writeBytes<unsigned long long>(val, ByteOrder == Endianness::LittleEndian);
 }
-void Buffer::writeUInt64_LE(unsigned long long val)  {
+void Buffer::writeUInt64_LE(uint64_t val)  {
     writeBytes<unsigned long long>(val);
 }
-void Buffer::writeUInt64_BE(unsigned long long val)  {
+void Buffer::writeUInt64_BE(uint64_t val)  {
     writeBytes<unsigned long long>(val, false);
 }
 
@@ -186,7 +187,8 @@ void Buffer::writeFloat_BE(float val)  {
 }
 
 void Buffer::Write(double val)  {
-	Write(bitcast<uint64_t>(val));
+
+    Write(bitcast<uint64_t>(val));
 }
 
 void Buffer::writeDouble_LE(double val)  {

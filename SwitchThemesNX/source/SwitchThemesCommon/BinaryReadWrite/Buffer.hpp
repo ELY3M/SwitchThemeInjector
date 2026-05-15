@@ -2,6 +2,7 @@
 #include <vector>
 #include <span>
 #include <string>
+#include <cstdint>
 
 enum class Endianness : unsigned char
 {
@@ -51,7 +52,7 @@ public:
 	void Write(int);
 	void Write(unsigned int);
 	void Write(long long);
-	void Write(unsigned long long);
+	void Write(uint64_t);
 	void Write(float);
 	void Write(double);
 	void Write(const std::vector<unsigned char>&);
@@ -71,8 +72,8 @@ public:
 
     void writeInt64_LE(long long) ;
     void writeInt64_BE(long long) ;
-    void writeUInt64_LE(unsigned long long) ;
-    void writeUInt64_BE(unsigned long long) ;
+    void writeUInt64_LE(uint64_t);
+    void writeUInt64_BE(uint64_t) ;
 
     void writeFloat_LE(float) ;
     void writeFloat_BE(float) ;

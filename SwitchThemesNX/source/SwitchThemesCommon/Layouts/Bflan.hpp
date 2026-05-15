@@ -1,12 +1,11 @@
 #pragma once
-#include <iostream>
 #include <vector>
 #include <string>
 #include <type_traits>
+#include <memory>
 
 #include "../BinaryReadWrite/Buffer.hpp"
 #include "../MyTypes.h"
-#include "Patches.hpp"
 
 class BflanSection
 {
