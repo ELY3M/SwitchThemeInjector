@@ -106,6 +106,8 @@ unique_ptr<ThemeEntry> ThemeEntry::FromFile(const std::string& fileName)
 			return make_unique<LegacyEntry>(fileName, move(data));
 		if (StrEndsWith(fileName, ".nxtheme") || StrEndsWith(fileName, ".zip"))
 			return make_unique<NxEntry>(fileName, move(data));
+		if (StrEndsWith(fileName, ".jpg") || StrEndsWith(fileName, ".jpeg") || StrEndsWith(fileName, ".png"))
+			return make_unique<ImageEntry>(fileName, move(data));
 	}
 	catch (std::exception &ex)
 	{

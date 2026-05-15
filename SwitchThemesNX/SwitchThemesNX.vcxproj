@@ -74,6 +74,7 @@
     <ClInclude Include="source\Pages\RemoteInstall\Worker.hpp" />
     <ClInclude Include="source\Pages\SettingsPage.hpp" />
     <ClInclude Include="source\Pages\TextPage.hpp" />
+    <ClInclude Include="source\Pages\ThemeEntry\ImageEntry.hpp" />
     <ClInclude Include="source\Pages\ThemeEntry\ThemeEntry.hpp" />
     <ClInclude Include="source\Pages\ThemePage.hpp" />
     <ClInclude Include="source\Pages\UninstallPage.hpp" />
@@ -440,6 +441,7 @@
     <ClCompile Include="source\Pages\TextPage.cpp" />
     <ClCompile Include="source\Pages\ThemeEntry\BaseEntry.cpp" />
     <ClCompile Include="source\Pages\ThemeEntry\FontEntry.cpp" />
+    <ClCompile Include="source\Pages\ThemeEntry\ImageEntry.cpp" />
     <ClCompile Include="source\Pages\ThemeEntry\LegacyEntry.cpp" />
     <ClCompile Include="source\Pages\ThemeEntry\NxEntry.cpp" />
     <ClCompile Include="source\Pages\ThemePage.cpp" />

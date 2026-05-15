@@ -415,6 +415,9 @@
     <ClInclude Include="source\Pages\ImagePreview.hpp">
       <Filter>Pages</Filter>
     </ClInclude>
+    <ClInclude Include="source\Pages\ThemeEntry\ImageEntry.hpp">
+      <Filter>Pages\ThemeEntry</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\UI\imgui\imgui_demo.cpp">
@@ -902,6 +905,9 @@
     </ClCompile>
     <ClCompile Include="source\Pages\ImagePreview.cpp">
       <Filter>Pages</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Pages\ThemeEntry\ImageEntry.cpp">
+      <Filter>Pages\ThemeEntry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

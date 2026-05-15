@@ -126,3 +126,26 @@ private:
 	bool _CanInstall = true;
 	void ParseFont();
 };
+
+class ImageEntry : public ThemeEntry
+{
+public:
+	ImageEntry(const std::string& fileName, std::vector<u8>&& RawData);
+
+	bool IsFolder() override { return false; }
+	bool CanInstall() override { return CannotInstallReason.empty(); }
+	bool HasPreview() override { return CannotInstallReason.empty(); }
+protected:
+	bool DoInstall(bool ShowDialogs = true) override;
+	ImageRef GetPreview() override { return GetConvertedImage(); }
+
+private:
+	ImageRef _previewImage = nullptr;
+	std::vector<u8> _originalData{};
+	std::vector<u8> _convertedDds{};
+	bool _resizeWarning = false;
+
+	// Lazy conversion, only when needed for preview or installation, and the result is cached
+	void PerformConversion();
+	ImageRef GetConvertedImage();
+};

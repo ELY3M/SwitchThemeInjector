@@ -12,17 +12,18 @@ namespace DDSConv
 	{
 		std::vector<u8> Data;
 		std::string ErrorMessage;
+		bool resized;
 
 		bool IsSuccess() const { return ErrorMessage.empty(); }
 
-		static ConversionResult Success(std::vector<u8> data) 
+		static ConversionResult Success(std::vector<u8> data, bool resized) 
 		{
-			return { data, "" };
+			return { data, "", resized };
 		}
 
 		static ConversionResult Fail(std::string error) 
 		{
-			return { {}, error };
+			return { {}, error, false };
 		}
 	};
 
