@@ -1,7 +1,7 @@
-#include "SettingsPage.hpp"
-#include "../ViewFunctions.hpp"
-#include "../Platform/Platform.hpp"
 #include <vector>
+#include "SettingsPage.hpp"
+#include "../fs.hpp"
+#include "../ViewFunctions.hpp"
 #include "../SwitchThemesCommon/MyTypes.h"
 
 using namespace std;
@@ -99,7 +99,7 @@ void SettingsPage::Render(int X, int Y)
 		ImGui::PopStyleColor();
 		ImGui::SameLine();
 		if (ImGui::Button("Uninstall"))
-			PushFunction([this]() { RemoveSysmodule(true); });
+			PushFunction([]() { RemoveSysmodule(true); });
 	}
 	else
 	{
@@ -111,7 +111,7 @@ void SettingsPage::Render(int X, int Y)
 		{
 			ImGui::SameLine();
 			if (ImGui::Button("Install now"))
-				PushFunction([this]() { InstallSysmodule(); });
+				PushFunction([]() { InstallSysmodule(); });
 		}
 		else
 		{

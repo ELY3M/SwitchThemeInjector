@@ -1,8 +1,9 @@
-#include "ThemePage.hpp"
-#include "../ViewFunctions.hpp"
 #include <algorithm>
+#include <sstream>
+#include "ThemePage.hpp"
+#include "../fs.hpp"
+#include "../ViewFunctions.hpp"
 #include "../Platform/Platform.hpp"
-
 #include "../UI/imgui/imgui_internal.h"
 
 using namespace std;

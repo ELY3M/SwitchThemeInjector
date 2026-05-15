@@ -43,7 +43,7 @@ class ThemeEntry
 	protected:
 		virtual bool DoInstall(bool ShowDialogs = true) = 0;
 		
-		virtual LoadedImage GetPreview()
+		virtual ImageRef GetPreview()
 		{
 			throw std::runtime_error("Preview is not available");
 		}
@@ -81,7 +81,7 @@ public:
 
 protected:
 	bool DoInstall(bool ShowDialogs = true) override;
-	LoadedImage GetPreview() override;
+	ImageRef GetPreview() override;
 
 private:
 	bool _CanInstall = true;

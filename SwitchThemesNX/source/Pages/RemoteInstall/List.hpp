@@ -12,7 +12,6 @@ namespace RemoteInstall
 
 		void Update() override;
 		void Render(int X, int Y) override;
-		~ListPage();
 	private:
 		enum class Result
 		{

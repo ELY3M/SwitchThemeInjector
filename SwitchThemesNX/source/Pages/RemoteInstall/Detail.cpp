@@ -1,12 +1,13 @@
 #include "Detail.hpp"
 #include "Worker.hpp"
+#include "../../fs.hpp"
 #include "../../ViewFunctions.hpp"
 #include "../../SwitchThemesCommon/Common.hpp"
-#include "../ThemeEntry/ImagePreview.hpp"
 #include "../ThemeEntry/ThemeEntry.hpp"
+#include "../ImagePreview.hpp"
 #include "../ThemePage.hpp"
 
-RemoteInstall::DetailPage::DetailPage(const RemoteInstall::API::Entry& entry, LoadedImage i) : entry(entry), img(i)
+RemoteInstall::DetailPage::DetailPage(const RemoteInstall::API::Entry& entry, ImageRef i) : entry(entry), img(i)
 {
 	auto info = ThemeTargetInfo::Find(entry.Target);
 	PartName = info ? info->PartName : "Unknown part name";
@@ -25,8 +26,8 @@ void RemoteInstall::DetailPage::Render(int X, int Y)
 	Utils::ImGuiCenterString(PartName);
 
 	ImGui::SetCursorPosX(SCR_W / 4.0f);
-	if (ImGui::ImageButton((ImTextureID)(uintptr_t)img, ImVec2(SCR_W, SCR_H) / 2))
-		PushPage(new ImagePreview(img));
+	if (ImGui::ImageButton(img->TextureId, ImVec2(SCR_W, SCR_H) / 2))
+		PushPage(new ImagePreview(img, entry.Name));
 
 	const float BtnW = SCR_W / 3.0f;
 
@@ -50,12 +51,6 @@ void RemoteInstall::DetailPage::Render(int X, int Y)
 
 	ImGui::End();
 	ImGui::PopFont();
-}
-
-RemoteInstall::DetailPage::~DetailPage()
-{
-	if (img)
-		Image::Free(img);
 }
 
 void RemoteInstall::DetailPage::UserDownload(Action action)

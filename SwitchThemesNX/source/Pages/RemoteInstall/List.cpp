@@ -1,13 +1,13 @@
+#include <sstream>
+#include <filesystem>
 #include "List.hpp"
-#include "../../ViewFunctions.hpp"
-#include "../ThemeEntry/ImagePreview.hpp"
 #include "Worker.hpp"
+#include "../ImagePreview.hpp"
 #include "../ThemePage.hpp"
-
+#include "../../fs.hpp"
+#include "../../ViewFunctions.hpp"
 #include "../../UI/UI.hpp"
 #include "../../SwitchThemesCommon/Common.hpp"
-
-#include <sstream>
 
 const ImVec2 ImageSize = { 398, 224 };
 
@@ -46,7 +46,7 @@ void RemoteInstall::ListPage::Render(int X, int Y)
 		// Don't allow previewing if have the lowres image
 		// TODO: downlaod the full size preview on request
 		else if (res == Result::Preview && response.Entries[i].ThumbUrl() == response.Entries[i]._Preview)
-			PushPage(new ImagePreview(images.List[i]));
+			PushPage(new ImagePreview(images.List[i], ""));
 		else 
 			Utils::ImGuiDragWithLastElement();
 
@@ -86,12 +86,6 @@ void RemoteInstall::ListPage::Render(int X, int Y)
 
 	ImGui::End();
 	ImGui::PopFont();
-}
-
-RemoteInstall::ListPage::~ListPage()
-{
-	for (LoadedImage i : images.List)
-		Image::Free(i);
 }
 
 size_t RemoteInstall::ListPage::SelectedCount() const
@@ -239,7 +233,7 @@ RemoteInstall::ListPage::Result RemoteInstall::ListPage::RenderWidget(size_t ind
 	auto targetInfo = ThemeTargetInfo::Find(response.Entries[index].Target);
 	const char* Target = targetInfo ? targetInfo->PartName.c_str() : "Unknown part name";
 
-	const LoadedImage img = images.List[index];
+	const auto& img = images.List[index];
 
 	ImGuiWindow* window = ImGui::GetCurrentWindow();
 	if (window->SkipItems)
@@ -273,7 +267,7 @@ RemoteInstall::ListPage::Result RemoteInstall::ListPage::RenderWidget(size_t ind
 		ImGui::MarkItemEdited(id);
 		result = Result::Clicked;
 	}
-	else if (hovered && KeyPressed(GLFW_GAMEPAD_BUTTON_X) && img)
+	else if (hovered && KeyPressed(GLFW_GAMEPAD_BUTTON_X) && img->IsValid())
 		result = Result::Preview;
 
 	// Render
@@ -281,7 +275,7 @@ RemoteInstall::ListPage::Result RemoteInstall::ListPage::RenderWidget(size_t ind
 	ImGui::RenderNavHighlight(bb, id);
 	ImGui::RenderFrame(bb.Min, bb.Max, col, true, style.FrameRounding);
 
-	window->DrawList->AddImage((ImTextureID)(uintptr_t)img, imageBox.Min, imageBox.Max);
+	window->DrawList->AddImage(img->TextureId, imageBox.Min, imageBox.Max);
 
 	const float Checkboxsz = 35;
 	window->DrawList->AddRectFilled(pos, pos + ImVec2(Checkboxsz, Checkboxsz), ImGui::GetColorU32(ImGuiCol_FrameBg));

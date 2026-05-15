@@ -53,7 +53,7 @@ namespace RemoteInstall::Worker
 	public:
 		struct Result {
 			size_t Total, Failed;
-			std::vector<LoadedImage> List;
+			std::vector<ImageRef> List;
 		};
 
 		ImageFetch(const std::vector<std::string>& urls, Result& result) : BaseWorker(urls), OutResult(result)

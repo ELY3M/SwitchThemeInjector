@@ -2,7 +2,6 @@
 #include "SwitchThemesCommon/MyTypes.h"
 #include <vector>
 #include <string>
-#include <filesystem>
 #include <span>
 
 #include "Platform/PlatformFs.hpp"

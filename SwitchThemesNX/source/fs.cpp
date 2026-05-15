@@ -1,5 +1,6 @@
 #include <cstring>
 #include <sstream>
+#include <filesystem>
 
 #include "fs.hpp"
 #include "SwitchThemesCommon/Common.hpp"

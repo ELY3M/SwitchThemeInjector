@@ -412,6 +412,9 @@
     <ClInclude Include="Libs\zip\miniz.h">
       <Filter>Libs\zip</Filter>
     </ClInclude>
+    <ClInclude Include="source\Pages\ImagePreview.hpp">
+      <Filter>Pages</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\UI\imgui\imgui_demo.cpp">
@@ -888,9 +891,6 @@
     <ClCompile Include="Libs\zip\zip.c">
       <Filter>Libs\zip</Filter>
     </ClCompile>
-    <ClCompile Include="source\Pages\ThemeEntry\ImagePreview.hpp">
-      <Filter>Pages\ThemeEntry</Filter>
-    </ClCompile>
     <ClCompile Include="source\Pages\ThemeEntry\LegacyEntry.cpp">
       <Filter>Pages\ThemeEntry</Filter>
     </ClCompile>
@@ -899,6 +899,9 @@
     </ClCompile>
     <ClCompile Include="source\Pages\ThemeEntry\FontEntry.cpp">
       <Filter>Pages\ThemeEntry</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Pages\ImagePreview.cpp">
+      <Filter>Pages</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

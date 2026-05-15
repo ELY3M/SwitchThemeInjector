@@ -4,14 +4,13 @@
 #include <vector>
 #include <utility>
 
+#include "ThemeEntry.hpp"
+#include "../ImagePreview.hpp"
 #include "../../ViewFunctions.hpp"
 #include "../../fs.hpp"
 #include "../../Platform/Platform.hpp"
 #include "../../UI/UI.hpp"
 #include "../../SwitchThemesCommon/MyTypes.h"
-
-#include "ThemeEntry.hpp"
-#include "ImagePreview.hpp"
 
 using namespace std;
 using namespace SwitchThemesCommon;
@@ -36,9 +35,7 @@ public:
 
 	bool IsFolder() override { return Folder; }
 	bool CanInstall() override { return false; }
-	bool HasPreview() override { return false; }
 protected:
-	LoadedImage GetPreview() override { throw runtime_error("Preview is not implemented"); }
 	bool DoInstall(bool ShowDialogs = true) override { return false; }
 };
 
@@ -208,9 +205,9 @@ ThemeEntry::UserAction ThemeEntry::Render(bool OverrideColor)
 	if (HasPreview() && (hovered || held) && KeyPressed(GLFW_GAMEPAD_BUTTON_X))
 	{
 		auto Preview = GetPreview();
-		if (Preview)
+		if (Preview && Preview->IsValid())
 		{
-			PushPage(new ImagePreview(Preview));
+			PushPage(new ImagePreview(Preview, FileName));
 			return UserAction::Preview;
 		}
 	}

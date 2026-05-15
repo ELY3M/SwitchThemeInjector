@@ -23,6 +23,7 @@
 #include "Pages/QlaunchPatchPage.hpp"
 
 #include "SwitchTools/PatchMng.hpp"
+#include "fs.hpp"
 
 //#define DEBUG
 
@@ -415,7 +416,7 @@ int main(int argc, char **argv)
 	}
 
 	GFX::Exit();
-	Image::Internal::AssertOnLeaks();
+	RenderImage::DebugAssertLeaks();
 	PlatformExit();
 	
     return 0;

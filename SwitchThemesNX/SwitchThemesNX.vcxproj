@@ -58,6 +58,7 @@
     <ClInclude Include="Libs\stb_image\stb_image_resize2.h" />
     <ClInclude Include="Libs\zip\miniz.h" />
     <ClInclude Include="Libs\zip\zip.h" />
+    <ClInclude Include="source\Pages\ImagePreview.hpp" />
     <ClInclude Include="source\Pages\QlaunchPatchPage.hpp" />
     <ClInclude Include="source\Dialogs.hpp" />
     <ClInclude Include="source\fs.hpp" />
@@ -421,6 +422,7 @@
     <ClCompile Include="Libs\SOIL2\wfETC.c" />
     <ClCompile Include="Libs\stb_image\stb_image_impl.c" />
     <ClCompile Include="Libs\zip\zip.c" />
+    <ClCompile Include="source\Pages\ImagePreview.cpp" />
     <ClCompile Include="source\Pages\QlaunchPatchPage.cpp" />
     <ClCompile Include="source\fs.cpp" />
     <ClCompile Include="source\main.cpp" />
@@ -438,7 +440,6 @@
     <ClCompile Include="source\Pages\TextPage.cpp" />
     <ClCompile Include="source\Pages\ThemeEntry\BaseEntry.cpp" />
     <ClCompile Include="source\Pages\ThemeEntry\FontEntry.cpp" />
-    <ClCompile Include="source\Pages\ThemeEntry\ImagePreview.hpp" />
     <ClCompile Include="source\Pages\ThemeEntry\LegacyEntry.cpp" />
     <ClCompile Include="source\Pages\ThemeEntry\NxEntry.cpp" />
     <ClCompile Include="source\Pages\ThemePage.cpp" />

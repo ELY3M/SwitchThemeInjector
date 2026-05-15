@@ -241,14 +241,14 @@ bool NxEntry::DoInstall(bool ShowDialogs)
 	return true;
 }
 
-LoadedImage NxEntry::GetPreview()
+ImageRef NxEntry::GetPreview()
 {
 	if (!_HasPreview) return 0;
 	auto image = GetBackgroundImage();
 	if (!image) return 0;
 
 	auto Preview = ImageCache::LoadDDS(*image, FileName);
-	if (!Preview)
+	if (!Preview->IsValid())
 	{
 		_HasPreview = false;
 		DialogBlocking("Failed to load the preview image");
@@ -345,8 +345,6 @@ void NxEntry::Initialize()
 
 	lblFname = theme.manifest->ThemeName;
 	lblLine2 = TargetInfo->PartName;
-	if (_HasPreview)
-		lblLine2 += " - press X for preview";
 
 	lblLine1 = "";
 	if (theme.manifest->Author != "")

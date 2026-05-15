@@ -13,8 +13,7 @@
 
 #include "../../Libs/SOIL2/SOIL2.h"
 
-static_assert(std::is_same<GLuint, LoadedImage>::value);
-static_assert(sizeof(LoadedImage) <= sizeof(ImTextureID)); //We must not lose data when passing the image to ImGui
+static_assert(sizeof(GLuint) <= sizeof(ImTextureID)); //We must not lose data when passing the image to ImGui
 
 //moved here from ViewFunctions as it needs static variables
 void Utils::ImGuiDragWithLastElement()
@@ -42,45 +41,62 @@ void Utils::ImGuiDragWithLastElement()
 	}
 }
 
-static size_t ImageCount = 0;
+size_t RenderImage::LeakCount = 0;
 
-void Image::Free(LoadedImage img)
+RenderImage::RenderImage(const std::vector<u8>& data)
 {
-	if (img)
-	{
-		ImageCount--;
-		glDeleteTextures(1, &img);
-	}
-}
+	auto tex = SOIL_load_OGL_texture_from_memory(data.data(), data.size(), 4, 0, 0);
 
-LoadedImage Image::Load(const std::vector<u8>& data)
-{
-	GLuint tex = SOIL_load_OGL_texture_from_memory(data.data(), data.size(), 4, 0, 0);
-	
-	if (!tex)
+	if (tex <= 0)
 	{
 		LOGf("Failed to load image, SOIL error: %s\n", SOIL_last_result());
-		return 0;
+
+		Invalidate();
+		return;
 	}
 
-	ImageCount++;
-	return tex;
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &Width);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &Height);
+	TextureId = (ImTextureID)(intptr_t)tex;
+
+	LeakCount++;
 }
 
-void Image::Internal::AssertOnLeaks()
+RenderImage::RenderImage(RenderImage&& other) 
+{
+	Width = other.Width;
+	Height = other.Height;
+	TextureId = other.TextureId;
+
+	other.Invalidate();
+}
+
+RenderImage::~RenderImage()
+{
+	if (IsValid())
+	{
+		GLuint id = (GLuint)TextureId;
+		glDeleteTextures(1, &id);
+		--LeakCount;
+	}
+
+	Invalidate();
+}
+
+void RenderImage::DebugAssertLeaks()
 {
 	ImageCache::Clear();
-	if (ImageCount)
+	if (LeakCount)
 		throw std::runtime_error("Leaking images !");
 }
 
-using namespace std;
+using CacheEntry = std::pair<std::string, ImageRef>;
+std::vector<CacheEntry> ImagePool;
 
-vector<pair<string, LoadedImage>> ImagePool;
-
-static auto HasString(const string& str) 
+static auto HasString(const std::string& str)
 {
-	auto res = std::find_if(ImagePool.begin(), ImagePool.end(), [&str](pair<string, LoadedImage>& pair) { return pair.first == str; });
+	auto res = std::find_if(ImagePool.begin(), ImagePool.end(), 
+		[&str](const CacheEntry& pair) { return pair.first == str; });
 	return res;
 }
 
@@ -90,44 +106,40 @@ static void PopFirst()
 	ImageCache::FreeImage(ImagePool[0].first);
 }
 
-static void AddValue(const string& str, LoadedImage img)
+static void AddValue(const std::string& str, ImageRef img)
 {
 	ImagePool.emplace_back(str, img);
 	LOGf("Pushing %s size %lu\n", str.c_str(), ImagePool.size());
 
-	const u32 MaxCachedImages = UseLowMemory ? 2 : 7;
+	const u32 MaxCachedImages = UseLowMemory ? 3 : 8;
 	if (ImagePool.size() > MaxCachedImages)
 		PopFirst();
 }
 
 void ImageCache::Clear()
 {
-	for (const auto& i : ImagePool)
-		Image::Free(i.second);
-
 	ImagePool.clear();
 }
 
-void ImageCache::FreeImage(const string &img)
+void ImageCache::FreeImage(const std::string &img)
 {
 	auto res = HasString(img);
 	if (res == ImagePool.end()) return;
-	Image::Free(res->second);
 	ImagePool.erase(res);
 }
 
-LoadedImage ImageCache::LoadDDS(const vector<u8> &data, const string &name)
+ImageRef ImageCache::LoadDDS(const std::vector<u8> &data, const std::string &name)
 {	
 	auto res = HasString(name);
 	if (res != ImagePool.end())
 		return res->second;
 
-	GLuint tex = Image::Load(data);
+	auto image = std::make_shared<RenderImage>(data);
 
-	if (tex)
-		AddValue(name, tex);
+	if (image->IsValid())
+		AddValue(name, image);
 	
-	return tex;
+	return image;
 }
 
 IPage::~IPage(){}

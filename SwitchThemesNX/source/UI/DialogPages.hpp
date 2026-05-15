@@ -2,11 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <filesystem>
-#include "../SwitchThemesCommon/MyTypes.h"
 #include "UI.hpp"
-#include "../fs.hpp"
-#include <functional>
 
 class LoadingOverlay : public IUIControlObj
 {	
