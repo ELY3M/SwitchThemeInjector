@@ -91,7 +91,7 @@ void TabRenderer::Render(int X, int Y)
 
 	auto dList = ImGui::GetOverlayDrawList();
 
-	dList->AddText(font40, 40, { 21,21 }, 0xffffffff, Title.c_str());
+	dList->AddText(font40, 40, { TopLine.x ,21 }, 0xffffffff, Title.c_str());
 
 	dList->AddRectFilled(TopLine, TopLine + TopLineSz, 0xffffffff);
 	dList->AddRectFilled(BottomLine, BottomLine + TopLineSz, 0xffffffff);
