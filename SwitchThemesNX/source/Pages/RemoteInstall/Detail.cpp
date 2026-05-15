@@ -1,7 +1,7 @@
 #include "Detail.hpp"
 #include "Worker.hpp"
 #include "../../ViewFunctions.hpp"
-#include "../../SwitchThemesCommon/common.hpp"
+#include "../../SwitchThemesCommon/Common.hpp"
 #include "../ThemeEntry/ImagePreview.hpp"
 #include "../ThemeEntry/ThemeEntry.hpp"
 #include "../ThemePage.hpp"
