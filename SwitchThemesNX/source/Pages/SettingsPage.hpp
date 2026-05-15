@@ -17,9 +17,9 @@ class SettingsPage : public IPage
 		void Update() override;
 
 		static bool CheckSysmoduleInstalled();
+		static bool InstallSysmodule();
+		static bool RemoveSysmodule(bool dialogs);
 	private:
-		bool sysmoduleInstalled;
-
-		void InstallSysmodule();
-		void RemoveSysmodule();
+		static bool sysmoduleInstalled;
+		static bool canInstallSysmodule;
 };

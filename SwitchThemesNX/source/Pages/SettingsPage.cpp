@@ -15,35 +15,51 @@ namespace Settings {
 SettingsPage::SettingsPage()
 {
 	Name = "Settings";
-	sysmoduleInstalled = CheckSysmoduleInstalled();
+	CheckSysmoduleInstalled();
 }
 
 #define SYSMODULE_ID "00FF007468656D65"
 
+bool SettingsPage::sysmoduleInstalled;
+bool SettingsPage::canInstallSysmodule;
+
 bool SettingsPage::CheckSysmoduleInstalled()
 {
-	return fs::Exists(fs::path::FsMitmFolder() + SYSMODULE_ID "/exefs.nsp");
+	sysmoduleInstalled = fs::Exists(fs::path::FsMitmFolder() + SYSMODULE_ID "/exefs.nsp");
+	canInstallSysmodule = fs::Exists(ASSET("sysmodule/ThemeSysmodule.nsp"));
+
+	return sysmoduleInstalled;
 }
 
-void SettingsPage::InstallSysmodule()
+bool SettingsPage::InstallSysmodule()
 {
-	try {
+	if (!canInstallSysmodule)
+	{
+		Dialog("Failed to install the sysmodule. This version of the theme installer was built without the sysmodule binary.");
+		return false;
+	}
+
+	try 
+	{
 		fs::CreateDirectory(fs::path::FsMitmFolder() + SYSMODULE_ID "/flags");
 		fs::WriteFile(fs::path::FsMitmFolder() + SYSMODULE_ID "/exefs.nsp", fs::OpenFile(ASSET("sysmodule/ThemeSysmodule.nsp")));
 		fs::WriteFile(fs::path::FsMitmFolder() + SYSMODULE_ID "/toolbox.json", fs::OpenFile(ASSET("sysmodule/toolbox.json")));
 		fs::WriteFile(fs::path::FsMitmFolder() + SYSMODULE_ID "/flags/boot2.flag", std::vector<u8>{ 'a' });
 		fs::WriteFile(fs::path::FsMitmFolder() + SYSMODULE_ID "/ver.txt", std::vector<u8>{ '1' });
-		sysmoduleInstalled = true;
-
+		
+		CheckSysmoduleInstalled();
 		Dialog("The sysmodule has been installed. Restart your console to apply the changes.");
+		
+		return true;
 	}
 	catch (const std::exception& ex)
 	{
 		Dialog("Error installing sysmodule: "s + ex.what());
+		return false;
 	}
 }
 
-void SettingsPage::RemoveSysmodule()
+bool SettingsPage::RemoveSysmodule(bool dialogs)
 {
 	auto path = fs::path::FsMitmFolder() + SYSMODULE_ID "/";
 
@@ -51,13 +67,17 @@ void SettingsPage::RemoveSysmodule()
 		if (fs::Exists(path))
 			fs::DeleteDirectory(path);
 
-		sysmoduleInstalled = false;
+		CheckSysmoduleInstalled();
 
-		Dialog("The sysmodule has been uninstalled. Restart your console to apply the changes.");
+		if (dialogs)
+			Dialog("The sysmodule has been uninstalled. Restart your console to apply the changes.");
+
+		return true;
 	}
 	catch (const std::exception& ex)
 	{
 		Dialog("Error uninstalling sysmodule: "s + ex.what());
+		return false;
 	}
 }
 
@@ -79,16 +99,27 @@ void SettingsPage::Render(int X, int Y)
 		ImGui::PopStyleColor();
 		ImGui::SameLine();
 		if (ImGui::Button("Uninstall"))
-			PushFunction([this]() { RemoveSysmodule(); });
+			PushFunction([this]() { RemoveSysmodule(true); });
 	}
 	else
 	{
 		ImGui::PushStyleColor(ImGuiCol_Text, Colors::Red);
 		ImGui::Text("The sysmodule is currently not installed.    ");
 		ImGui::PopStyleColor();
-		ImGui::SameLine();
-		if (ImGui::Button("Install now"))
-			PushFunction([this]() { InstallSysmodule(); });
+
+		if (canInstallSysmodule) 
+		{
+			ImGui::SameLine();
+			if (ImGui::Button("Install now"))
+				PushFunction([this]() { InstallSysmodule(); });
+		}
+		else
+		{
+			ImGui::PushStyleColor(ImGuiCol_Text, Colors::Red);
+			ImGui::TextWrapped("This version of the theme installer does not contain the sysmodule binary.");
+			ImGui::PopStyleColor();
+			ImGui::TextWrapped("If this is a custom build, you forgot to compile the sysmodule and copy it to the romfs.");
+		}
 	}
 	PAGE_RESET_FOCUS;
 

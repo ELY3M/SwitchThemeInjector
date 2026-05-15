@@ -77,8 +77,8 @@ bool PatchMng::ExefsCompatAsk(const std::string& SzsName)
 
 void PatchMng::RemoveAll()
 {
-	fs::RecursiveDeleteFolder(GetExefsPatchesPath());
-	fs::RecursiveDeleteFolder(fs::path::PatchesDir);
+	fs::DeleteDirectory(GetExefsPatchesPath());
+	fs::DeleteDirectory(fs::path::PatchesDir);
 	HasLatestPatches = false;
 }
 

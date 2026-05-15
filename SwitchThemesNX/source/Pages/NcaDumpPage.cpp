@@ -41,7 +41,7 @@ void NcaDumpPage::Render(int X, int Y)
 			try 
 			{
 				if (fs::Exists(fs::path::SystemDataFolder + "extracted/"))
-					fs::RecursiveDeleteFolder(fs::path::SystemDataFolder + "extracted/");
+					fs::DeleteDirectory(fs::path::SystemDataFolder + "extracted/");
 
 				DisplayLoading("Extracting qlaunch...");
 				WriteExtracted("extracted/qlaunch", RomfsCache::GetContent(ThemeTargetInfo::QlaunchID));
@@ -73,7 +73,7 @@ void NcaDumpPage::Render(int X, int Y)
 				try
 				{
 					if (fs::Exists(fs::path::SystemDataFolder + "nca/"))
-						fs::RecursiveDeleteFolder(fs::path::SystemDataFolder + "nca/");
+						fs::DeleteDirectory(fs::path::SystemDataFolder + "nca/");
 
 					fs::CreateDirectory(fs::path::SystemDataFolder + "nca/");
 

@@ -64,7 +64,7 @@ string& fs::path::ToUnixSeparators(string& str)
 	return str;
 }
 
-static vector<string> GetThemeFilesInDirRecursive(const string &path, int level)
+static vector<string> GetThemeFilesInDirRecursive(const string& path, int level)
 {
 	vector<string> res;
 	if (level > 7) return res;
@@ -73,9 +73,9 @@ static vector<string> GetThemeFilesInDirRecursive(const string &path, int level)
 		if (p.is_directory())
 		{
 			// Folders excluded from search
-			if (p.path().filename() == SYSTEMDATA_DIR || 
+			if (p.path().filename() == SYSTEMDATA_DIR ||
 				p.path().filename() == SYSTEMPATCHES_DIR)
-					continue;
+				continue;
 
 			auto path = p.path().string();
 			res.push_back(fs::path::ToUnixSeparators(path));
@@ -85,9 +85,9 @@ static vector<string> GetThemeFilesInDirRecursive(const string &path, int level)
 		}
 		else if (p.is_regular_file())
 		{
-			if (StrEndsWith(p.path().string(), ".szs") || 
-				StrEndsWith(p.path().string(), ".nxtheme") || 
-				StrEndsWith(p.path().string(), ".zip") || 
+			if (StrEndsWith(p.path().string(), ".szs") ||
+				StrEndsWith(p.path().string(), ".nxtheme") ||
+				StrEndsWith(p.path().string(), ".zip") ||
 				StrEndsWith(p.path().string(), ".ttf")) {
 				auto str = p.path().string();
 				res.push_back(fs::path::ToUnixSeparators(str));
@@ -97,13 +97,13 @@ static vector<string> GetThemeFilesInDirRecursive(const string &path, int level)
 	return res;
 }
 
-vector<u8> fs::OpenFile(const string &name)
+vector<u8> fs::OpenFile(const string& name)
 {
-	FILE* f = fopen(name.c_str(),"rb");
+	FILE* f = fopen(name.c_str(), "rb");
 	if (!f)
 		throw std::runtime_error("Opening file " + name + " failed !\n" FS_TROUBLESHOOT_MSG);
 
-	fseek(f,0,SEEK_END);
+	fseek(f, 0, SEEK_END);
 	size_t len = 0;
 	{
 		auto fsz = ftell(f);
@@ -121,16 +121,16 @@ vector<u8> fs::OpenFile(const string &name)
 	return coll;
 }
 
-void fs::WriteFile(const string &name, std::span<const u8> data)
+void fs::WriteFile(const string& name, std::span<const u8> data)
 {
 	if (filesystem::exists(name))
 		remove(name.c_str());
-	
-	FILE* f = fopen(name.c_str(),"wb");
+
+	FILE* f = fopen(name.c_str(), "wb");
 	if (!f)
 		throw std::runtime_error("Saving file " + name + "failed !");
-	
-	fwrite(data.data(),1,data.size(),f);
+
+	fwrite(data.data(), 1, data.size(), f);
 	fflush(f);
 	fclose(f);
 }
@@ -141,11 +141,13 @@ void fs::Delete(const std::string& path) { std::filesystem::remove(path); }
 
 void fs::CreateDirectory(const std::string& path) { std::filesystem::create_directories(path); }
 
-void fs::DeleteDirectory(const std::string& path) { 
+void fs::DeleteDirectory(const std::string& path) {
 	// remove_all fails for some reason so we must iterate manually.
 	if (!std::filesystem::is_directory(path))
 	{
-		fs::Delete(path);
+		if (fs::Exists(path))
+			fs::Delete(path);
+
 		return;
 	}
 
@@ -164,7 +166,7 @@ std::string fs::SanitizeName(const std::string& name)
 {
 	const char* forbiddenChars = "/?<>\\:*|\".";
 
-	std::string res = name.length() > 30 ? name.substr(0,30) : name;
+	std::string res = name.length() > 30 ? name.substr(0, 30) : name;
 	char* c = res.data();
 	while (*c)
 	{
@@ -176,29 +178,6 @@ std::string fs::SanitizeName(const std::string& name)
 	return res;
 }
 
-void fs::RecursiveDeleteFolder(const string &path)
-{
-	if (!filesystem::exists(path)) return;
-	vector<string> toDelete;
-	for (auto p : filesystem::directory_iterator(path))
-	{
-		if (p.is_directory())
-		{
-			toDelete.push_back(p.path().string());
-		}
-		else if (p.is_regular_file())
-		{
-			remove(p.path().string().c_str());
-		}
-	}
-	for (auto p : toDelete)
-	{
-		RecursiveDeleteFolder(p);
-		DeleteDirectory(p);
-	}
-	DeleteDirectory(path);
-}
-
 bool fs::EnsureThemesFolderExists()
 {
 	if (!filesystem::exists(path::ThemesFolder))
@@ -207,7 +186,7 @@ bool fs::EnsureThemesFolderExists()
 	bool Result = filesystem::exists(path::SystemDataFolder);
 	if (!Result)
 		CreateDirectory(path::SystemDataFolder);
-	
+
 	patches::CreateFolder();
 
 	return Result;
@@ -245,7 +224,7 @@ string fs::JoinPath(const string& first, const string& second)
 
 void fs::RemoveSystemDataDir()
 {
-	RecursiveDeleteFolder(path::SystemDataFolder);
+	DeleteDirectory(path::SystemDataFolder);
 	CreateDirectory(path::SystemDataFolder);
 }
 
@@ -279,27 +258,23 @@ bool fs::theme::ShouldRescanThemeList()
 
 void fs::theme::UninstallTheme(bool full)
 {
-	#define DelDirFromCfw(x) if (filesystem::exists(path::FsMitmFolder() + x)) \
-		RecursiveDeleteFolder(path::FsMitmFolder() + x);
-	
 	if (full)
 	{
-		DelDirFromCfw("0100000000001000")
-		DelDirFromCfw("0100000000001013")
+		DeleteDirectory(path::FsMitmFolder() + "0100000000001000");
+		DeleteDirectory(path::FsMitmFolder() + "0100000000001013");
 	}
-	else 
+	else
 	{
-		DelDirFromCfw("0100000000001000/romfs/lyt")
-		DelDirFromCfw("0100000000001013/romfs/lyt")
+		DeleteDirectory(path::FsMitmFolder() + "0100000000001000/romfs/lyt");
+		DeleteDirectory(path::FsMitmFolder() + "0100000000001013/romfs/lyt");
 	}
-	DelDirFromCfw("0100000000001007") //Player select
-	DelDirFromCfw("0100000000000811") //Custom font
-	DelDirFromCfw("0100000000000039") //needed to enable custom font
-	
-	#undef DelDirFromCfw
+
+	DeleteDirectory(path::FsMitmFolder() + "0100000000001007"); //Player select
+	DeleteDirectory(path::FsMitmFolder() + "0100000000000811"); //Custom font
+	DeleteDirectory(path::FsMitmFolder() + "0100000000000039"); //needed to enable custom font
 }
 
-void fs::theme::CreateMitmStructure(const string &id)
+void fs::theme::CreateMitmStructure(const string& id)
 {
 	string path = path::FsMitmFolder();
 	CreateDirectory(path);
@@ -309,21 +284,21 @@ void fs::theme::CreateMitmStructure(const string &id)
 	{
 		vector<u8> t = {};
 		WriteFile(path + "fsmitm.flag", t);
-	}		
+	}
 }
 
-void fs::theme::CreateRomfsDir(const std::string &id)
+void fs::theme::CreateRomfsDir(const std::string& id)
 {
 	CreateDirectory(path::RomfsFolder(id));
 }
 
-void fs::theme::CreateStructure(const string &id)
-{	
+void fs::theme::CreateStructure(const string& id)
+{
 	CreateMitmStructure(id);
 	CreateDirectory(path::RomfsFolder(id) + "lyt");
 }
 
-void fs::theme::WriteSystemVersionFile() 
+void fs::theme::WriteSystemVersionFile()
 {
 	static bool VersionAlreadyWritten = false;
 
@@ -331,15 +306,15 @@ void fs::theme::WriteSystemVersionFile()
 	if (VersionAlreadyWritten)
 		return;
 
-	try 
+	try
 	{
 		WriteFile(
-			fs::path::FsMitmFolder() + ThemeTargetInfo::TitleIdToString(ThemeTargetInfo::QlaunchID) + "/version_hash.bin", 
+			fs::path::FsMitmFolder() + ThemeTargetInfo::TitleIdToString(ThemeTargetInfo::QlaunchID) + "/version_hash.bin",
 			hos::VersionHash);
 
 		VersionAlreadyWritten = true;
 	}
-	catch (const std::exception&) 
+	catch (const std::exception&)
 	{
 		// Ignore
 	}
@@ -365,9 +340,9 @@ std::vector<std::string> fs::cfw::SearchFolders()
 	vector<string> res;
 #define CHECKFOLDER(f) \
 	if (fs::Exists(f) && std::filesystem::is_directory(f)) res.push_back(f)
-		CHECKFOLDER(path::Atmosphere);
-		CHECKFOLDER(path::Reinx);
-		CHECKFOLDER(path::SX);
+	CHECKFOLDER(path::Atmosphere);
+	CHECKFOLDER(path::Reinx);
+	CHECKFOLDER(path::SX);
 #undef CHECKFOLDER
 	return res;
 }
@@ -376,7 +351,7 @@ void fs::cfw::SetFolder(const std::string& s)
 {
 	// Should probably normalize all path code to use unix style path separators
 	CfwFolder = std::strchr("/\\", s[s.size() - 1]) ? s : s + '/';
-	
+
 	bool useContents = false;
 
 	if (cfw::IsAms())
@@ -388,7 +363,7 @@ void fs::cfw::SetFolder(const std::string& s)
 	else if (cfw::IsSX())
 		// Sx still uses titles
 		useContents = false;
-	
+
 	TitlesFolder = useContents ? "contents/" : "titles/";
 }
 

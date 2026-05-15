@@ -64,8 +64,6 @@ namespace fs {
 	std::string GetParentDir(const std::string& path);
 	std::string JoinPath(const std::string& first, const std::string& second);
 
-	void RecursiveDeleteFolder(const std::string& path);
-
 	// Meant for file names, truncates to 30 characters and replaces the following characters /?<>\:*|". with _
 	// WIll remove file extensions
 	std::string SanitizeName(const std::string& name);
