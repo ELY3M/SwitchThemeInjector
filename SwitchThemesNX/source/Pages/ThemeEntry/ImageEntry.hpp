@@ -4,6 +4,7 @@
 #include <vector>
 #include <tuple>
 #include <span>
+#include <unordered_map>
 
 class InstallImageDialog : public IUIControlObj
 {
@@ -14,6 +15,7 @@ public:
 	void Update() override {};
 private:
 	std::vector<std::tuple<std::string, std::string>> targetParts;
+	std::unordered_map<std::string, ImageRef> partOverlay;
 
 	ImageRef previewImage;
 	std::span<const u8> ddsImage;
@@ -21,4 +23,5 @@ private:
 	bool* outSuccess;
 
 	void ApplyToPart(const std::string& part);
+	ImageRef LoadOverlayPart(const std::string& part);
 };

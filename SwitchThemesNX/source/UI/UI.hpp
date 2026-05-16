@@ -24,7 +24,7 @@ constexpr uint32_t SCR_H = 720;
 namespace Colors 
 {
 	const ImVec4 Highlight = { 0,1,0.788f,1 };
-	const ImVec4 Red = { 1,0,0,1 };
+	const ImVec4 Red = { 1,.2f,.2f,1 };
 }
 
 class RenderImage 

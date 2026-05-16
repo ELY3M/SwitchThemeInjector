@@ -88,7 +88,7 @@ void SettingsPage::Render(int X, int Y)
 	ImGui::PushFont(font25);
 
 	ImGui::PushFont(font30);
-	ImGui::TextUnformatted("Update detection sysmodule");
+	ImGui::TextUnformatted("Update detection sysmodule (BETA)");
 	ImGui::PopFont();
 
 	ImGui::TextWrapped("There is a new experimental sysmodule that automatically uninstalls themes when the system firmware is updated. This fixes the common crashes caused by incompatible versions of the home menu.");

@@ -12,6 +12,7 @@
 #include "../../UI/UI.hpp"
 #include "../../fs.hpp"
 #include "../../ViewFunctions.hpp"
+#include <string_view>
 
 namespace 
 {
@@ -95,6 +96,31 @@ InstallImageDialog::InstallImageDialog(ImageRef preview, const std::vector<u8>& 
 	};
 }
 
+ImageRef InstallImageDialog::LoadOverlayPart(const std::string& part)
+{
+	if (partOverlay.count(part))
+		return partOverlay.at(part);
+
+	ImageRef res = nullptr;
+
+	auto path = ASSET("preview/") + part + ".png";
+	try 
+	{
+		if (fs::Exists(path))
+		{
+			auto image = fs::OpenFile(path);
+			res = std::make_shared<RenderImage>(image);
+		}	
+	}
+	catch(const std::exception& ex)
+	{
+		LOGf("%s", ex.what());
+	}
+
+	partOverlay[part] = res;
+	return res;
+}
+
 void InstallImageDialog::ApplyToPart(const std::string& part)
 {
 	// Hacky impl: build an nxtheme in memory and start the installation process
@@ -120,6 +146,7 @@ void InstallImageDialog::Render(int X, int Y)
 	Utils::ImGuiNextFullScreen();
 	ImGui::Begin("ThemeInstall", nullptr, DefaultWinFlags);
 
+	ImGui::NewLine();
 	ImGui::PushFont(font40);
 	Utils::ImGuiCenterString("Set theme wallpaper");
 	ImGui::PopFont();
@@ -127,8 +154,11 @@ void InstallImageDialog::Render(int X, int Y)
 	if (resizeWarning)
 	{
 		ImGui::PushStyleColor(ImGuiCol_Text, Colors::Red);
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 		Utils::ImGuiCenterString("This image was automatically resized.");
 		Utils::ImGuiCenterString("For optimal resuls only use images with 720p resulution (1280x720 pixels).");
+		ImGui::NewLine();
+		ImGui::PopStyleVar();
 		ImGui::PopStyleColor();
 	}
 
@@ -151,9 +181,12 @@ void InstallImageDialog::Render(int X, int Y)
 	auto itemStart = previewWidth + padding * 2;
 	auto itemSize = ImVec2(SCR_W - itemStart - padding, 0);
 
+	const std::string* currentPart = nullptr;
 	for (const auto& [label, part] : targetParts)
 	{
 		ImGui::SetCursorPosX(itemStart);
+		
+		auto id = ImGui::GetID(label.c_str());
 		if (ImGui::Selectable(label.c_str(), false, ImGuiSelectableFlags_DontClosePopups, itemSize))
 		{
 			PushFunction([this, part]()
@@ -161,10 +194,24 @@ void InstallImageDialog::Render(int X, int Y)
 				ApplyToPart(part);
 			});
 		}
+
+		if (ImGui::GetFocusID() == id)
+			currentPart = &part;
 	}
 
 	if (ImGui::GetFocusID() == 0)
 		ImGui::SetFocusID(ImGui::GetID("Home menu"), ImGui::GetCurrentWindow());
+
+	if (currentPart)
+	{
+		auto overlay = LoadOverlayPart(*currentPart);
+		if (overlay && overlay->IsValid())
+		{
+			ImGui::SetCursorPosY(startY);
+			ImGui::SetCursorPosX(padding);
+			ImGui::Image(overlay->TextureId, { previewWidth, previewHeight });
+		}
+	}
 		
 	auto textSize = ImGui::CalcTextSize("Cancel");
 
