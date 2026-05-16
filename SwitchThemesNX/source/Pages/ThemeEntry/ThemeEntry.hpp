@@ -40,6 +40,7 @@ class ThemeEntry
 		virtual UserAction Render(bool OverrideColor = false);
 
 		std::string InstallLog;
+		std::string CannotInstallReason;
 	protected:
 		virtual bool DoInstall(bool ShowDialogs = true) = 0;
 		
@@ -62,8 +63,6 @@ class ThemeEntry
 		std::string lblFname;
 		std::string lblLine1;
 		std::string lblLine2;
-
-		std::string CannotInstallReason;
 
 		//Used to return by reference for the background image
 		const static std::vector<u8> _emtptyVec;

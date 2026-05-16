@@ -8,15 +8,17 @@
 class InstallImageDialog : public IUIControlObj
 {
 public:
-	InstallImageDialog(ImageRef previer, const std::vector<u8>& data, bool resizeWarning, bool* outSuccess);
+	InstallImageDialog(ImageRef preview, const std::vector<u8>& ddsImage, bool resizeWarning, bool* outSuccess);
 
 	void Render(int X, int Y) override;
 	void Update() override {};
 private:
+	std::vector<std::tuple<std::string, std::string>> targetParts;
+
 	bool resizeWarning;
-	ImageRef img;
-	std::span<const u8> data;
+	ImageRef previewImage;
+	std::span<const u8> ddsImage;
 	bool* outSuccess;
 
-	std::vector<std::tuple<std::string, std::string>> targetParts;
+	void ApplyToPart(const std::string& part);
 };

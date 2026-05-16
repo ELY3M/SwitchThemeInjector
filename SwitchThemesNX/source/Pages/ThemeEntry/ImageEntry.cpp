@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include <utility>
+#include <format>
 #include "ThemeEntry.hpp"
 #include "ImageEntry.hpp"
 #include "../../SwitchThemesCommon/MyTypes.h"
@@ -11,6 +12,22 @@
 #include "../../UI/UI.hpp"
 #include "../../fs.hpp"
 #include "../../ViewFunctions.hpp"
+
+namespace 
+{
+	FileData BuildManifest(const std::string& target) 
+	{
+		std::string msg = std::format(
+			R"({{
+				"Target": "{}",
+				"ThemeName": "New Theme",
+				"Version": {}
+			}})",
+			target, SwitchThemesCommon::NXThemeVer);
+
+		return FileData(msg.begin(), msg.end());
+	}
+}
 
 ImageEntry::ImageEntry(const std::string& fileName, std::vector<u8>&& RawData)
 {
@@ -61,8 +78,8 @@ bool ImageEntry::DoInstall(bool ShowDialogs)
 	return result;
 }
 
-InstallImageDialog::InstallImageDialog(ImageRef previer, const std::vector<u8>& data, bool resizeWarning, bool* outSuccess) :
-	img(previer), data(data), resizeWarning(resizeWarning), outSuccess(outSuccess)
+InstallImageDialog::InstallImageDialog(ImageRef preview, const std::vector<u8>& ddsImage, bool resizeWarning, bool* outSuccess) :
+	previewImage(preview), ddsImage(ddsImage), resizeWarning(resizeWarning), outSuccess(outSuccess)
 {
 	*outSuccess = false;
 	targetParts = 
@@ -75,6 +92,26 @@ InstallImageDialog::InstallImageDialog(ImageRef previer, const std::vector<u8>& 
 		{ "User page",		"user"},
 		{ "Player selection", "psl"},
 	};
+}
+
+void InstallImageDialog::ApplyToPart(const std::string& part)
+{
+	// Hacky impl: build an nxtheme in memory and start the installation process
+	FileContainer files =
+	{
+		{"info.json", BuildManifest(part) },
+		{"image.dds", FileData(ddsImage.begin(), ddsImage.end()) },
+	};
+
+	auto entry = NxEntry("theme", std::move(files));
+	if (!entry.CanInstall())
+	{
+		Dialog("Failed to build the theme file. Open an issue on github.\n" + entry.CannotInstallReason);
+		return;
+	}
+
+	entry.Install(true);
+	PopPage(this);
 }
 
 void InstallImageDialog::Render(int X, int Y)
@@ -95,35 +132,45 @@ void InstallImageDialog::Render(int X, int Y)
 	}
 
 	Utils::ImGuiCenterString("Select where you want to apply this image");
+	ImGui::NewLine();
 
 	auto startY = ImGui::GetCursorPosY();
-	auto padding = ImGui::GetStyle().ItemSpacing.x * 2;
+	auto padding = ImGui::GetStyle().ItemSpacing.x * 4;
 
 	// Three paddings: left, image to list, list to right
 	auto previewWidth = 2 * (SCR_W - padding * 3) / 3.0f;
-	auto previewRatio = (float)img->Height / img->Width;
+	auto previewRatio = (float)previewImage->Height / previewImage->Width;
 	auto previewHeight = previewWidth * previewRatio;
 
 	ImGui::SetCursorPosX(padding);
-	ImGui::Image(img->TextureId, { previewWidth, previewHeight });
+	ImGui::Image(previewImage->TextureId, { previewWidth, previewHeight });
 
 	ImGui::SetCursorPosY(startY);
+
+	auto itemStart = previewWidth + padding * 2;
+	auto itemSize = ImVec2(SCR_W - itemStart - padding, 0);
 
 	bool first = true;
 	for (const auto& [label, part] : targetParts)
 	{
-		ImGui::SetCursorPosX(previewWidth + padding * 2);
-		ImGui::Selectable(label.c_str(), false, ImGuiSelectableFlags_DontClosePopups);
+		ImGui::SetCursorPosX(itemStart);
+		if (ImGui::Selectable(label.c_str(), false, ImGuiSelectableFlags_DontClosePopups, itemSize))
+		{
+			PushFunction([this, part]()
+			{
+				ApplyToPart(part);
+			});
+		}
 	}
 
 	if (ImGui::GetFocusID() == 0)
 		ImGui::SetFocusID(ImGui::GetID("Home menu"), ImGui::GetCurrentWindow());
+		
+	auto textSize = ImGui::CalcTextSize("Cancel");
 
-	ImGui::NewLine();
-	ImGui::NewLine();
-	
+	ImGui::SetCursorPosY(startY + previewHeight - textSize.y);
 	ImGui::SetCursorPosX(previewWidth + padding * 2);
-	if (ImGui::Selectable("Cancel", false, ImGuiSelectableFlags_DontClosePopups))
+	if (ImGui::Selectable("Cancel", false, ImGuiSelectableFlags_DontClosePopups, itemSize))
 		PopPage(this);
 
 	ImGui::End();
