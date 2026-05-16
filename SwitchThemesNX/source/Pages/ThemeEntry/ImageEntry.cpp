@@ -31,6 +31,7 @@ namespace
 
 ImageEntry::ImageEntry(const std::string& fileName, std::vector<u8>&& RawData)
 {
+	FileName = fileName;
 	lblFname = fs::GetFileName(fileName);
 	lblLine1 = fileName;
 	lblLine2 = "Image file";
@@ -170,7 +171,11 @@ void InstallImageDialog::Render(int X, int Y)
 
 	ImGui::SetCursorPosY(startY + previewHeight - textSize.y);
 	ImGui::SetCursorPosX(previewWidth + padding * 2);
+	
 	if (ImGui::Selectable("Cancel", false, ImGuiSelectableFlags_DontClosePopups, itemSize))
+		PopPage(this);
+
+	if (Utils::PageLeaveFocusInput(false))
 		PopPage(this);
 
 	ImGui::End();
