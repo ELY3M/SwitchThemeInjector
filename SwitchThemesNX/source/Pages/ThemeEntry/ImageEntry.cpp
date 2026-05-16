@@ -111,7 +111,7 @@ void InstallImageDialog::ApplyToPart(const std::string& part)
 		return;
 	}
 
-	entry.Install(true);
+	*outSuccess = entry.Install(true);
 	PopPage(this);
 }
 
@@ -151,7 +151,6 @@ void InstallImageDialog::Render(int X, int Y)
 	auto itemStart = previewWidth + padding * 2;
 	auto itemSize = ImVec2(SCR_W - itemStart - padding, 0);
 
-	bool first = true;
 	for (const auto& [label, part] : targetParts)
 	{
 		ImGui::SetCursorPosX(itemStart);

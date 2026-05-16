@@ -15,9 +15,9 @@ public:
 private:
 	std::vector<std::tuple<std::string, std::string>> targetParts;
 
-	bool resizeWarning;
 	ImageRef previewImage;
 	std::span<const u8> ddsImage;
+	bool resizeWarning;
 	bool* outSuccess;
 
 	void ApplyToPart(const std::string& part);

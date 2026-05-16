@@ -75,7 +75,7 @@ RenderImage::~RenderImage()
 {
 	if (IsValid())
 	{
-		GLuint id = (GLuint)TextureId;
+		GLuint id = (GLuint)(uintptr_t)TextureId;
 		glDeleteTextures(1, &id);
 		--LeakCount;
 	}
@@ -87,7 +87,7 @@ void RenderImage::DebugAssertLeaks()
 {
 	ImageCache::Clear();
 	if (LeakCount)
-		throw std::runtime_error("Leaking images !");
+		throw std::runtime_error("Leaking images !");	
 }
 
 using CacheEntry = std::pair<std::string, ImageRef>;

@@ -1,4 +1,3 @@
-#pragma once
 #include "ImagePreview.hpp"
 #include "../ViewFunctions.hpp"
 
