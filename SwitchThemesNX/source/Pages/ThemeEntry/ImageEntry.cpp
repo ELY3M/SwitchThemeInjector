@@ -8,7 +8,7 @@
 #include "../../SwitchThemesCommon/MyTypes.h"
 #include "../../SwitchThemesCommon/Bntx/DDS_conversion.hpp"
 #include "../../SwitchThemesCommon/Common.hpp"
-#include "../../SwitchThemesCommon/NxTheme.hpp"
+#include "../../SwitchThemesCommon/NXTheme.hpp"
 #include "../../UI/UI.hpp"
 #include "../../fs.hpp"
 #include "../../ViewFunctions.hpp"
