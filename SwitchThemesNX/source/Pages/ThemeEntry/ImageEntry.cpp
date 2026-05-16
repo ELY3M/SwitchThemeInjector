@@ -75,13 +75,13 @@ bool ImageEntry::DoInstall(bool ShowDialogs)
 		return false;
 
 	bool result;
-	PushPageBlocking(new InstallImageDialog(_previewImage, _convertedDds, _resizeWarning, &result));
+	PushPageBlocking(new InstallImageDialog(_previewImage, _convertedDds, _resizeWarning, ShowDialogs, &result));
 
 	return result;
 }
 
-InstallImageDialog::InstallImageDialog(ImageRef preview, const std::vector<u8>& ddsImage, bool resizeWarning, bool* outSuccess) :
-	previewImage(preview), ddsImage(ddsImage), resizeWarning(resizeWarning), outSuccess(outSuccess)
+InstallImageDialog::InstallImageDialog(ImageRef preview, const std::vector<u8>& ddsImage, bool resizeWarning, bool showInstallDialogs, bool* outSuccess) :
+	previewImage(preview), ddsImage(ddsImage), resizeWarning(resizeWarning), showInstallDialogs(showInstallDialogs), outSuccess(outSuccess)
 {
 	*outSuccess = false;
 	targetParts = 
@@ -123,6 +123,8 @@ ImageRef InstallImageDialog::LoadOverlayPart(const std::string& part)
 
 void InstallImageDialog::ApplyToPart(const std::string& part)
 {
+	DisplayLoading("Installing...");
+
 	// Hacky impl: build an nxtheme in memory and start the installation process
 	FileContainer files =
 	{
@@ -137,7 +139,7 @@ void InstallImageDialog::ApplyToPart(const std::string& part)
 		return;
 	}
 
-	*outSuccess = entry.Install(true);
+	*outSuccess = entry.Install(showInstallDialogs);
 	PopPage(this);
 }
 
