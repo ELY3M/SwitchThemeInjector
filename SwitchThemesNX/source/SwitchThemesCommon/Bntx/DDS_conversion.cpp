@@ -169,6 +169,9 @@ DDSConv::ConversionResult DDSConv::ConvertImage(const std::vector<u8>& imgData, 
 		imageResized = true;
 	}
 
+	if (image.width != Width || image.height != Height)
+		return DDSConv::ConversionResult::Fail("Resize failure");
+
 	const int BytePerBlock = DXT5 ? 16 : 8;
 
 	//Hacky af but works(TM)

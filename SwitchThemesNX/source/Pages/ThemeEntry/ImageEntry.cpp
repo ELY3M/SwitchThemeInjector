@@ -98,6 +98,9 @@ InstallImageDialog::InstallImageDialog(ImageRef preview, const std::vector<u8>& 
 
 ImageRef InstallImageDialog::LoadOverlayPart(const std::string& part)
 {
+	if (previewLoadFailure)
+		return nullptr;
+
 	if (partOverlay.count(part))
 		return partOverlay.at(part);
 
@@ -115,6 +118,13 @@ ImageRef InstallImageDialog::LoadOverlayPart(const std::string& part)
 	catch(const std::exception& ex)
 	{
 		LOGf("%s", ex.what());
+		previewError = ex.what();
+	}
+
+	if (!res || !res->IsValid())
+	{
+		previewLoadFailure = true;
+		return nullptr;
 	}
 
 	partOverlay[part] = res;
@@ -156,16 +166,14 @@ void InstallImageDialog::Render(int X, int Y)
 	if (resizeWarning)
 	{
 		ImGui::PushStyleColor(ImGuiCol_Text, Colors::Red);
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-		Utils::ImGuiCenterString("This image was automatically resized.");
-		Utils::ImGuiCenterString("For optimal resuls only use images with 720p resulution (1280x720 pixels).");
-		ImGui::NewLine();
-		ImGui::PopStyleVar();
+		Utils::ImGuiCenterString("This image was automatically resized. For optimal resuls use 1280x720 images.");
 		ImGui::PopStyleColor();
 	}
 
 	Utils::ImGuiCenterString("Select where you want to apply this image");
-	ImGui::NewLine();
+	
+	if (!resizeWarning)
+		ImGui::NewLine();
 
 	auto startY = ImGui::GetCursorPosY();
 	auto padding = ImGui::GetStyle().ItemSpacing.x * 4;
@@ -222,6 +230,26 @@ void InstallImageDialog::Render(int X, int Y)
 	
 	if (ImGui::Selectable("Cancel", false, ImGuiSelectableFlags_DontClosePopups, itemSize))
 		PopPage(this);
+
+	if (previewLoadFailure)
+	{
+		ImGui::SetCursorPosX(padding);
+		ImGui::PushStyleColor(ImGuiCol_Text, Colors::Red);
+		if (UseLowMemory)
+			ImGui::Text("Failed to load previews. You are running in applet mode, this is not supported. Relaunch with title takeover");
+		else
+			ImGui::Text("Failed to load previews.");
+
+		if (!previewError.empty())
+		{
+			ImGui::SetCursorPosX(padding);
+			ImGui::PushTextWrapPos(SCR_W - padding);
+			ImGui::Text(previewError.c_str());
+			ImGui::PopTextWrapPos();
+		}
+
+		ImGui::PopStyleColor();
+	}
 
 	if (Utils::PageLeaveFocusInput(false))
 		PopPage(this);

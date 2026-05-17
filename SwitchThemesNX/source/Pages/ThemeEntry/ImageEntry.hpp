@@ -23,6 +23,9 @@ private:
 	bool showInstallDialogs;
 	bool* outSuccess;
 
+	bool previewLoadFailure = false;
+	std::string previewError = "";
+
 	void ApplyToPart(const std::string& part);
 	ImageRef LoadOverlayPart(const std::string& part);
 };
