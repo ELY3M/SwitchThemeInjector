@@ -41,7 +41,11 @@ public:
 	RenderImage() : Width(0), Height(0), TextureId(0) {}
 
 	RenderImage(const RenderImage&) = delete;
+	RenderImage& operator=(const RenderImage&) = delete;
+
 	RenderImage(RenderImage&&);
+	RenderImage& operator=(RenderImage&&);
+
 	~RenderImage();
 
 	void Release();

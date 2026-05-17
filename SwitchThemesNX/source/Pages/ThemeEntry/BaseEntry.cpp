@@ -111,7 +111,9 @@ unique_ptr<ThemeEntry> ThemeEntry::FromFile(const std::string& fileName)
 	}
 	catch (std::exception &ex)
 	{
-		return make_unique<DummyEntry>(fileName, "Error - " + std::string(ex.what()), fileName, "ERROR");
+		auto err = make_unique<DummyEntry>(fileName, "Error - Open for details", fileName, "ERROR");
+		err->CannotInstallReason = ex.what();
+		return err;
 	}
 	catch (...)
 	{

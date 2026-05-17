@@ -43,7 +43,8 @@ void Utils::ImGuiDragWithLastElement()
 
 size_t RenderImage::LeakCount = 0;
 
-RenderImage::RenderImage(const std::vector<u8>& data)
+RenderImage::RenderImage(const std::vector<u8>& data) : 
+	Width(0), Height(0), TextureId(0)
 {
 	int orig_channels = 0;
 	auto img = SOIL_load_image_from_memory(
@@ -61,7 +62,7 @@ RenderImage::RenderImage(const std::vector<u8>& data)
 	int w = Width;
 	int h = Height;
 
-	auto tex_id = SOIL_create_OGL_texture(img, &w, &h, 4, 0, 0);	
+	auto tex_id = SOIL_create_OGL_texture(img, &w, &h, 4, 0, 0);		
 	SOIL_free_image_data(img);
 
 	if (tex_id == 0)
@@ -86,6 +87,16 @@ RenderImage::RenderImage(RenderImage&& other)
 	TextureId = other.TextureId;
 
 	other.Invalidate();
+}
+
+RenderImage& RenderImage::operator=(RenderImage&& other)
+{
+	Width = other.Width;
+	Height = other.Height;
+	TextureId = other.TextureId;
+
+	other.Invalidate();
+	return *this;
 }
 
 void RenderImage::Release()
@@ -124,7 +135,7 @@ namespace
 	std::vector<CacheEntry> ImagePool;
 	size_t CurrentCacheSize = 0;
 
-	const size_t CacheSizeLowMem = 18 * 1024 * 1024; //18mb
+	const size_t CacheSizeLowMem = 10 * 1024 * 1024; //10mb
 	const size_t CacheSize = 150 * 1024 * 1024; 
 
 	size_t EstimateSize(const ImageRef& image)
@@ -201,13 +212,23 @@ ImageRef ImageCache::Load(const std::vector<u8> &data, const std::string &name)
 	auto image = std::make_shared<RenderImage>(data);
 
 	// Especially in applet mode, sometimes loading images fails due to memory fragmentation, even if we have enough free memory.
-	// Try to free some cache and try again once.
-	if (!image->IsValid() && ImagePool.size() >= 2)
+	// Try to free some cache and try again a couple of times
+	int attempt = 0;
+	while (!image->IsValid() && ImagePool.size() > 1)
 	{
+		LOGf("Loading image %s failed, trying to free some cache and retry (attempt %d)\n", name.c_str(), attempt);
+	
 		PopOne();
 		image = std::make_shared<RenderImage>(data);
+
+		if (++attempt >= 3)
+		{
+			LOGf("Failed to load image %s after multiple attempts, giving up\n", name.c_str());
+			break;
+		}
 	}
 
+	LOGf("Loaded image %s, size %dx%d, valid: %d\n", name.c_str(), image->Width, image->Height, image->IsValid());
 	if (image->IsValid())
 		AddValue(name, image);
 	

@@ -20,7 +20,7 @@
 #include <GLFW/glfw3.h>
 #include "../source/UI/glad.h"
 
-#define SOIL_CHECK_FOR_GL_ERRORS 0
+#define SOIL_CHECK_FOR_GL_ERRORS 1
 
 #if defined( __APPLE_CC__ ) || defined ( __APPLE__ )
 	#include <TargetConditionals.h>
