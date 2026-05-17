@@ -209,7 +209,7 @@ ThemeEntry::UserAction ThemeEntry::Render(bool OverrideColor)
 		auto Preview = GetPreview();
 		if (Preview && Preview->IsValid())
 		{
-			PushPage(new ImagePreview(Preview, FileName));
+			PushPage(new ImagePreview(Preview, fs::GetFileName(FileName)));
 			return UserAction::Preview;
 		}
 	}

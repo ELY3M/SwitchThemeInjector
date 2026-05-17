@@ -12,7 +12,6 @@
 #include "../../UI/UI.hpp"
 #include "../../fs.hpp"
 #include "../../ViewFunctions.hpp"
-#include <string_view>
 
 namespace 
 {
@@ -41,8 +40,15 @@ ImageEntry::ImageEntry(const std::string& fileName, std::vector<u8>&& RawData)
 
 void ImageEntry::PerformConversion()
 {
-	if (_previewImage)
+	if (CannotInstallReason.size() || _convertedDds.size())
 		return;
+
+	if (_originalData.empty())
+	{
+		CannotInstallReason = "No data to convert";
+		lblLine1 = "Error loading file";
+		return;
+	}
 
 	auto dds = DDSConv::ConvertImage(_originalData, false, 1280, 720, true);
 	_originalData.clear();
@@ -50,32 +56,50 @@ void ImageEntry::PerformConversion()
 	if (dds.ErrorMessage.size())
 	{
 		CannotInstallReason = dds.ErrorMessage;
-		_previewImage = std::make_shared<RenderImage>();
 		lblLine1 = "Error loading file";
 	}
 	else
 	{
 		_convertedDds = std::move(dds.Data);
 		_resizeWarning = dds.resized;
-		_previewImage = std::make_shared<RenderImage>(_convertedDds);
 	}
 }
 
 ImageRef ImageEntry::GetConvertedImage()
 {
 	PerformConversion();
-	return _previewImage;
+
+	if (_previewImage)
+		return _previewImage;
+
+	auto res = std::make_shared<RenderImage>(_convertedDds);
+	if (!res || !res->IsValid())
+	{
+		CannotInstallReason = "Failed to load the image after conversion";
+		lblLine1 = "Error loading file";
+		_convertedDds.clear();
+	}
+
+	// Cache previews only when not in applet mode
+	if (!UseLowMemory)
+		_previewImage = res;
+
+	return res;
 }
 
 bool ImageEntry::DoInstall(bool ShowDialogs)
 {
 	PerformConversion();
 
-	if (!CanInstall() || !_previewImage || _convertedDds.empty())
+	if (!CanInstall() || _convertedDds.empty())
+		return false;
+
+	auto preview = GetConvertedImage();
+	if (!preview || !preview->IsValid())
 		return false;
 
 	bool result;
-	PushPageBlocking(new InstallImageDialog(_previewImage, _convertedDds, _resizeWarning, ShowDialogs, &result));
+	PushPageBlocking(new InstallImageDialog(preview, _convertedDds, _resizeWarning, ShowDialogs, &result));
 
 	return result;
 }
@@ -94,6 +118,13 @@ InstallImageDialog::InstallImageDialog(ImageRef preview, const std::vector<u8>& 
 		{ "User page",		"user"},
 		{ "Player selection", "psl"},
 	};
+
+	if (!UseLowMemory)
+	{
+		// Warmup all the overlays in the image cache
+		for (const auto& [_, part] : targetParts)
+			LoadOverlayPart(part);
+	}
 }
 
 ImageRef InstallImageDialog::LoadOverlayPart(const std::string& part)
@@ -101,19 +132,17 @@ ImageRef InstallImageDialog::LoadOverlayPart(const std::string& part)
 	if (previewLoadFailure)
 		return nullptr;
 
-	if (partOverlay.count(part))
-		return partOverlay.at(part);
+	std::string cacheKey = "preview_overlay://";
+	cacheKey.append(part);
 
-	ImageRef res = nullptr;
+	ImageRef res = ImageCache::Get(cacheKey);
+	if (res) return res;
 
 	auto path = ASSET("preview/") + part + ".png";
 	try 
 	{
-		if (fs::Exists(path))
-		{
-			auto image = fs::OpenFile(path);
-			res = std::make_shared<RenderImage>(image);
-		}	
+		auto image = fs::OpenFile(path);
+		res = ImageCache::Load(image, cacheKey);
 	}
 	catch(const std::exception& ex)
 	{
@@ -127,7 +156,6 @@ ImageRef InstallImageDialog::LoadOverlayPart(const std::string& part)
 		return nullptr;
 	}
 
-	partOverlay[part] = res;
 	return res;
 }
 

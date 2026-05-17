@@ -45,19 +45,36 @@ size_t RenderImage::LeakCount = 0;
 
 RenderImage::RenderImage(const std::vector<u8>& data)
 {
-	auto tex = SOIL_load_OGL_texture_from_memory(data.data(), data.size(), 4, 0, 0);
-
-	if (tex <= 0)
+	int orig_channels = 0;
+	auto img = SOIL_load_image_from_memory(
+		data.data(), data.size(),
+		&Width, &Height, &orig_channels,
+		4);
+	
+	if (!img)
 	{
 		LOGf("Failed to load image, SOIL error: %s\n", SOIL_last_result());
-
 		Invalidate();
 		return;
 	}
 
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &Width);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &Height);
-	TextureId = (ImTextureID)(intptr_t)tex;
+	int w = Width;
+	int h = Height;
+
+	auto tex_id = SOIL_create_OGL_texture(img, &w, &h, 4, 0, 0);	
+	SOIL_free_image_data(img);
+
+	if (tex_id == 0)
+	{
+		LOGf("Failed to load image, SOIL error: %s\n", SOIL_last_result());
+		Invalidate();
+		return;
+	}
+
+	if (w != Width || h != Height)
+		LOGf("Warning: SOIL resized the image from %dx%d to %dx%d\n", Width, Height, w, h); 
+
+	TextureId = (ImTextureID)(intptr_t)tex_id;
 
 	LeakCount++;
 }
@@ -71,9 +88,9 @@ RenderImage::RenderImage(RenderImage&& other)
 	other.Invalidate();
 }
 
-RenderImage::~RenderImage()
+void RenderImage::Release()
 {
-	if (IsValid())
+	if (TextureId)
 	{
 		GLuint id = (GLuint)(uintptr_t)TextureId;
 		glDeleteTextures(1, &id);
@@ -81,6 +98,16 @@ RenderImage::~RenderImage()
 	}
 
 	Invalidate();
+}
+
+RenderImage::~RenderImage()
+{
+	Release();
+}
+
+size_t RenderImage::DebugLoadedImages() 
+{
+	return LeakCount;
 }
 
 void RenderImage::DebugAssertLeaks()
@@ -91,33 +118,52 @@ void RenderImage::DebugAssertLeaks()
 }
 
 using CacheEntry = std::pair<std::string, ImageRef>;
-std::vector<CacheEntry> ImagePool;
 
-static auto HasString(const std::string& str)
+namespace 
 {
-	auto res = std::find_if(ImagePool.begin(), ImagePool.end(), 
-		[&str](const CacheEntry& pair) { return pair.first == str; });
-	return res;
+	std::vector<CacheEntry> ImagePool;
+	size_t CurrentCacheSize = 0;
+
+	const size_t CacheSizeLowMem = 18 * 1024 * 1024; //18mb
+	const size_t CacheSize = 150 * 1024 * 1024; 
+
+	size_t EstimateSize(const ImageRef& image)
+	{
+		return image->Width * image->Height * 4; //RGBA8
+	}
+
+	auto HasString(const std::string& str)
+	{
+		auto res = std::find_if(ImagePool.begin(), ImagePool.end(),
+			[&str](const CacheEntry& pair) { return pair.first == str; });
+		return res;
+	}
+
+	static size_t MaxCacheSize() {
+		return UseLowMemory ? CacheSizeLowMem : CacheSize;
+	}
+
+	static void AddValue(const std::string& str, ImageRef img)
+	{
+		ImagePool.emplace_back(str, img);
+		LOGf("Pushing %s size %lu\n", str.c_str(), ImagePool.size());
+
+		CurrentCacheSize += EstimateSize(img);
+
+		while (ImagePool.size() > 1 && CurrentCacheSize > MaxCacheSize())
+			ImageCache::PopOne();
+	}
 }
 
-static void PopFirst()
+void ImageCache::PopOne()
 {
-	LOGf("Pool full, popping %s\n", ImagePool[0].first.c_str());
+	LOGf("popping %s\n", ImagePool[0].first.c_str());
 	ImageCache::FreeImage(ImagePool[0].first);
-}
-
-static void AddValue(const std::string& str, ImageRef img)
-{
-	ImagePool.emplace_back(str, img);
-	LOGf("Pushing %s size %lu\n", str.c_str(), ImagePool.size());
-
-	const u32 MaxCachedImages = UseLowMemory ? 3 : 8;
-	if (ImagePool.size() > MaxCachedImages)
-		PopFirst();
 }
 
 void ImageCache::Clear()
 {
+	CurrentCacheSize = 0;
 	ImagePool.clear();
 }
 
@@ -125,16 +171,42 @@ void ImageCache::FreeImage(const std::string &img)
 {
 	auto res = HasString(img);
 	if (res == ImagePool.end()) return;
+	CurrentCacheSize -= EstimateSize(res->second);
 	ImagePool.erase(res);
 }
 
-ImageRef ImageCache::LoadDDS(const std::vector<u8> &data, const std::string &name)
+void ImageCache::DebugInformation(size_t& out_size, int& out_count, float& out_percent)
+{
+	auto max = (float)MaxCacheSize();
+	out_size = CurrentCacheSize;
+	out_count = ImagePool.size();
+	out_percent = max == 0 ? 0 : (CurrentCacheSize / max) * 100.0f;
+}
+
+ImageRef ImageCache::Get(const std::string& name)
+{
+	auto res = HasString(name);
+	if (res != ImagePool.end())
+		return res->second;
+
+	return nullptr;
+}
+
+ImageRef ImageCache::Load(const std::vector<u8> &data, const std::string &name)
 {	
 	auto res = HasString(name);
 	if (res != ImagePool.end())
 		return res->second;
 
 	auto image = std::make_shared<RenderImage>(data);
+
+	// Especially in applet mode, sometimes loading images fails due to memory fragmentation, even if we have enough free memory.
+	// Try to free some cache and try again once.
+	if (!image->IsValid() && ImagePool.size() >= 2)
+	{
+		PopOne();
+		image = std::make_shared<RenderImage>(data);
+	}
 
 	if (image->IsValid())
 		AddValue(name, image);

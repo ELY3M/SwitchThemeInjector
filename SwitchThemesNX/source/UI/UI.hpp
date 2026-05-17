@@ -12,6 +12,7 @@
 #include <memory>
 
 constexpr ImGuiWindowFlags DefaultWinFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove;
+
 const ImVec2 TabPageSize = { 900, 552 };
 
 extern ImFont* font25;
@@ -34,7 +35,7 @@ public:
 	int Height;
 	ImTextureID TextureId;
 
-	bool IsValid() const { return TextureId != 0; }
+	bool IsValid() const { return TextureId != 0 && Width != 0 && Height != 0; }
 
 	RenderImage(const std::vector<u8>& data);
 	RenderImage() : Width(0), Height(0), TextureId(0) {}
@@ -43,7 +44,10 @@ public:
 	RenderImage(RenderImage&&);
 	~RenderImage();
 
+	void Release();
+
 	static void DebugAssertLeaks();
+	static size_t DebugLoadedImages();
 private:
 	static size_t LeakCount;
 	void Invalidate() { TextureId = 0; Width = 0; Height = 0; }
@@ -55,8 +59,13 @@ namespace ImageCache
 {
 	void Clear();
 	void FreeImage(const std::string& img);
+
 	//Cache automatically frees old images, no need to do it manually
-	ImageRef LoadDDS(const std::vector<u8>& data, const std::string& name);
+	ImageRef Load(const std::vector<u8>& data, const std::string& name);
+	ImageRef Get(const std::string& name);
+	void PopOne();
+
+	void DebugInformation(size_t& out_size, int& out_count, float& out_percent);
 };
 
 struct PageEvent

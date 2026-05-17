@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <filesystem>
 #include <algorithm>
+#include <format>
 
 #include "UI/UIManagement.hpp"
 #include "UI/UI.hpp"
@@ -25,7 +26,7 @@
 #include "SwitchTools/PatchMng.hpp"
 #include "fs.hpp"
 
-//#define DEBUG
+const int DebugOverlay = false;
 
 static inline void ImguiBindController()
 {
@@ -125,13 +126,14 @@ void FatalError(std::string message)
 	exit(-1);
 }
 
-#ifdef DEBUG
-double previousTime = glfwGetTime();
-int frameCount = 0;
-int fpsValue = 0;
-
-static void calcFPS() 
+static void RenderDebugOverlay()
 {
+	static double previousTime = glfwGetTime();
+	static int frameCount = 0;
+	static int fpsValue = 0;
+
+	auto dlist = ImGui::GetForegroundDrawList();
+
 	double currentTime = glfwGetTime();
 	frameCount++;
 
@@ -142,13 +144,25 @@ static void calcFPS()
 		frameCount = 0;
 		previousTime = currentTime;
 	}
-	ImGui::Text("FPS %d", fpsValue);
-	for (int i = 0; i < 6; i++)
-	{
-		ImGui::Text("pad[%d] = %d %f %f ", i, (int)(StickAsButton(i) != 0), gamepad.axes[i], OldGamepad.axes[i]);
-	}
+
+	auto text = std::format("FPS: {}", fpsValue);
+	dlist->AddText(ImVec2{0, 0}, 0xffffffff, text.c_str());
+
+	text = std::format("Pages: {} PopList: {}", Pages.size(), PopList.size());
+	dlist->AddText(ImVec2{0, 20}, 0xffffffff, text.c_str());
+	
+	text = std::format("Images: {}", RenderImage::DebugLoadedImages());
+	dlist->AddText(ImVec2{0, 40}, 0xffffffff, text.c_str());
+
+	size_t cacheSize;
+	int cacheCount;
+	float cachePercent;
+
+	ImageCache::DebugInformation(cacheSize, cacheCount, cachePercent);
+
+	text = std::format("Cache: {} bytes ({} images, {:.2f}%)", cacheSize, cacheCount, cachePercent);
+	dlist->AddText(ImVec2{ 0, 60 }, 0xffffffff, text.c_str());
 }
-#endif
 
 static inline void MainLoop(bool BreakOnPop = false)
 {
@@ -176,9 +190,10 @@ static inline void MainLoop(bool BreakOnPop = false)
 				FatalError(msg);
 			});
 		}
-#ifdef DEBUG
-		calcFPS();
-#endif
+
+		if (DebugOverlay)
+			RenderDebugOverlay();
+
 		GFX::EndFrame();
 		IsRendering = false;
 
@@ -203,7 +218,6 @@ static inline void MainLoop(bool BreakOnPop = false)
 		PlatformSleep(1 / 30.0f * 1000);
 	}
 }
-
 
 void PushPageBlocking(IUIControlObj* page)
 {

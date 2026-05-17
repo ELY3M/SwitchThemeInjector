@@ -247,7 +247,7 @@ ImageRef NxEntry::GetPreview()
 	auto image = GetBackgroundImage();
 	if (!image) return 0;
 
-	auto Preview = ImageCache::LoadDDS(*image, FileName);
+	auto Preview = ImageCache::Load(*image, FileName);
 	if (!Preview->IsValid())
 	{
 		_HasPreview = false;
