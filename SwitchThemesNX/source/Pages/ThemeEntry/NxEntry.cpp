@@ -6,6 +6,7 @@
 
 #include "ThemeEntry.hpp"
 
+#include "../../Platform/Platform.hpp"
 #include "../../fs.hpp"
 #include "../../SwitchTools/PatchMng.hpp"
 #include "../../SwitchThemesCommon/NXTheme.hpp"
@@ -244,10 +245,14 @@ bool NxEntry::DoInstall(bool ShowDialogs)
 ImageRef NxEntry::GetPreview()
 {
 	if (!_HasPreview) return 0;
+
 	auto image = GetBackgroundImage();
 	if (!image) return 0;
 
-	auto Preview = ImageCache::Load(*image, FileName);
+	auto Preview = UseLowMemory ? 
+		std::make_shared<RenderImage>(*image) : 
+		ImageCache::Load(*image, FileName);
+
 	if (!Preview->IsValid())
 	{
 		_HasPreview = false;

@@ -16,6 +16,12 @@ void ImagePreview::Render(int X, int Y)
 	auto sz = ImGui::CalcTextSize("HelloWorld");
 	Utils::ImGuiCenterString(label);
 
+	/*ImGui::Text("%d, %d %dx%d", 
+		img ? 0 : 1,
+		img->IsValid() ? 0 : 1,
+		img ? img->Width : 0, 
+		img ? img->Height : 0);*/
+
 	if (!img || !img->IsValid())
 	{
 		ImGui::NewLine();
