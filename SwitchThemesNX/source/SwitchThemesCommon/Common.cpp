@@ -11,6 +11,7 @@
 namespace SwitchThemesCommon 
 {
 	const std::string CoreVer = "4.9 (C++)";
+	// Starting from v17 zip nxthemes are supported, before only szs were supported.
 	const int NXThemeVer = 17;
 }
 

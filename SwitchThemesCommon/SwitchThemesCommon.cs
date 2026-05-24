@@ -30,7 +30,7 @@ namespace SwitchThemes.Common
 
     public static class CommonInfo
     {
-        public const string CoreVer = "5.0";
+        public const string CoreVer = "4.9";
         public const int NxThemeFormatVersion = 17;
 
         public const string PartHome = "home";

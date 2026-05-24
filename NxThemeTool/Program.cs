@@ -2,7 +2,7 @@
 using SwitchThemes.Common;
 
 Console.WriteLine("NxThemeTool - https://github.com/exelix11/SwitchThemeInjector");
-Console.WriteLine();
+Console.WriteLine($"Using ThemesCommon {CommonInfo.CoreVer}");
 
 if (args.Length == 0 || args.Any(x => x == "help" || x == "-h" || x == "--help" || x == "-help"))
 {
