@@ -1,5 +1,7 @@
 ﻿using NxThemeTool;
+using SARCExt;
 using SwitchThemes.Common;
+using System.ComponentModel.DataAnnotations;
 
 Console.WriteLine("NxThemeTool - https://github.com/exelix11/SwitchThemeInjector");
 Console.WriteLine($"Using ThemesCommon {CommonInfo.CoreVer}");
@@ -8,6 +10,15 @@ if (args.Length == 0 || args.Any(x => x == "help" || x == "-h" || x == "--help" 
 {
     PrintHelp();
     return 0;
+}
+
+void NeedArgs(int count) 
+{
+    if (args.Length < count + 1) // Account for the command itself being the first argument
+    {
+        Console.WriteLine("Not enough arguments.");
+        Environment.Exit(1);
+    }
 }
 
 if (args[0] == "list")
@@ -21,11 +32,7 @@ if (args[0] == "list")
 }
 if (args[0] == "new")
 {
-    if (args.Length < 3)
-    {
-        Console.WriteLine("Not enough arguments.");
-        return 1;
-    }
+    NeedArgs(2);
 
     var theme = NxTheme.CreateNew(args[1]);
     theme.MainImageFile = Util.CreateEmpty720PJPG();
@@ -35,6 +42,8 @@ if (args[0] == "new")
 }
 else if (args[0] == "validate")
 {
+    NeedArgs(1);
+
     var validation = new ProcessResult();
 
     using var provider = ProviderHelper.OpenFor(args[1]);
@@ -44,11 +53,7 @@ else if (args[0] == "validate")
 }
 else if (args[0] == "pack")
 {
-    if (args.Length < 3)
-    {
-        Console.WriteLine("Not enough arguments for packing.");
-        return 1;
-    }
+    NeedArgs(2);
 
     if (!Directory.Exists(args[1]))
     {
@@ -67,11 +72,7 @@ else if (args[0] == "pack")
 }
 else if (args[0] == "apply")
 {
-    if (args.Length < 4)
-    {
-        Console.WriteLine("Not enough arguments.");
-        return 1;
-    }
+    NeedArgs(3);
 
     var source = args[1];
     var szs = args[2];
@@ -88,11 +89,8 @@ else if (args[0] == "apply")
 }
 else if (args[0] == "unpack" || File.Exists(args[0]))
 {
-    if (args[0] == "unpack" && args.Length < 3)
-    {
-        Console.WriteLine("Not enough arguments for unpacking.");
-        return 1;
-    }
+    if (args[0] == "unpack")
+        NeedArgs(2);
 
     var source = args[0] == "unpack" ? args[1] : args[0];
     var dest = args[0] == "unpack" ? args[2] : Path.GetFileNameWithoutExtension(args[0]) + "_unpacked";
@@ -105,11 +103,7 @@ else if (args[0] == "unpack" || File.Exists(args[0]))
 }
 else if (args[0] == "install")
 {
-    if (args.Length < 3)
-    {
-        Console.WriteLine("Not enough arguments.");
-        return 1;
-    }
+    NeedArgs(2);
 
     var result = RemoteInstall.DoRemoteInstall(args[1], File.ReadAllBytes(args[2]));
     if (result != null)
@@ -120,16 +114,60 @@ else if (args[0] == "install")
 }
 else if (args[0] == "cppgen")
 {
-    if (args.Length < 2)
-    {
-        Console.WriteLine("Not enough arguments.");
-        return 1;
-    }
+    NeedArgs(1);
 
     var gen = new CppGen(args[1]);
     gen.GeneratePatchTemplates();
     gen.GenerateTextureReplacementTable();
     gen.GenerateLayoutJsons();
+}
+else if (args[0] == "diff")
+{
+    NeedArgs(3);
+    var source = args[1];
+    var modified = args[2];
+    var outpput = args[3];
+
+    var differ = new LayoutDiff(
+        SARC.Unpack(ManagedYaz0.Decompress(File.ReadAllBytes(source))),
+        SARC.Unpack(ManagedYaz0.Decompress(File.ReadAllBytes(modified)))
+    );
+
+    var res = differ.ComputeDiff();
+    
+    if (!string.IsNullOrWhiteSpace(differ.OutputLog))
+        Console.WriteLine(differ.OutputLog);
+
+    File.WriteAllText(outpput, res.AsJson());
+}
+else if (args[0] == "szs")
+{
+    NeedArgs(2);
+    var source = args[1];
+    var output = args.Last();
+
+    var dds = args.FirstOrDefault(x => x.EndsWith(".dds"));
+    var json = args.FirstOrDefault(x => x.EndsWith(".json"));
+
+    if (dds is null && json is null)
+    {
+        Console.WriteLine("At least a dds or a json file must be provided.");
+        return 1;
+    }
+
+    if (output == dds || output == json)
+    {
+        Console.WriteLine("Missing output file name.");
+        return 1;
+    }
+
+    var res = ThemeApply.ApplySimple(
+        File.ReadAllBytes(source),
+        dds is null ? null : File.ReadAllBytes(dds),
+        json is null ? null : File.ReadAllText(json)
+    );
+
+    File.WriteAllBytes(output, res);
 }
 else
 {
@@ -174,6 +212,8 @@ void PrintHelp()
     Console.WriteLine("  unpack <file> <output directory>   Extracts the content of a nxtheme file to the specified directory");
     Console.WriteLine("  install <file> <ip address>        Perform remote install to NXThemesInstaller running on a console");
     Console.WriteLine("  apply <nxtheme> <szs> <output>     Apply an nxthme file to one or more szs files. Szs must be the the path to the systemData folder of the theme installer.");
+    Console.WriteLine("  diff <source szs> <modified szs> <output json>     Produce a json diff from the two provided szs files.");
+    Console.WriteLine("  szs <target szs> [optional dds file] [optional json layout] <output szs>     Patch an szs file with the provided dds image and json layout.");
     Console.WriteLine("Extra:");
     Console.WriteLine("  <nxtheme file>                     If the only specified argument is a valid nxtheme file it will be unpacked. This is a convenience feature which allows dragging nxtheme files on this binary to unpack them automatically.");
     Console.WriteLine("Development:");

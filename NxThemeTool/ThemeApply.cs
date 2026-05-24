@@ -18,6 +18,28 @@ namespace NxThemeTool
             return new ThemeApply(new NxTheme(source, result), ProviderHelper.OpenFor(szs));
         }
 
+        public static byte[] ApplySimple(byte[] szs, byte[]? dds, string? json)
+        {
+            var theme = SARC.Unpack(ManagedYaz0.Decompress(szs));
+            var patcher = new SzsPatcher(theme)
+            {
+                CompatFixes = LayoutCompatibilityOption.DisableFixes
+            };
+
+            if (dds is not null)
+            {
+                patcher.PatchMainBG(dds);
+                patcher.FinalizeBntx();
+            }
+
+            if (json is not null)
+            {
+                patcher.PatchLayouts(LayoutPatch.Load(json));
+            }
+
+            return ManagedYaz0.Compress(SARC.Pack(theme).Item2);
+        }
+
         public void Apply(IContentWriter writer, ProcessResult result)
         {
             var info = CommonInfo.GetPart(Theme.Manifest.Target);
