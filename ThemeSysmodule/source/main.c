@@ -59,6 +59,7 @@ void __attribute__((weak)) __appInit(void)
 	if (R_FAILED(rc))
 		fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_SM));
 	
+	// pmdmnt was changed with fw updates, libnx needs to know hos version to call the correct functions.
 	rc = setsysInitialize();
 	if (R_SUCCEEDED(rc)) {
 		rc = setsysGetFirmwareVersion(&fw);
@@ -70,9 +71,12 @@ void __attribute__((weak)) __appInit(void)
 
 	rc = pmdmntInitialize();
 	if (R_FAILED(rc))
-		fatalThrow(MAKERESULT(Module_Libnx, LibnxError_ShouldNotHappen));
+		fatalThrow(rc);
 
 	// Try to do this as fast as possible
+	// In ams source code, the create process hook is a global variable
+	// This means only one hook can be set at a time and this function fails if it has already been done.
+	// In practice this is unlikely because this function is rarely used and our hook fires early during boot since qlaunch always launches.
 	rc = pmdmntHookToCreateProcess(&homeMenuLaunched, QLAUNCH_ID);
 	if (R_FAILED(rc))
 		fatalThrow(rc);
@@ -156,15 +160,19 @@ int main(int argc, char* argv[])
 	}
 	else if (rc == KERNELRESULT(TimedOut))
 	{
+		// This branch should never happen because our hook should always trigger before qlaunch.
+		// In case it does, call fatal for now. We are interested in knowing if our impl suffers from race conditions.
+		// Not calling fatal here would allow the user to boot with a potentially incompatible theme which would crash qlaunch.
+		// Instead, we want to know early if your sysmodule failed so we should be the ones to crash the console.
 		if (R_SUCCEEDED(pmdmntGetProcessId(&pid, QLAUNCH_ID)) && pid)
 		{
 			// We were too slow?
-			fatalThrow(MAKERESULT(Module_Libnx, LibnxError_AlreadyInitialized));
+			fatalThrow(MAKERESULT(Module_Libnx, LibnxError_HandleTooEarly));
 		}
 		else
 		{
 			// Qlaunch is not running at all?
-			fatalThrow(rc);
+			fatalThrow(MAKERESULT(Module_Libnx, LibnxError_ShouldNotHappen));
 		}
 	}
 	else
