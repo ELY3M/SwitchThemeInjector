@@ -2,12 +2,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <filesystem>
-#include "../SwitchThemesCommon/SwitchThemesCommon.hpp"
 #include "../UI/UI.hpp"
-#include "../fs.hpp"
 #include "ThemeEntry/ThemeEntry.hpp"
-#include <functional>
 
 class ExternalInstallPage : public IUIControlObj
 {
@@ -21,9 +17,12 @@ class ExternalInstallPage : public IUIControlObj
 		bool tooManyItems = false;
 		int RenderStartIndex = 0;
 		int SelectedIndex = 0;
+
+		bool installationRequested = false;
+		bool cancellationRequested = false;
 	
-        bool isInstalled = false;	
-		bool installSuccess = true;
+        bool processStarted = false;	
+		std::string installationErrorMessage = "";
 		std::vector <std::unique_ptr<ThemeEntry>> ArgEntries; 
 		const u32 GRAY = 0x808080FF;
 };

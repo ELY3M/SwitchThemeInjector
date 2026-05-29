@@ -155,9 +155,9 @@ void RemoteInstall::Worker::ImageFetch::OnComplete()
     for (const auto& res : Results)
     {
         if (res.size())
-            OutResult.List.push_back(Image::Load(res));
+            OutResult.List.push_back(std::make_shared<RenderImage>(res));
         else
-            OutResult.List.push_back(0);
+            OutResult.List.push_back(std::make_shared<RenderImage>());
     }
 }
 

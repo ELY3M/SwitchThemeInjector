@@ -1,4 +1,5 @@
 #include "QuickBntx.hpp"
+#include <stdexcept>
 
 using namespace std;
 

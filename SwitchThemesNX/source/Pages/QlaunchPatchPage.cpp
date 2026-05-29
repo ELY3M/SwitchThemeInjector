@@ -1,6 +1,7 @@
 #include "QlaunchPatchPage.hpp"
-#include "../ViewFunctions.hpp"
 #include "RemoteInstall/Worker.hpp"
+#include "../ViewFunctions.hpp"
+#include "../fs.hpp"
 
 class ThemeUpdateDownloader : public RemoteInstall::Worker::BaseWorker {
 public:

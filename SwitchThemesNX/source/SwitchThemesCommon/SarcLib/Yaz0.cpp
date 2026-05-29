@@ -4,13 +4,22 @@
 #include <algorithm>
 
 using namespace std;
-vector<u8> Yaz0::Decompress(const vector<u8>& Data)
+
+bool Yaz0::IsYaz0(std::span<const u8> Data)
 {
 	if (Data.size() < 8)
-		throw std::runtime_error("File format: invalid length");
+		return false;
 
 	if (std::memcmp(Data.data(), "Yaz0", 4))
-		throw std::runtime_error("File format: missing yaz0 magic");
+		return false;
+
+	return true;
+}
+
+vector<u8> Yaz0::Decompress(const vector<u8>& Data)
+{
+	if (!IsYaz0(Data))
+		throw std::runtime_error("Invalid Yaz0 file format");
 
 	u32 leng = (u32)(Data[4] << 24 | Data[5] << 16 | Data[6] << 8 | Data[7]);
 	vector<u8> Result(leng);

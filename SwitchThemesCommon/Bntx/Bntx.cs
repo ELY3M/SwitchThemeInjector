@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SwitchThemes.Common.Bntxx
+namespace SwitchThemes.Common.Bntx
 {
 	class QuickBntx
 	{
@@ -49,7 +49,7 @@ namespace SwitchThemes.Common.Bntxx
 				Reader.BaseStream.Seek(Reader.ReadInt64(), SeekOrigin.Begin);
 
 				Textures.Add(new Texture(Reader));
-				//File.WriteAllBytes("F:\\test", Textures[0].Write());
+				//File.WriteAllBytes("test", Textures[0].Write());
 			}
 
 			Reader.BaseStream.Position = RelocAddress;
@@ -63,7 +63,7 @@ namespace SwitchThemes.Common.Bntxx
 			ReplaceTex(texName, dds);
 		}
 
-		public Bntxx.Texture FindTex(string texName) => Textures.Where(x => x.Name == texName).FirstOrDefault();
+		public Bntx.Texture FindTex(string texName) => Textures.Where(x => x.Name == texName).FirstOrDefault();
 
 		public void ReplaceTex(string texName, Images.DDS dds)
 		{

@@ -1,5 +1,6 @@
 #include "Sarc.hpp"
 #include <algorithm>
+#include <stdexcept>
 
 using namespace std;
 
@@ -233,7 +234,7 @@ SARC::PackedSarc SARC::Pack(SARC::SarcData &data, s32 _align)
 	return PackedSarc{bw.getBuffer(), (u32)align};
 }
 
-SARC::SarcData SARC::Unpack(const vector<u8> &data) 
+SARC::SarcData SARC::Unpack(std::span<const u8> data)
 {
 	SARC::SarcData res;
 	Buffer buf = Buffer(data);

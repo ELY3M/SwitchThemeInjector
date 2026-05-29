@@ -2,9 +2,9 @@
 #include <string>
 #include <vector>
 #include <optional>
+#include <unordered_map>
 #include "../MyTypes.h"
-#include "../SarcLib/Sarc.hpp"
-#include "../NXTheme.hpp"
+#include "../Common.hpp"
 
 struct Vector3 { float X, Y, Z; bool operator==(Vector3 const&) const = default; };
 struct Vector2 { float X, Y; bool operator==(Vector2 const&) const = default; };
@@ -53,6 +53,8 @@ struct PanePatch
 
 	std::vector<UsdPatch> UsdPatches;
 
+	std::string PaneSpecific[4];
+
 	// These fields were originally used for color data in PIC1 panes, now they can be used for pane-specific data 
 	// For compatibility reasons they keep the original name in the JSON
 
@@ -77,8 +79,6 @@ struct PanePatch
 	inline std::string& PaneSpecific3() { return PaneSpecific[3]; }
 
 	bool operator==(PanePatch const&) const = default;
-private:
-	std::string PaneSpecific[4];
 };
 
 struct ExtraGroup
@@ -165,7 +165,7 @@ struct LayoutPatch
 struct PatchTemplate 
 {
 	std::string TemplateName;
-	std::string szsName;
+	std::string SzsName;
 	std::string TitleId;
 	std::string FirmName;
 
@@ -178,8 +178,11 @@ struct PatchTemplate
 	std::vector<std::string> targetPanels;
 	std::string SecondaryTexReplace;
 
+	std::string NXThemeName;
+
 	bool DirectPatchPane = false;
 	bool NoRemovePanel = false;
+	bool RequiresCodePatch = false;
 };
 
 struct TextureReplacement 
@@ -190,7 +193,7 @@ struct TextureReplacement
 	std::string FileName;
 	std::string PaneName;
 	s32 W, H;
-	LayoutFilePatch patch;
+	LayoutFilePatch Patch;
 	ConsoleFirmware MinFirmware = ConsoleFirmware::Invariant;
 };
 

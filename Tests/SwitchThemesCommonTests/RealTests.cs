@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SARCExt;
 using SwitchThemes.Common;
+using SwitchThemes.Common.Patching;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -44,8 +45,9 @@ namespace SwitchThemesCommonTests
 				patcher.PatchLayouts(l);
 			}
 
-			var final = patcher.GetFinalSarc();
-			CompareSarc(final, exp);
+			patcher.FinalizeBntx();
+
+			CompareSarc(src, exp);
 		}
 
 		[TestMethod]

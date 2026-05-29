@@ -1,6 +1,7 @@
 #include "DDS.hpp"
 #include <algorithm>
 #include <cstring>
+#include <stdexcept>
 
 using namespace std;
 

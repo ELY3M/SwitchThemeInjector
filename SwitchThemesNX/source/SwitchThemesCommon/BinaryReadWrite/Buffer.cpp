@@ -1,12 +1,21 @@
 #include "Buffer.hpp"
 #include <stdexcept>
-#include <iomanip> // byteStr()
+#include <iomanip>
+#include <sstream> 
+#include <memory>
+#include <span>
+#include <string>
+#include <cstring>
 
 /************************* WRITING *************************/
 
 Buffer::Buffer()  {}
+
 Buffer::Buffer(const std::vector<unsigned char> &_buffer) :
     buffer(_buffer) {}
+
+Buffer::Buffer(std::span<const unsigned char> _buffer) :
+    buffer(_buffer.begin(), _buffer.end()) {}
 
 size_t Buffer::Length() { return buffer.size(); }
 
@@ -21,7 +30,7 @@ void Buffer::clear()  {
     Position = 0;
 }
 
-std::string Buffer::byteStr(bool LE) const  {
+std::string Buffer::byteStr(bool LE) const {
     std::stringstream byteStr;
     byteStr << std::hex << std::setfill('0');
 
@@ -147,46 +156,47 @@ void Buffer::writeInt64_BE(long long val)  {
     writeBytes<long long>(val, false);
 }
 
-void Buffer::Write(unsigned long long val)  {
+void Buffer::Write(uint64_t val)  {
     writeBytes<unsigned long long>(val, ByteOrder == Endianness::LittleEndian);
 }
-void Buffer::writeUInt64_LE(unsigned long long val)  {
+void Buffer::writeUInt64_LE(uint64_t val)  {
     writeBytes<unsigned long long>(val);
 }
-void Buffer::writeUInt64_BE(unsigned long long val)  {
+void Buffer::writeUInt64_BE(uint64_t val)  {
     writeBytes<unsigned long long>(val, false);
 }
 
+template<typename T, typename U>
+T bitcast(U value) {
+    static_assert(sizeof(T) == sizeof(U), "Size of T and U must be the same for bitcast.");
+    T result;
+    std::memcpy(&result, &value, sizeof(T));
+    return result;
+}
+
 void Buffer::Write(float val)  {
-    union { float fnum; unsigned inum; } u;
-    u.fnum = val;
-    Write(u.inum);
+    Write(bitcast<uint32_t>(val));
 }
+
 void Buffer::writeFloat_LE(float val)  {
-    union { float fnum; unsigned inum; } u;
-    u.fnum = val;
-    writeUInt32_LE(u.inum);
+    writeUInt32_LE(bitcast<uint32_t>(val));
 }
+
 void Buffer::writeFloat_BE(float val)  {
-    union { float fnum; unsigned inum; } u;
-    u.fnum = val;
-    writeUInt32_BE(u.inum);
+    writeUInt32_BE(bitcast<uint32_t>(val));
 }
 
 void Buffer::Write(double val)  {
-	union { double fnum; unsigned long long inum; } u;
-	u.fnum = val;
-	Write(u.inum);
+
+    Write(bitcast<uint64_t>(val));
 }
+
 void Buffer::writeDouble_LE(double val)  {
-    union { double fnum; unsigned long long inum; } u;
-    u.fnum = val;
-    writeUInt64_LE(u.inum);
+    writeUInt64_LE(bitcast<uint64_t>(val));
 }
+
 void Buffer::writeDouble_BE(double val)  {
-    union { double fnum; unsigned long long inum; } u;
-    u.fnum = val;
-    writeUInt64_BE(u.inum);
+    writeUInt64_BE(bitcast<uint64_t>(val));
 }
 
 void Buffer::Write(const std::vector<unsigned char>& vec)

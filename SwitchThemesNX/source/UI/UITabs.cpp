@@ -90,12 +90,20 @@ void TabRenderer::Render(int X, int Y)
 		CurrentControl = Pages[selectedIndex];
 
 	auto dList = ImGui::GetOverlayDrawList();
+	
+	dList->AddText(font40, 40, { TopLine.x ,21 }, 0xffffffff, Title.c_str());
 
-	dList->AddText(font40, 40, { 21,21 }, 0xffffffff, Title.c_str());
+	if (UseLowMemory) 
+	{
+		ImGui::PushFont(font40);
+		auto titleSize = ImGui::CalcTextSize(Title.c_str());
+		ImGui::PopFont();
+	
+		dList->AddText(font25, 30, { TopLine.x + titleSize.x + 20 , 30 }, 0xff2020ff, "Applet mode");
+	}
 
 	dList->AddRectFilled(TopLine, TopLine + TopLineSz, 0xffffffff);
 	dList->AddRectFilled(BottomLine, BottomLine + TopLineSz, 0xffffffff);
-	//dList->AddRectFilled(SideLine, SideLine + SideLineSz, 0xffffffff);
 	
 	ImGui::PopFont();
 	Utils::ImGuiCloseWin();

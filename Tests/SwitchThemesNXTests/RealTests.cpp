@@ -1,5 +1,7 @@
 #include "CppUnitTest.h"
-#include "../../SwitchThemesNX/source/SwitchThemesCommon/SwitchThemesCommon.hpp"
+#include "../../SwitchThemesNX/source/SwitchThemesCommon/Common.hpp"
+#include "../../SwitchThemesNX/source/SwitchThemesCommon/Patcher.hpp"
+#include "../../SwitchThemesNX/source/SwitchThemesCommon/SarcLib/Yaz0.hpp"
 #include "../../SwitchThemesNX/source/SwitchThemesCommon/Layouts/Bflan.hpp"
 #include "../../SwitchThemesNX/source/SwitchThemesCommon/Layouts/Bflyt/Bflyt.hpp"
 #include "picosha2.h"

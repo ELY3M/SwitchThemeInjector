@@ -1,6 +1,7 @@
 #include "CfwSelectPage.hpp"
 #include "../ViewFunctions.hpp"
 #include "../UI/UIManagement.hpp"
+#include "../fs.hpp"
 
 using namespace std;
 

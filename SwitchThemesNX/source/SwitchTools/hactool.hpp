@@ -1,22 +1,18 @@
 #pragma once
-#include "../fs.hpp"
+#include <unordered_map>
+#include <vector>
 #include <string>
 #include <array>
+#include <cstdint>
 
-namespace hactool {
-	constexpr u64 QlaunchID = 0x0100000000001000;
-	constexpr u64 PslID = 0x0100000000001007;
-	constexpr u64 UserPageID = 0x0100000000001013;
+namespace hactool 
+{
+	std::unordered_map<std::string, std::vector<uint8_t>> ExtractFiles(uint64_t contentId, std::vector<std::string> files);
 
-	void ExtractPlayerSelectMenu();
-	void ExtractUserPage();
-	void ExtractHomeMenu();
-	void ExtractTitle(u64 contentID, const std::string& Path);
-	
-	void ExtractHomeExefs();
+	std::vector<uint8_t> GetNca(uint64_t contentId);
 
-	std::array<u8, 32> GetTitleBuildID(u64 contentID);
-	std::string BuildIDToString(std::array<u8, 32> data);
+	std::array<uint8_t, 32> GetTitleBuildID(uint64_t contentID);
+	std::string BuildIDToString(std::array<uint8_t, 32> data);
 
 	std::string QlaunchBuildID();
 }

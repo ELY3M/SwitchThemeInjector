@@ -1,12 +1,23 @@
+#include <string>
+
 #include "NcaDumpPage.hpp"
 #include "../ViewFunctions.hpp"
-#include "../fs.hpp"
-#include "../SwitchTools/hactool.hpp"
-#include <filesystem>
-#include "../Platform/Platform.hpp"
-#include "../SwitchThemesCommon/NXTheme.hpp"
 
-using namespace std;
+#include "../SwitchTools/hactool.hpp"
+#include "../SwitchTools/RomfsCache.hpp"
+#include "../fs.hpp"
+#include "../SwitchThemesCommon/Common.hpp"
+
+static void WriteExtracted(const std::string& basePath, const FileContainer& files)
+{
+	for (const auto& [name, data] : files)
+	{
+		auto finalPath = fs::path::SystemDataFolder + fs::JoinPath(basePath, name);
+		auto parent = fs::GetParentDir(finalPath);
+		fs::CreateDirectory(parent);
+		fs::WriteFile(finalPath, data);
+	}
+}
 
 NcaDumpPage::NcaDumpPage()
 {
@@ -18,41 +29,72 @@ void NcaDumpPage::Render(int X, int Y)
 	Utils::ImGuiSetupPage(this, X, Y);
 	ImGui::PushFont(font30);
 
-	ImGui::TextWrapped("To install .nxtheme files you need to extract the home menu first.\n"
-		"This is needed every time the firmware changes, both for updates and downgrades.\n"
-		"When the extracted version doesn't match with your firmware you will be prompted to do it.\n\n"
-		"Usually you don't need to extract it manually but in case you're facing issues you can try doing so here.");
+	ImGui::TextWrapped(
+		"This page allows extracting the RomFS of the home menu and related titles.\n\n"
+		"This option allows extracting the common szs files (for example, ResidentMenu.szs) to your SD card so you can create custom layouts. For simply installing themes you do not need this feature, it is done automaticaly done during installation."
+	);
 
-	if (ImGui::Button("Extract home menu"))
+	if (ImGui::Button("Extract szs layout files"))
 	{
-		PushFunction([]() {
-			if ((gamepad.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] && gamepad.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER]))
+		PushFunction([]() 
+		{
+			try 
 			{
-				DialogBlocking("Super secret combination entered, only the home menu NCA will be dumped (it won't be extracted)");
-				DisplayLoading("Extracting NCA...");
-				if (fs::theme::DumpHomeMenuNca())
-					Dialog("The home menu NCA was extracted, now use the injector to complete the setup.\nIf you didn't do this on purpose ignore this message.");
-				return;
+				if (fs::Exists(fs::path::SystemDataFolder + "extracted/"))
+					fs::DeleteDirectory(fs::path::SystemDataFolder + "extracted/");
+
+				DisplayLoading("Extracting qlaunch...");
+				WriteExtracted("extracted/qlaunch", RomfsCache::GetContent(ThemeTargetInfo::QlaunchID));
+
+				DisplayLoading("Extracting playerselect...");
+				WriteExtracted("extracted/playerselect", RomfsCache::GetContent(ThemeTargetInfo::PslID));
+
+				DisplayLoading("Extracting mypage...");
+				WriteExtracted("extracted/mypage", RomfsCache::GetContent(ThemeTargetInfo::UserPageID));
+
+				Dialog("The files have been extracted to the themes/systemData/extracted/ folder on your SD card.");
 			}
-			if (!YesNoPage::Ask(
-				"To install custom themes you need to extract the home menu first, this process may take several minutes, don't let your console go to sleep mode and don't press the home button.\n"
-				"Do you want to continue ?")) return;
-			fs::RemoveSystemDataDir();
-			try
-			{				
-				hactool::ExtractHomeMenu();
-				hactool::ExtractPlayerSelectMenu();
-				hactool::ExtractUserPage();
-				Dialog("Done, the home menu was extracted, now you can install nxtheme files !");
-			}
-			catch (std::runtime_error &err)
+			catch (const std::exception& ex)
 			{
-				DialogBlocking("Error while extracting the home menu: " + string(err.what()));
+				DialogBlocking("Error while extracting the layout files: " + std::string(ex.what()));
 			}
 		});
 	}
-	PAGE_RESET_FOCUS;
-	
+
+	ImGui::NewLine();
+
+	ImGui::TextWrapped(
+		"If you need the complete set of files of the home menu you can extract the raw NCA. To extract this you will need hactool or similar software on your computer."
+	);
+	if (ImGui::Button("Extract raw NCA files"))
+	{
+		PushFunction([]()
+			{
+				try
+				{
+					if (fs::Exists(fs::path::SystemDataFolder + "nca/"))
+						fs::DeleteDirectory(fs::path::SystemDataFolder + "nca/");
+
+					fs::CreateDirectory(fs::path::SystemDataFolder + "nca/");
+
+					auto nca = hactool::GetNca(ThemeTargetInfo::QlaunchID);
+					fs::WriteFile(fs::path::SystemDataFolder + "nca/" + ThemeTargetInfo::TitleIdToString(ThemeTargetInfo::QlaunchID) + ".nca", nca);
+					
+					nca = hactool::GetNca(ThemeTargetInfo::PslID);
+					fs::WriteFile(fs::path::SystemDataFolder + "nca/" + ThemeTargetInfo::TitleIdToString(ThemeTargetInfo::PslID) + ".nca", nca);
+
+					nca = hactool::GetNca(ThemeTargetInfo::UserPageID);
+					fs::WriteFile(fs::path::SystemDataFolder + "nca/" + ThemeTargetInfo::TitleIdToString(ThemeTargetInfo::UserPageID) + ".nca", nca);
+
+					Dialog("The files have been extracted to the themes/systemData/nca folder on your SD card.");
+				}
+				catch (const std::exception& ex)
+				{
+					DialogBlocking("Error while extracting the layout files: " + std::string(ex.what()));
+				}
+			});
+	}
+		
 	ImGui::PopFont();
 	Utils::ImGuiCloseWin();
 }
@@ -62,61 +104,6 @@ void NcaDumpPage::Update()
 	if (Utils::PageLeaveFocusInput()){
 		Parent->PageLeaveFocus(this);
 	}
-}
-
-void NcaDumpPage::CheckHomeMenuVer()
-{
-	if (!filesystem::exists(SD_PREFIX "/themes/systemData/ResidentMenu.szs"))
-	{
-		DialogBlocking("To install custom themes you need to extract the home menu first, this process may take several minutes, don't let your console go to sleep mode and don't press the home button.\nPress A to start");
-		goto DUMP_HOMEMENU;
-	}
-	
-	if (filesystem::exists(SD_PREFIX "/themes/systemData/ver.cfg"))
-	{
-		FILE *ver = fopen(SD_PREFIX "/themes/systemData/ver.cfg", "r");
-		if (ver)
-		{
-			char str[50] = {0};
-			fgets(str,49,ver);
-			fclose(ver);
-			string version(str);
-			if (version != SystemVer) goto ASK_DUMP;
-			else return;
-		}
-		else goto ASK_DUMP;
-	}
-	else if (HOSVer.major >= 7) goto ASK_DUMP;
-	else WriteHomeNcaVersion();
-	return;
-	
-ASK_DUMP:
-	if (!YesNoPage::Ask("The current firmware version is different than the one of the extracted home menu, do you want to extract the home menu again ?\nIf the extracted home menu doesn't match with the installed one themes will crash."))
-	{
-		DialogBlocking("You won't see this message again, in case of crashes you can extract the home menu manually from the `Extract home menu` option in the main menu");
-		WriteHomeNcaVersion();
-		return;
-	}
-	
-DUMP_HOMEMENU:
-	fs::RemoveSystemDataDir();
-	try
-	{
-		hactool::ExtractHomeMenu();
-	}
-	catch (std::runtime_error &err)
-	{
-		DialogBlocking("Error while extracting the home menu: " + string(err.what()));
-	}
-}
-
-void NcaDumpPage::WriteHomeNcaVersion()
-{
-	FILE* ver = fopen(fs::path::NcaVersionCfg.c_str(), "w");
-	if (!ver)
-		return;
-	fprintf(ver, "%s", SystemVer.c_str());
-	fclose(ver);
 }
 
 

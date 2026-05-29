@@ -1,7 +1,7 @@
 #include "TextPage.hpp"
 #include "../Version.hpp"
 #include "../ViewFunctions.hpp"
-#include "../UI/imgui/imgui_internal.h"
+#include "../SwitchThemesCommon/Common.hpp"
 
 using namespace std;
 
@@ -42,7 +42,6 @@ CreditsPage::CreditsPage() :
 	Name = "Credits";
 }
 
-extern void ShowFirstTimeHelp(bool WelcomeScr); //from main.cpp
 void CreditsPage::Render(int X, int Y)
 {
 	Utils::ImGuiSetupPage(this, X, Y);
@@ -63,10 +62,6 @@ void CreditsPage::Render(int X, int Y)
 		"Fincs for the hybrid_app template\n"
 		"Everyone from the DearImgui github repo"
 	);
-
-	if (ImGui::Button("Show first startup info"))
-		PushFunction([]() {ShowFirstTimeHelp(false); });
-	PAGE_RESET_FOCUS;
 
 	ImGui::PopFont();
 	Utils::ImGuiSetWindowScrollable();

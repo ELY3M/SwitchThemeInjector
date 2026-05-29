@@ -9,8 +9,10 @@
 #ifdef  __SWITCH__
 #include <switch.h>
 #endif
+#include <memory>
 
 constexpr ImGuiWindowFlags DefaultWinFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove;
+
 const ImVec2 TabPageSize = { 900, 552 };
 
 extern ImFont* font25;
@@ -20,28 +22,54 @@ extern ImFont* font40;
 constexpr uint32_t SCR_W = 1280;
 constexpr uint32_t SCR_H = 720;
 
-typedef unsigned int LoadedImage;
-
-namespace Colors {
-	const ImVec4 Highlight = { 0,1,0.788f,1 };
-	const ImVec4 Red = { 1,0,0,1 };
-}
-
-namespace Image 
+namespace Colors 
 {
-	void Free(LoadedImage img);
-	LoadedImage Load(const std::vector<u8>& data);
-	//TODO: LoadedImage Load(const std::string path);
-	namespace Internal {
-		void AssertOnLeaks();
-	}
+	const ImVec4 Highlight = { 0,1,0.788f,1 };
+	const ImVec4 Red = { 1,.2f,.2f,1 };
 }
 
-namespace ImageCache {
+class RenderImage 
+{
+public:
+	int Width;
+	int Height;
+	ImTextureID TextureId;
+
+	bool IsValid() const { return TextureId != 0 && Width != 0 && Height != 0; }
+
+	RenderImage(const std::vector<u8>& data);
+	RenderImage() : Width(0), Height(0), TextureId(0) {}
+
+	RenderImage(const RenderImage&) = delete;
+	RenderImage& operator=(const RenderImage&) = delete;
+
+	RenderImage(RenderImage&&);
+	RenderImage& operator=(RenderImage&&);
+
+	~RenderImage();
+
+	void Release();
+
+	static void DebugAssertLeaks();
+	static size_t DebugLoadedImages();
+private:
+	static size_t LeakCount;
+	void Invalidate() { TextureId = 0; Width = 0; Height = 0; }
+};
+
+using ImageRef = std::shared_ptr<RenderImage>;
+
+namespace ImageCache 
+{
 	void Clear();
 	void FreeImage(const std::string& img);
+
 	//Cache automatically frees old images, no need to do it manually
-	LoadedImage LoadDDS(const std::vector<u8>& data, const std::string& name);
+	ImageRef Load(const std::vector<u8>& data, const std::string& name);
+	ImageRef Get(const std::string& name);
+	void PopOne();
+
+	void DebugInformation(size_t& out_size, int& out_count, float& out_percent);
 };
 
 struct PageEvent

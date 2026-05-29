@@ -1,5 +1,5 @@
 #include "CppUnitTest.h"
-#include "../../SwitchThemesNX/source/SwitchThemesCommon/SwitchThemesCommon.hpp"
+#include "../../SwitchThemesNX/source/SwitchThemesCommon/Common.hpp"
 #include "../../SwitchThemesNX/source/SwitchThemesCommon/Layouts/Bflan.hpp"
 #include "../../SwitchThemesNX/source/SwitchThemesCommon/Layouts/Bflyt/Bflyt.hpp"
 #include "picosha2.h"
@@ -30,7 +30,7 @@ namespace SwitchThemesNXTests
 			
 			auto t = *std::find_if(Patches::DefaultTemplates.begin(), Patches::DefaultTemplates.end(),
 				[](const PatchTemplate& t) {
-					return t.szsName == "ResidentMenu.szs" && t.targetPanels[0] == "P_Bg_00";
+					return t.SzsName == "ResidentMenu.szs" && t.targetPanels[0] == "P_Bg_00";
 				});
 
 			if (!p.PatchBgLayout(t))

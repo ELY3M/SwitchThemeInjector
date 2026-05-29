@@ -1,8 +1,6 @@
 #pragma once
 #include "API.hpp"
-#include "../../UI/UI.hpp"
 #include <vector>
-#include "../../SwitchThemesCommon/Layouts/Base64.hpp"
 #include "Worker.hpp"
 
 namespace RemoteInstall
@@ -14,7 +12,6 @@ namespace RemoteInstall
 
 		void Update() override;
 		void Render(int X, int Y) override;
-		~ListPage();
 	private:
 		enum class Result
 		{

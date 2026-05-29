@@ -1,14 +1,16 @@
+#include <filesystem>
+#include <stdexcept>
+#include <exception>
+#include <vector>
+#include <utility>
+
 #include "ThemeEntry.hpp"
-#include "../../SwitchThemesCommon/SwitchThemesCommon.hpp"
+#include "../ImagePreview.hpp"
 #include "../../ViewFunctions.hpp"
 #include "../../fs.hpp"
-#include <filesystem>
 #include "../../Platform/Platform.hpp"
-
-#include "ImagePreview.hpp"
-#include "FontEntry.hpp"
-#include "LegacyEntry.hpp"
-#include "NxEntry.hpp"
+#include "../../UI/UI.hpp"
+#include "../../SwitchThemesCommon/MyTypes.h"
 
 using namespace std;
 using namespace SwitchThemesCommon;
@@ -33,9 +35,7 @@ public:
 
 	bool IsFolder() override { return Folder; }
 	bool CanInstall() override { return false; }
-	bool HasPreview() override { return false; }
 protected:
-	LoadedImage GetPreview() override { throw runtime_error("Preview is not implemented"); }
 	bool DoInstall(bool ShowDialogs = true) override { return false; }
 };
 
@@ -85,12 +85,17 @@ unique_ptr<ThemeEntry> ThemeEntry::FromFile(const std::string& fileName)
 	try {
 		if (filesystem::is_directory(fileName))
 		{
-			auto&& e = make_unique<DummyEntry>(fileName, fs::GetFileName(fileName), fileName, "folder");
+			// By convention all folder entries should end with a /
+			auto fullPath = fileName;
+			if (!StrEndsWith(fullPath, "/"))
+				fullPath += "/";
+
+			auto&& e = make_unique<DummyEntry>(fullPath, fs::GetFileName(fileName), fileName, "folder");
 			e->Folder = true;
 			return move(e);
 		}
 
-		vector<u8>&& data = fs::OpenFile(fileName);
+		auto data = fs::OpenFile(fileName);
 
 		if (data.size() == 0)
 			return make_unique<DummyEntry>(fileName, "Couldn't open this file", fileName, "ERROR");
@@ -99,12 +104,16 @@ unique_ptr<ThemeEntry> ThemeEntry::FromFile(const std::string& fileName)
 			return make_unique<FontEntry>(fileName, move(data));
 		if (StrEndsWith(fileName, ".szs"))
 			return make_unique<LegacyEntry>(fileName, move(data));
-		if (StrEndsWith(fileName, ".nxtheme"))
+		if (StrEndsWith(fileName, ".nxtheme") || StrEndsWith(fileName, ".zip"))
 			return make_unique<NxEntry>(fileName, move(data));
+		if (StrEndsWith(fileName, ".jpg") || StrEndsWith(fileName, ".jpeg") || StrEndsWith(fileName, ".png"))
+			return make_unique<ImageEntry>(fileName, move(data));
 	}
 	catch (std::exception &ex)
 	{
-		return make_unique<DummyEntry>(fileName, "Error - " + std::string(ex.what()), fileName, "ERROR");
+		auto err = make_unique<DummyEntry>(fileName, "Error - Open for details", fileName, "ERROR");
+		err->CannotInstallReason = ex.what();
+		return err;
 	}
 	catch (...)
 	{
@@ -114,15 +123,45 @@ unique_ptr<ThemeEntry> ThemeEntry::FromFile(const std::string& fileName)
 	return make_unique<DummyEntry>(fileName, "Unknown file type", fileName, "ERROR");
 }
 
-unique_ptr<ThemeEntry> ThemeEntry::FromSZS(const std::vector<u8>& RawData)
+unique_ptr<ThemeEntry> ThemeEntry::FromMemory(const std::vector<u8>& binary)
 {
-	auto &&DecompressedFile = Yaz0::Decompress(RawData);
-	auto &&sarc = SARC::Unpack(DecompressedFile);
+	std::string error = "Unknown file format";
 
-	if (sarc.files.count("info.json"))
-		return make_unique<NxEntry>("", move(sarc));
-	else
-		return make_unique<LegacyEntry>("", move(sarc));
+	// new nxtheme format
+	if (zip::IsZip(binary))
+	{
+		auto data = zip::Extract(binary);
+		if (std::holds_alternative<std::string>(data))
+		{
+			error = std::get<std::string>(data);
+			goto hande_error;
+		}
+
+		return make_unique<NxEntry>("", move(std::get<FileContainer>(data)));
+	}
+
+	if (Yaz0::IsYaz0(binary))
+	{
+		// Could also be a raw szs qlaunch file, try to load it and check if it's nxtheme.
+		auto szs = szs::Extract(binary);
+		if (std::holds_alternative<std::string>(szs))
+		{
+			error = std::get<std::string>(szs);
+			goto hande_error;
+		}
+
+		auto& data = std::get<FileContainer>(szs);
+		if (data.count("info.json"))
+			return make_unique<NxEntry>("", move(data));
+		else
+		{
+			std::vector<u8> copy = binary;
+			return make_unique<LegacyEntry>("", move(copy));
+		}
+	}	
+
+hande_error:
+	return make_unique<DummyEntry>("Error", "Failed to load", error, "");
 }
 
 using namespace ImGui;
@@ -170,9 +209,9 @@ ThemeEntry::UserAction ThemeEntry::Render(bool OverrideColor)
 	if (HasPreview() && (hovered || held) && KeyPressed(GLFW_GAMEPAD_BUTTON_X))
 	{
 		auto Preview = GetPreview();
-		if (Preview)
+		if (Preview && Preview->IsValid())
 		{
-			PushPage(new ImagePreview(Preview));
+			PushPage(new ImagePreview(Preview, fs::GetFileName(FileName)));
 			return UserAction::Preview;
 		}
 	}

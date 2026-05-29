@@ -7,8 +7,6 @@
 #include "UI/DialogPages.hpp"
 #include "Platform/Platform.hpp"
 
-extern std::string SystemVer;
-
 void PushPage(IUIControlObj* page);
 void PopPage(IUIControlObj* page);
 
@@ -139,7 +137,8 @@ namespace Utils
 	static inline void ImGuiSelectItem(bool isFocused = true, ImGuiID ID = 0)
 	{
 		auto win = ImGui::GetCurrentWindow();
-		if (ID == 0) ID = win->DC.LastItemId;
+		if (!ID) ID = win->DC.LastItemId;
+		if (!ID) return;
 		ImGui::SetFocusID(ID, win);
 		GImGui->NavDisableHighlight = !isFocused;
 		GImGui->NavInitResultId = ID;

@@ -1,13 +1,11 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <fstream>
 #include <stdexcept>
-#include <stdio.h>
 #include <filesystem>
-#include <variant>
+#include <algorithm>
+#include <format>
 
-#include "Version.hpp"
 #include "UI/UIManagement.hpp"
 #include "UI/UI.hpp"
 #include "Platform/Platform.hpp"
@@ -19,16 +17,16 @@
 #include "Pages/TextPage.hpp"
 #include "Pages/ExternalInstallPage.hpp"
 #include "ViewFunctions.hpp"
-#include "SwitchThemesCommon/SwitchThemesCommon.hpp"
-#include "SwitchThemesCommon/NXTheme.hpp"
+#include "SwitchThemesCommon/Common.hpp"
 #include "Pages/RemoteInstallPage.hpp"
 #include "Pages/SettingsPage.hpp"
 #include "Pages/RebootPage.cpp"
 #include "Pages/QlaunchPatchPage.hpp"
 
 #include "SwitchTools/PatchMng.hpp"
+#include "fs.hpp"
 
-//#define DEBUG
+const int DebugOverlay = false;
 
 static inline void ImguiBindController()
 {
@@ -121,13 +119,21 @@ void DisplayLoading(std::initializer_list<std::string> lines)
 	DisplayLoading(LoadingOverlay(lines));
 }
 
-#ifdef DEBUG
-double previousTime = glfwGetTime();
-int frameCount = 0;
-int fpsValue = 0;
-
-static void calcFPS() 
+void FatalError(std::string message)
 {
+	LOGf("Fatal error: %s\n", message.c_str());
+	DialogBlocking("Fatal error: " + message + "\n\nThe application will close");
+	exit(-1);
+}
+
+static void RenderDebugOverlay()
+{
+	static double previousTime = glfwGetTime();
+	static int frameCount = 0;
+	static int fpsValue = 0;
+
+	auto dlist = ImGui::GetForegroundDrawList();
+
 	double currentTime = glfwGetTime();
 	frameCount++;
 
@@ -138,13 +144,25 @@ static void calcFPS()
 		frameCount = 0;
 		previousTime = currentTime;
 	}
-	ImGui::Text("FPS %d", fpsValue);
-	for (int i = 0; i < 6; i++)
-	{
-		ImGui::Text("pad[%d] = %d %f %f ", i, (int)(StickAsButton(i) != 0), gamepad.axes[i], OldGamepad.axes[i]);
-	}
+
+	auto text = std::format("FPS: {}", fpsValue);
+	dlist->AddText(ImVec2{0, 0}, 0xffffffff, text.c_str());
+
+	text = std::format("Pages: {} PopList: {}", Pages.size(), PopList.size());
+	dlist->AddText(ImVec2{0, 20}, 0xffffffff, text.c_str());
+	
+	text = std::format("Images: {}", RenderImage::DebugLoadedImages());
+	dlist->AddText(ImVec2{0, 40}, 0xffffffff, text.c_str());
+
+	size_t cacheSize;
+	int cacheCount;
+	float cachePercent;
+
+	ImageCache::DebugInformation(cacheSize, cacheCount, cachePercent);
+
+	text = std::format("Cache: {} bytes ({} images, {:.2f}%)", cacheSize, cacheCount, cachePercent);
+	dlist->AddText(ImVec2{ 0, 60 }, 0xffffffff, text.c_str());
 }
-#endif
 
 static inline void MainLoop(bool BreakOnPop = false)
 {
@@ -159,17 +177,37 @@ static inline void MainLoop(bool BreakOnPop = false)
 
 		IsRendering = true;
 		GFX::StartFrame();
-		CurObj->Render(0,0);
-#ifdef DEBUG
-		calcFPS();
-#endif
+
+		try 
+		{
+			CurObj->Render(0, 0);
+		}
+		catch (std::exception& ex)
+		{
+			// This will likely still fail due to imgui throwing on end frame if the page was not properly popped
+			std::string msg = ex.what();
+			PushFunction([msg] {
+				FatalError(msg);
+			});
+		}
+
+		if (DebugOverlay)
+			RenderDebugOverlay();
+
 		GFX::EndFrame();
 		IsRendering = false;
 
-		if (CurObj == ViewObj)
-			CurObj->Update();
-		
-		ExecuteDeferredFunctions();
+		try {
+			if (CurObj == ViewObj)
+				CurObj->Update();
+
+			ExecuteDeferredFunctions();
+		}
+		catch (std::exception& ex)
+		{
+			FatalError(ex.what());
+		}
+
 		if (PopList.size())
 		{
 			_PopPage();
@@ -180,7 +218,6 @@ static inline void MainLoop(bool BreakOnPop = false)
 		PlatformSleep(1 / 30.0f * 1000);
 	}
 }
-
 
 void PushPageBlocking(IUIControlObj* page)
 {
@@ -213,28 +250,6 @@ class QuitPage : public IPage
 			App::Quit();
 		}
 };
-
-void ShowFirstTimeHelp(bool WelcomeScr)
-{	
-	if (WelcomeScr)
-		DialogBlocking("Welcome to NXThemes Installer " + Version::Name + "!\n\nThese pages contains some important informations, it's recommended to read them carefully.\nThis will only show up once, you can read it again from the Credits tab.");
-
-	DialogBlocking(
-		"Custom themes CANNOT brick your console because they're installed only on the SDcard. \n"
-		"If after installing a theme your console doesn't boot anymore manually delete the '0100000000001000' and '0100000000001013' folders in 'SDcard/atmosphere/contents'.\n\n"
-		"When you change the firmware your console (upgrade or downgrade) you must uninstall the theme first because the installed files on the sd are firmware-dependent.\n"
-		"If the firmware you installed supports themes you can install them back after the update.\n\n"
-		"Lockscreen themes after firmware version 9.0 are not supported on all CFWs because some lack support for patching titles via IPS."
-	);
-
-	DialogBlocking(
-		"You can find some themes on the /r/NXThemes subreddit and in the Qcean Discord server (invite: CUnHJgb) where you can also ask for support. \n\n"
-		"To make your own themes download the windows app at: https://git.io/fpxAS\n"
-		"Or use the online theme editor at: https://exelix11.github.io/SwitchThemeInjector/v2\n"
-		"\n"
-		"That's all, have fun with custom themes :)"
-	);
-}
 
 // Note that CfwFolder is set after the constructor of any page pushed before CheckCFWDir is called, CfwFolder shouldn't be used until the theme is actually being installed
 static void SetCfwFolder()
@@ -297,12 +312,14 @@ static std::vector<std::string> GetArgsInstallList(int argc, char** argv)
 	}
 }	
 
-std::string SystemVer = "";
 static void SetupSysVer()
 {
 #if __SWITCH__
 	setsysInitialize();
 	SetSysFirmwareVersion firmware;
+
+	static_assert(sizeof(firmware.version_hash) == sizeof(hos::VersionHash), "Version hash size mismatch");
+
 	auto res = setsysGetFirmwareVersion(&firmware);
 	if (R_FAILED(res))
 	{
@@ -310,22 +327,15 @@ static void SetupSysVer()
 		DialogBlocking("Could not get sys ver res=" + std::to_string(res));
 		return;
 	}
-	HOSVer = { firmware.major,firmware.minor,firmware.micro };
+	
+	hos::Version = { firmware.major,firmware.minor,firmware.micro };
+	memcpy(hos::VersionHash.data(), firmware.version_hash, sizeof(firmware.version_hash));
+
 	setsysExit();
 #else 
-	HOSVer = { 20,0,0 };
+	hos::Version = { 20,0,0 };
+	memcpy(hos::VersionHash.data(), "fakever", sizeof("fakever"));
 #endif
-	if (HOSVer.major <= 5)
-	{
-		ThemeTargetToName = ThemeTargetToName5X;
-		ThemeTargetToFileName = ThemeTargetToFileName6X; //The file names are the same
-	}
-	else //6.X
-	{
-		ThemeTargetToName = ThemeTargetToName6X;
-		ThemeTargetToFileName = ThemeTargetToFileName6X;
-	}
-	SystemVer = std::to_string(HOSVer.major) + "." + std::to_string(HOSVer.minor) + "." + std::to_string(HOSVer.micro);
 }
 
 int main(int argc, char **argv)
@@ -342,15 +352,30 @@ int main(int argc, char **argv)
 	SetupSysVer();
 	DisplayLoading("Loading system info...");
 
-	bool ThemesFolderExists = fs::EnsureThemesFolderExists();
-	NcaDumpPage::CheckHomeMenuVer();
+	fs::EnsureThemesFolderExists();
 	SetCfwFolder();
 
 	PatchMng::Init();
 
+	QlaunchPatchPage* patchPage = new QlaunchPatchPage();
+	bool missingPatches = patchPage->ShouldShow();
+
 	if (envHasArgv() && argc > 1)
 	{
-		PatchMng::EnsureInstalled(); // no checks here :(
+		if (missingPatches)
+		{
+			// We don't have rendering here so at most we can show a yes/no dialog.
+			if (YesNoPage::Ask(
+				"You are missing home menu patches needed for lock screen themes. If you install a theme that is not compatibile it will cause your console to crash on boot.\n\n"
+				"The theme installer can download these patches automatically.\nDo you want to open the download page?\n\n",
+				"Cancel installation and open patch settings",
+				"Continue installing anyway (not recommended)"
+			))
+			{
+				goto SKIP_ARGUMENTS;
+			}
+		}
+
 		auto paths = GetArgsInstallList(argc,argv);
 		if (paths.size() != 0)
 		{
@@ -360,16 +385,12 @@ int main(int argc, char **argv)
 	}	
 	else
 	{
+		SKIP_ARGUMENTS:
 		TabRenderer *t = new TabRenderer();
 		PushPage(t);
-		
-		if (!ThemesFolderExists)
-			ShowFirstTimeHelp(true);
-
-		QlaunchPatchPage* patchPage = new QlaunchPatchPage();
 
 		// Internally calls patchmng
-		if (patchPage->ShouldShow())
+		if (missingPatches)
 			t->AddPage(patchPage);
 
 		ThemesPage *p = new ThemesPage();
@@ -391,7 +412,6 @@ int main(int argc, char **argv)
 
 		MainLoop();
 		
-		delete patchPage;
 		delete p;
 		delete up;
 		delete dp;
@@ -401,6 +421,8 @@ int main(int argc, char **argv)
 		delete q;
 	}
 
+	delete patchPage;
+
 	while (Pages.size() != 0)
 	{
 		delete Pages.back();
@@ -408,7 +430,7 @@ int main(int argc, char **argv)
 	}
 
 	GFX::Exit();
-	Image::Internal::AssertOnLeaks();
+	RenderImage::DebugAssertLeaks();
 	PlatformExit();
 	
     return 0;

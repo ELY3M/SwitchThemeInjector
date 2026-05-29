@@ -13,9 +13,6 @@
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\NXTheme.cpp">
       <Filter>SwitchThemesCommon</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\SwitchThemesCommon.cpp">
-      <Filter>SwitchThemesCommon</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\BinaryReadWrite\Buffer.cpp">
       <Filter>SwitchThemesCommon</Filter>
     </ClCompile>
@@ -23,9 +20,6 @@
       <Filter>SwitchThemesCommon</Filter>
     </ClCompile>
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\DDS.cpp">
-      <Filter>SwitchThemesCommon</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\DDSConv\DDSConv.cpp">
       <Filter>SwitchThemesCommon</Filter>
     </ClCompile>
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\QuickBntx.cpp">
@@ -43,13 +37,33 @@
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\Bflyt\BflytPatcher.cpp">
       <Filter>SwitchThemesCommon</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\DefaultTemplates.cpp">
-      <Filter>SwitchThemesCommon</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\NewFirmFixes.cpp">
       <Filter>SwitchThemesCommon</Filter>
     </ClCompile>
-    <ClCompile Include="Layouts.cpp" />
+    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\LayoutCompatibility.cpp">
+      <Filter>SwitchThemesCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Generated\PatchTemplates.g.cpp">
+      <Filter>SwitchThemesCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Generated\TextureReplacement.g.cpp">
+      <Filter>SwitchThemesCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\DDS_conversion.cpp">
+      <Filter>SwitchThemesCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\LayoutDeserializer.cpp">
+      <Filter>SwitchThemesCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Common.cpp">
+      <Filter>SwitchThemesCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Patcher.cpp">
+      <Filter>SwitchThemesCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SwitchThemesNX\Libs\zip\zip.c">
+      <Filter>Lib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="picosha2.h" />
@@ -65,9 +79,6 @@
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\NXTheme.hpp">
       <Filter>SwitchThemesCommon</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\SwitchThemesCommon.hpp">
-      <Filter>SwitchThemesCommon</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\BinaryReadWrite\Buffer.hpp">
       <Filter>SwitchThemesCommon</Filter>
     </ClInclude>
@@ -75,9 +86,6 @@
       <Filter>SwitchThemesCommon</Filter>
     </ClInclude>
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\DDS.hpp">
-      <Filter>SwitchThemesCommon</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\DDSConv\DDSConv.hpp">
       <Filter>SwitchThemesCommon</Filter>
     </ClInclude>
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\DDSConv\stb_dxt.h">
@@ -131,10 +139,34 @@
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\Patches.hpp">
       <Filter>SwitchThemesCommon</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\LayoutCompatibility.hpp">
+      <Filter>SwitchThemesCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Generated\NewFirmFixes.g.hpp">
+      <Filter>SwitchThemesCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\DDS_conversion.hpp">
+      <Filter>SwitchThemesCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Common.hpp">
+      <Filter>SwitchThemesCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Patcher.hpp">
+      <Filter>SwitchThemesCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SwitchThemesNX\Libs\zip\zip.h">
+      <Filter>Lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SwitchThemesNX\Libs\zip\miniz.h">
+      <Filter>Lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="SwitchThemesCommon">
       <UniqueIdentifier>{35922621-d0a5-4bd8-9334-09ca22041550}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lib">
+      <UniqueIdentifier>{c989e790-e670-44b9-9695-e3762fe13c03}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

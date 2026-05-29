@@ -1,6 +1,7 @@
 #pragma once
 #include "../../MyTypes.h"
 #include "../../BinaryReadWrite/Buffer.hpp"
+#include <stdexcept>
 
 namespace Panes {
 	class BflytMaterial

@@ -1,10 +1,28 @@
 #pragma once
-#include <iostream>
 #include <vector>
 #include <string>
-#include "MyTypes.h"
+#include <optional>
 #include <unordered_map>
-#include "SarcLib/Sarc.hpp"
+#include <variant>
+#include <span>
+#include <string_view>
+
+#include "MyTypes.h"
+#include "Common.hpp"
+
+using FileResult = std::variant<FileData, std::string>;
+using ContainerResult = std::variant<FileContainer, std::string>;
+
+namespace zip
+{
+	bool IsZip(std::span<const u8> data);
+	ContainerResult Extract(std::span<const u8> data);
+}
+
+namespace szs
+{
+	ContainerResult Extract(const std::vector<u8>& data);
+}
 
 struct ThemeFileManifest
 {
@@ -13,86 +31,40 @@ struct ThemeFileManifest
 	std::string ThemeName;
 	std::string LayoutInfo;
 	std::string Target;
+
+	static ThemeFileManifest FromJson(std::string_view json);
 };
 
-// This enum defines the compatibility level of layouts, it is not meant to map exactly to HOS versions. New versions are only added when there are breaking changes to address via the NewFirmFixes feature
-enum class ConsoleFirmware : int
+class NxTheme 
 {
-	// Default value
-	Invariant = 0,
-	// Firmware versions in the format A.B.C => A_B_C
-	// These should be set in a way that makes them chronologically comparable with < and > operators
-	Fw5_0 = 5'0'0,
-	Fw6_0 = 6'0'0,
-	Fw8_0 = 8'0'0,
-	Fw9_0 = 9'0'0,
-	Fw11_0 = 11'0'0,
-	Fw20_0 = 20'0'0,
+private:
+	void initialize();
+
+public:
+	FileContainer files;
+	std::optional<std::string> error;
+	std::optional<ThemeFileManifest> manifest;
+
+	bool IsValid() const { return !error.has_value() && manifest.has_value(); }
+	
+	NxTheme(FileContainer&& f) : files(std::move(f)) { initialize(); }
+	NxTheme(const FileContainer& f) : files(f) { initialize(); }
+
+	// All images are always returned in DDS format
+	static FileResult ConvertToDDS(const FileData& image, bool transparent, int width, int height);
+
+	bool HasMainImage() const { return files.count("image.dds") || files.count("image.jpg"); }
+	FileResult GetMainImage() const;
+
+	bool HasMainLayout() const { return files.count("layout.json"); }
+	std::string_view GetMainLayout() const;
+	
+	bool HasCommonLayout() const { return files.count("common.json"); }
+	std::string_view GetCommonLayout() const;
+		
+	bool HasImagePart(std::string_view partName) const;
+	FileResult GetImagePart(std::string_view partName, int width, int height) const;
+
+	static NxTheme FromError(std::string message);
+	static NxTheme TryLoad(const std::vector<u8>& data);
 };
-
-struct SystemVersion { 
-	u32 major, minor, micro;
-
-	constexpr auto operator<=>(const SystemVersion& other) const
-	{
-		auto m = major <=> other.major;
-		if (m == std::strong_ordering::equal)
-			m = minor <=> other.minor;
-		if (m == std::strong_ordering::equal)
-			m = micro <=> other.micro;
-		return m;
-	}
-
-	ConsoleFirmware ToFirmwareEnum() const
-	{
-		if (major < 5) return ConsoleFirmware::Invariant;
-		if (major == 5) return ConsoleFirmware::Fw5_0;
-		if (major == 6 || major == 7) return ConsoleFirmware::Fw6_0;
-		if (major == 8) return ConsoleFirmware::Fw8_0;
-		if (major == 9 || major == 10) return ConsoleFirmware::Fw9_0;
-		if (major >= 11 && major < 20) return ConsoleFirmware::Fw11_0;
-		if (major >= 20) return ConsoleFirmware::Fw20_0;
-
-		return ConsoleFirmware::Invariant;
-	}
-};
-
-extern SystemVersion HOSVer;
-
-extern std::unordered_map<std::string,std::string> ThemeTargetToName;
-extern std::unordered_map<std::string,std::string> ThemeTargetToFileName;
-
-const std::unordered_map<std::string,std::string> ThemeTargetToName6X
-{
-	{"home","Home menu"},
-	{"lock","Lock screen"},
-	{"user","User page"},
-	{"apps","All apps menu"},
-	{"set","Settings applet"},
-	{"news","News applet" },
-	{"psl","Player selection"},
-};
-
-const std::unordered_map<std::string,std::string> ThemeTargetToFileName6X
-{
-	{"home","ResidentMenu.szs"},
-	{"lock","Entrance.szs"},
-	{"user","MyPage.szs"},
-	{"apps","Flaunch.szs"},
-	{"set","Set.szs"},
-	{"news","Notification.szs"},
-	{"psl","Psl.szs" },
-};
-
-const std::unordered_map<std::string,std::string> ThemeTargetToName5X
-{
-	{"home","Home menu"},
-	{"lock","Lock screen"},
-	{"user","User page"},
-	{"apps","All applets"},
-	{"set","All applets"},
-	{"news","All applets"},
-	{"psl","Player selection" },
-};
-
-ThemeFileManifest ParseNXThemeFile(SARC::SarcData &SData);

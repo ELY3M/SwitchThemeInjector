@@ -1,4 +1,5 @@
 #include "BRTI.hpp"
+#include <stdexcept>
 
 using namespace std;
 using namespace Bntxx;

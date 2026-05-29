@@ -1,10 +1,5 @@
-#include <iostream>
-#include <vector>
 #include <string>
-#include <algorithm>
-#include "../SwitchThemesCommon/SwitchThemesCommon.hpp"
 #include "../UI/UI.hpp"
-#include "../fs.hpp"
 
 #include "../Platform/Platform.hpp"
 #include "../ViewFunctions.hpp"

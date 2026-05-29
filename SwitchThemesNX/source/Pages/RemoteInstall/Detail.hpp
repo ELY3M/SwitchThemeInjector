@@ -8,16 +8,15 @@ namespace RemoteInstall
 	class DetailPage : public IUIControlObj
 	{
 	public:
-		DetailPage(const RemoteInstall::API::Entry& entry, LoadedImage img);
+		DetailPage(const RemoteInstall::API::Entry& entry, ImageRef img);
 
 		const RemoteInstall::API::Entry entry;
 
 		void Update();
 		void Render(int X, int Y);
-		~DetailPage();
 	private:
 		std::string PartName;
-		LoadedImage img;
+		ImageRef img;
 
 		enum class Action : int 
 		{

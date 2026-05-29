@@ -1,11 +1,5 @@
 #pragma once
-#include <iostream>
-#include <vector>
-#include <string>
-#include <filesystem>
-#include "../SwitchThemesCommon/SwitchThemesCommon.hpp"
 #include "../UI/UI.hpp"
-#include "../fs.hpp"
 
 class NcaDumpPage : public IPage
 {
@@ -14,7 +8,4 @@ class NcaDumpPage : public IPage
 		
 		void Render(int X, int Y) override;
 		void Update() override;
-		
-		static void CheckHomeMenuVer();
-		static void WriteHomeNcaVersion();
 };

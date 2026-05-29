@@ -53,7 +53,7 @@ namespace RemoteInstall::Worker
 	public:
 		struct Result {
 			size_t Total, Failed;
-			std::vector<LoadedImage> List;
+			std::vector<ImageRef> List;
 		};
 
 		ImageFetch(const std::vector<std::string>& urls, Result& result) : BaseWorker(urls), OutResult(result)
@@ -81,7 +81,7 @@ namespace RemoteInstall::Worker
 	class ActionOnItemFinish : public BaseWorker 
 	{
 	public:
-		ActionOnItemFinish(const std::vector<std::string>& urls, size_t& failed, const T& action) : BaseWorker(urls), Failed(failed), Action(action)
+		ActionOnItemFinish(const std::vector<std::string>& urls, size_t& failed, T&& action) : BaseWorker(urls), Failed(failed), Action(action)
 		{
 			Failed = 0;
 		}
@@ -101,6 +101,6 @@ namespace RemoteInstall::Worker
 		}
 
 		size_t& Failed;
-		const T& Action;
+		T Action;
 	};
 }

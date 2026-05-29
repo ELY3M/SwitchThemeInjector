@@ -1,9 +1,8 @@
 #pragma once
 #include "SwitchThemesCommon/MyTypes.h"
-#include <stdio.h>
 #include <vector>
 #include <string>
-#include <filesystem>
+#include <span>
 
 #include "Platform/PlatformFs.hpp"
 
@@ -28,7 +27,6 @@ namespace fs::path
 	const std::string ThemesFolder = THEMES_PATH;
 	const std::string SystemDataFolder = SYSTEMDATA_PATH;
 	const std::string DownloadsFolder = THEMES_PATH "Downloads/";
-	const std::string NcaVersionCfg = SYSTEMDATA_PATH "ver.cfg";
 	const std::string ProvidersFile = THEMES_PATH PROVIDERS_NAME;
 	const std::string PatchesDir = SYSTEMPATCHES_PATH;
 
@@ -38,7 +36,8 @@ namespace fs::path
 
 	std::string GetFreeDownloadFolder();
 
-	std::string Nca(u64 contentID);
+	// Modifies in-place
+	std::string& ToUnixSeparators(std::string& str);
 
 	const std::string Atmosphere = SD_PREFIX ATMOS_DIR;
 	const std::string Reinx = SD_PREFIX REINX_DIR;
@@ -47,18 +46,22 @@ namespace fs::path
 
 namespace fs {
 	std::vector<u8> OpenFile(const std::string& name);
-	void WriteFile(const std::string& name, const std::vector<u8>& data);
+	
+	void WriteFile(const std::string& name, std::span<const u8> data);
 
-	static inline bool Exists(const std::string& name) { return std::filesystem::exists(name); }
-	static inline void Delete(const std::string& path) { unlink(path.c_str()); }
-	static inline void CreateDirectory(const std::string& path) { std::filesystem::create_directories(path); }
-	static inline void DeleteDirectory(const std::string& path) { rmdir(path.c_str()); }
+	bool Exists(const std::string& name);
+	void Delete(const std::string& path);
+	void CreateDirectory(const std::string& path);
+	void DeleteDirectory(const std::string& path);
 
-	std::string GetFileName(const std::string& path);
+	constexpr std::string GetFileName(const std::string& path)
+	{
+		return path.substr(path.find_last_of("/\\") + 1);
+	}
+
 	std::string GetPath(const std::string& path);
 	std::string GetParentDir(const std::string& path);
-
-	void RecursiveDeleteFolder(const std::string& path);
+	std::string JoinPath(const std::string& first, const std::string& second);
 
 	// Meant for file names, truncates to 30 characters and replaces the following characters /?<>\:*|". with _
 	// WIll remove file extensions
@@ -98,6 +101,5 @@ namespace fs::theme {
 	void CreateMitmStructure(const std::string& id);
 	void CreateRomfsDir(const std::string& id);
 	void CreateStructure(const std::string& id);
-
-	bool DumpHomeMenuNca();
+	void WriteSystemVersionFile();
 }

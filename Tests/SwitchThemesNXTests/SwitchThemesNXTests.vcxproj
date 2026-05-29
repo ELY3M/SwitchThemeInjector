@@ -88,34 +88,42 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\SwitchThemesNX\Libs\zip\zip.c" />
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\BinaryReadWrite\Buffer.cpp" />
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\BRTI.cpp" />
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\DDS.cpp" />
-    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\DDSConv\DDSConv.cpp" />
+    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\DDS_conversion.cpp" />
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\QuickBntx.cpp" />
+    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Common.cpp" />
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Fonts\TTF.cpp" />
+    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Generated\PatchTemplates.g.cpp" />
+    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Generated\TextureReplacement.g.cpp" />
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\Bflan.cpp" />
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\Bflyt\Bflyt.cpp" />
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\Bflyt\BflytPatcher.cpp" />
-    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\DefaultTemplates.cpp" />
+    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\LayoutCompatibility.cpp" />
+    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\LayoutDeserializer.cpp" />
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\NewFirmFixes.cpp" />
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\NXTheme.cpp" />
+    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Patcher.cpp" />
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\SarcLib\Sarc.cpp" />
     <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\SarcLib\Yaz0.cpp" />
-    <ClCompile Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\SwitchThemesCommon.cpp" />
     <ClCompile Include="Compression.cpp" />
-    <ClCompile Include="Layouts.cpp" />
     <ClCompile Include="RealTests.cpp" />
     <ClCompile Include="SyntheticTests.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\SwitchThemesNX\Libs\zip\miniz.h" />
+    <ClInclude Include="..\..\SwitchThemesNX\Libs\zip\zip.h" />
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\BinaryReadWrite\Buffer.hpp" />
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\BRTI.hpp" />
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\DDS.hpp" />
-    <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\DDSConv\DDSConv.hpp" />
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\DDSConv\stb_dxt.h" />
+    <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\DDS_conversion.hpp" />
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Bntx\QuickBntx.hpp" />
+    <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Common.hpp" />
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Fonts\TTF.hpp" />
+    <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Generated\NewFirmFixes.g.hpp" />
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\Base64.hpp" />
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\Bflan.hpp" />
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\Bflyt\BasePane.hpp" />
@@ -129,12 +137,13 @@
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\Bflyt\Txt1Pane.hpp" />
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\Bflyt\Usd1Pane.hpp" />
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\json.hpp" />
+    <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\LayoutCompatibility.hpp" />
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Layouts\Patches.hpp" />
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\MyTypes.h" />
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\NXTheme.hpp" />
+    <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\Patcher.hpp" />
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\SarcLib\Sarc.hpp" />
     <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\SarcLib\Yaz0.hpp" />
-    <ClInclude Include="..\..\SwitchThemesNX\source\SwitchThemesCommon\SwitchThemesCommon.hpp" />
     <ClInclude Include="picosha2.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,8 +1,41 @@
+#include <string>
+#include <exception>
 #include "UninstallPage.hpp"
+#include "SettingsPage.hpp"
 #include "../ViewFunctions.hpp"
 #include "../SwitchTools/PatchMng.hpp"
+#include "../fs.hpp"
 
-using namespace std;
+namespace 
+{
+	bool RemoveTheme(bool full) 
+	{
+		try 
+		{
+			fs::theme::UninstallTheme(full);
+		}
+		catch (const std::exception& ex)
+		{
+			Dialog("Error uninstalling theme: " + std::string(ex.what()));
+			return false;
+		}
+		return true;
+	}
+
+	bool RemovePatches() 
+	{
+		try
+		{
+			PatchMng::RemoveAll();
+		}
+		catch (const std::exception& ex)
+		{
+			Dialog("Error while removing lockscreen patches: " + std::string(ex.what()));
+			return false;
+		}
+		return true;
+	}
+}
 
 UninstallPage::UninstallPage()
 {
@@ -14,7 +47,7 @@ void UninstallPage::Render(int X, int Y)
 	Utils::ImGuiSetupPage(this, X, Y);
 	ImGui::PushFont(font30);
 
-	ImGui::TextWrapped("Use this to uninstall the currently installed themes.\nIf you have issues, you can try removing the whole LayeredFS folder and code patches.");
+	ImGui::TextWrapped("Use this to uninstall the currently installed themes.\nIf you are facing issues, you can try removing the whole LayeredFS folder and code patches.");
 
 	ImGui::PushStyleColor(ImGuiCol_Button, u32(0x6B70000ff));
 	
@@ -25,19 +58,26 @@ void UninstallPage::Render(int X, int Y)
 			if (!YesNoPage::Ask("Are you sure ?")) return;
 			if (i == 1)
 			{
-				DisplayLoading("Clearing LayeredFS dir...");
-				fs::theme::UninstallTheme(true);
-				PatchMng::RemoveAll();
-				Dialog(
-					"Done, everything theme-related has been removed, restart your console to apply the changes.\n"
-					"As this removed the home menu patches as well you should restart this app before installing any theme."
-				);
+				DisplayLoading("Clearing custom themes data...");
+
+				bool success = SettingsPage::RemoveSysmodule(false);
+				success &= RemoveTheme(true);
+				success &= RemovePatches();
+				
+				if (success) 
+				{
+					Dialog(
+						"Done, everything theme-related has been removed, restart your console to apply the changes.\n"
+						"As this removed the home menu patches as well you should restart this app before installing any theme."
+					);
+				}
 			}
 			else
 			{
 				DisplayLoading("Loading...");
-				fs::theme::UninstallTheme(false);
-				Dialog("Done, all the installed themes have been removed, restart your console to apply the changes");
+
+				if (RemoveTheme(false))
+					Dialog("Done, all the installed themes have been removed, restart your console to apply the changes");
 			}
 		});
 	}

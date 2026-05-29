@@ -7,12 +7,58 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Libs\SOIL\image_DXT.h" />
-    <ClInclude Include="Libs\SOIL\image_helper.h" />
-    <ClInclude Include="Libs\SOIL\SOIL.h" />
-    <ClInclude Include="Libs\SOIL\stbi_DDS_aug.h" />
-    <ClInclude Include="Libs\SOIL\stbi_DDS_aug_c.h" />
-    <ClInclude Include="Libs\SOIL\stb_image_aug.h" />
+    <ClInclude Include="Libs\hactool\source\aes.h" />
+    <ClInclude Include="Libs\hactool\source\bktr.h" />
+    <ClInclude Include="Libs\hactool\source\cJSON.h" />
+    <ClInclude Include="Libs\hactool\source\ConvertUTF.h" />
+    <ClInclude Include="Libs\hactool\source\extkeys.h" />
+    <ClInclude Include="Libs\hactool\source\filepath.h" />
+    <ClInclude Include="Libs\hactool\source\hfs0.h" />
+    <ClInclude Include="Libs\hactool\source\ivfc.h" />
+    <ClInclude Include="Libs\hactool\source\kip.h" />
+    <ClInclude Include="Libs\hactool\source\lz4.h" />
+    <ClInclude Include="Libs\hactool\source\nax0.h" />
+    <ClInclude Include="Libs\hactool\source\nca.h" />
+    <ClInclude Include="Libs\hactool\source\nca0_romfs.h" />
+    <ClInclude Include="Libs\hactool\source\npdm.h" />
+    <ClInclude Include="Libs\hactool\source\nso.h" />
+    <ClInclude Include="Libs\hactool\source\packages.h" />
+    <ClInclude Include="Libs\hactool\source\pfs0.h" />
+    <ClInclude Include="Libs\hactool\source\pki.h" />
+    <ClInclude Include="Libs\hactool\source\rsa.h" />
+    <ClInclude Include="Libs\hactool\source\save.h" />
+    <ClInclude Include="Libs\hactool\source\settings.h" />
+    <ClInclude Include="Libs\hactool\source\sha.h" />
+    <ClInclude Include="Libs\hactool\source\types.h" />
+    <ClInclude Include="Libs\hactool\source\utils.h" />
+    <ClInclude Include="Libs\hactool\source\version.h" />
+    <ClInclude Include="Libs\hactool\source\xci.h" />
+    <ClInclude Include="Libs\SOIL2\image_array.h" />
+    <ClInclude Include="Libs\SOIL2\image_array_helper.h" />
+    <ClInclude Include="Libs\SOIL2\image_DXT.h" />
+    <ClInclude Include="Libs\SOIL2\image_helper.h" />
+    <ClInclude Include="Libs\SOIL2\pkm_helper.h" />
+    <ClInclude Include="Libs\SOIL2\pvr_helper.h" />
+    <ClInclude Include="Libs\SOIL2\SOIL2.h" />
+    <ClInclude Include="Libs\SOIL2\stbi_DDS.h" />
+    <ClInclude Include="Libs\SOIL2\stbi_DDS_c.h" />
+    <ClInclude Include="Libs\SOIL2\stbi_ext.h" />
+    <ClInclude Include="Libs\SOIL2\stbi_ext_c.h" />
+    <ClInclude Include="Libs\SOIL2\stbi_pkm.h" />
+    <ClInclude Include="Libs\SOIL2\stbi_pkm_c.h" />
+    <ClInclude Include="Libs\SOIL2\stbi_pvr.h" />
+    <ClInclude Include="Libs\SOIL2\stbi_pvr_c.h" />
+    <ClInclude Include="Libs\SOIL2\stbi_qoi.h" />
+    <ClInclude Include="Libs\SOIL2\stbi_qoi_c.h" />
+    <ClInclude Include="Libs\SOIL2\stbi_qoi_write.h" />
+    <ClInclude Include="Libs\SOIL2\stb_image.h" />
+    <ClInclude Include="Libs\SOIL2\stb_image_write.h" />
+    <ClInclude Include="Libs\SOIL2\wfETC.h" />
+    <ClInclude Include="Libs\stb_image\stb_dxt.h" />
+    <ClInclude Include="Libs\stb_image\stb_image_resize2.h" />
+    <ClInclude Include="Libs\zip\miniz.h" />
+    <ClInclude Include="Libs\zip\zip.h" />
+    <ClInclude Include="source\Pages\ImagePreview.hpp" />
     <ClInclude Include="source\Pages\QlaunchPatchPage.hpp" />
     <ClInclude Include="source\Dialogs.hpp" />
     <ClInclude Include="source\fs.hpp" />
@@ -28,9 +74,8 @@
     <ClInclude Include="source\Pages\RemoteInstall\Worker.hpp" />
     <ClInclude Include="source\Pages\SettingsPage.hpp" />
     <ClInclude Include="source\Pages\TextPage.hpp" />
-    <ClInclude Include="source\Pages\ThemeEntry\ImagePreview.hpp" />
+    <ClInclude Include="source\Pages\ThemeEntry\ImageEntry.hpp" />
     <ClInclude Include="source\Pages\ThemeEntry\ThemeEntry.hpp" />
-    <ClInclude Include="source\Pages\ThemeEntry\NxEntry.hpp" />
     <ClInclude Include="source\Pages\ThemePage.hpp" />
     <ClInclude Include="source\Pages\UninstallPage.hpp" />
     <ClInclude Include="source\Platform\Platform.hpp" />
@@ -39,10 +84,11 @@
     <ClInclude Include="source\SwitchThemesCommon\BinaryReadWrite\Buffer.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\Bntx\BRTI.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\Bntx\DDS.hpp" />
-    <ClInclude Include="source\SwitchThemesCommon\Bntx\DDSconv\DDSConv.hpp" />
-    <ClInclude Include="source\SwitchThemesCommon\Bntx\DDSconv\stb_dxt.h" />
+    <ClInclude Include="source\SwitchThemesCommon\Bntx\DDS_conversion.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\Bntx\QuickBntx.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\Fonts\TTF.hpp" />
+    <ClInclude Include="source\SwitchThemesCommon\Generated\NewFirmFixes.g.hpp" />
+    <ClInclude Include="source\SwitchThemesCommon\json.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\Layouts\Base64.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\Layouts\Bflan.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\Layouts\Bflyt\BasePane.hpp" />
@@ -54,17 +100,19 @@
     <ClInclude Include="source\SwitchThemesCommon\Layouts\Bflyt\RGBAColor.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\Layouts\Bflyt\Txt1Pane.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\Layouts\Bflyt\Usd1Pane.hpp" />
-    <ClInclude Include="source\SwitchThemesCommon\Layouts\json.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\Layouts\LayoutCompatibility.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\Layouts\Patches.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\MyTypes.h" />
     <ClInclude Include="source\SwitchThemesCommon\NXTheme.hpp" />
+    <ClInclude Include="source\SwitchThemesCommon\Patcher.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\SarcLib\Sarc.hpp" />
     <ClInclude Include="source\SwitchThemesCommon\SarcLib\Yaz0.hpp" />
-    <ClInclude Include="source\SwitchThemesCommon\SwitchThemesCommon.hpp" />
+    <ClInclude Include="source\SwitchThemesCommon\Common.hpp" />
     <ClInclude Include="source\SwitchTools\hactool.hpp" />
     <ClInclude Include="source\SwitchTools\InjectorInstall.hpp" />
+    <ClInclude Include="source\SwitchTools\key_loader.hpp" />
     <ClInclude Include="source\SwitchTools\PatchMng.hpp" />
+    <ClInclude Include="source\SwitchTools\RomfsCache.hpp" />
     <ClInclude Include="source\UI\DialogPages.hpp" />
     <ClInclude Include="source\UI\glad.h" />
     <ClInclude Include="source\UI\imgui\imconfig.h" />
@@ -80,10 +128,302 @@
     <ClInclude Include="source\ViewFunctions.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Libs\SOIL\image_DXT.c" />
-    <ClCompile Include="Libs\SOIL\image_helper.c" />
-    <ClCompile Include="Libs\SOIL\SOIL.c" />
-    <ClCompile Include="Libs\SOIL\stb_image_aug.c" />
+    <ClCompile Include="Libs\hactool\source\aes.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\bktr.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\cJSON.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\ConvertUTF.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\extkeys.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\filepath.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\hfs0.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\kip.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\lz4.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\nax0.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\nca.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\nca0_romfs.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\npdm.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\nso.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\packages.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\pfs0.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\pki.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\romfs.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\rsa.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\save.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\sha.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\utils.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\hactool\source\xci.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)hactool\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\aes.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\aesni.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\arc4.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\asn1parse.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\asn1write.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\base64.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\bignum.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\blowfish.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\camellia.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\ccm.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\certs.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\cipher.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\cipher_wrap.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\cmac.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\ctr_drbg.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\debug.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\des.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\dhm.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\ecdh.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\ecdsa.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\ecjpake.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\ecp.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\ecp_curves.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\entropy.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\entropy_poll.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\error.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\gcm.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\havege.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\hmac_drbg.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\md.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\md2.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\md4.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\md5.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\md_wrap.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\memory_buffer_alloc.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\net_sockets.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\oid.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\padlock.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\pem.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\pk.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\pkcs11.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\pkcs12.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\pkcs5.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\pkparse.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\pkwrite.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\pk_wrap.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\platform.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\platform_util.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\ripemd160.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\rsa.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\rsa_internal.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\sha1.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\sha256.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\sha512.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\ssl_cache.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\ssl_ciphersuites.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\ssl_cli.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\ssl_cookie.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\ssl_srv.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\ssl_ticket.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\ssl_tls.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\threading.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\timing.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\version.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\version_features.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\x509.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\x509write_crt.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\x509write_csr.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\x509_create.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\x509_crl.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\x509_crt.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\x509_csr.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\mbedtls\source\xtea.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)mbedtls\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="Libs\SOIL2\image_array.c" />
+    <ClCompile Include="Libs\SOIL2\image_DXT.c" />
+    <ClCompile Include="Libs\SOIL2\image_helper.c" />
+    <ClCompile Include="Libs\SOIL2\SOIL2.c" />
+    <ClCompile Include="Libs\SOIL2\wfETC.c" />
+    <ClCompile Include="Libs\stb_image\stb_image_impl.c" />
+    <ClCompile Include="Libs\zip\zip.c" />
+    <ClCompile Include="source\Pages\ImagePreview.cpp" />
     <ClCompile Include="source\Pages\QlaunchPatchPage.cpp" />
     <ClCompile Include="source\fs.cpp" />
     <ClCompile Include="source\main.cpp" />
@@ -100,8 +440,10 @@
     <ClCompile Include="source\Pages\SettingsPage.cpp" />
     <ClCompile Include="source\Pages\TextPage.cpp" />
     <ClCompile Include="source\Pages\ThemeEntry\BaseEntry.cpp" />
-    <ClCompile Include="source\Pages\ThemeEntry\FontEntry.hpp" />
-    <ClCompile Include="source\Pages\ThemeEntry\LegacyEntry.hpp" />
+    <ClCompile Include="source\Pages\ThemeEntry\FontEntry.cpp" />
+    <ClCompile Include="source\Pages\ThemeEntry\ImageEntry.cpp" />
+    <ClCompile Include="source\Pages\ThemeEntry\LegacyEntry.cpp" />
+    <ClCompile Include="source\Pages\ThemeEntry\NxEntry.cpp" />
     <ClCompile Include="source\Pages\ThemePage.cpp" />
     <ClCompile Include="source\Pages\UninstallPage.cpp" />
     <ClCompile Include="source\Platform\PlatformSwitch.cpp" />
@@ -110,23 +452,28 @@
     <ClCompile Include="source\SwitchThemesCommon\BinaryReadWrite\Buffer.cpp" />
     <ClCompile Include="source\SwitchThemesCommon\Bntx\BRTI.cpp" />
     <ClCompile Include="source\SwitchThemesCommon\Bntx\DDS.cpp" />
-    <ClCompile Include="source\SwitchThemesCommon\Bntx\DDSconv\DDSConv.cpp" />
+    <ClCompile Include="source\SwitchThemesCommon\Bntx\DDS_conversion.cpp" />
     <ClCompile Include="source\SwitchThemesCommon\Bntx\QuickBntx.cpp" />
     <ClCompile Include="source\SwitchThemesCommon\Fonts\TTF.cpp" />
+    <ClCompile Include="source\SwitchThemesCommon\Generated\PatchTemplates.g.cpp" />
+    <ClCompile Include="source\SwitchThemesCommon\Generated\TextureReplacement.g.cpp" />
     <ClCompile Include="source\SwitchThemesCommon\Layouts\Bflan.cpp" />
     <ClCompile Include="source\SwitchThemesCommon\Layouts\Bflyt\Bflyt.cpp" />
     <ClCompile Include="source\SwitchThemesCommon\Layouts\Bflyt\BflytMaterial.hpp" />
     <ClCompile Include="source\SwitchThemesCommon\Layouts\Bflyt\BflytPatcher.cpp" />
-    <ClCompile Include="source\SwitchThemesCommon\Layouts\DefaultTemplates.cpp" />
+    <ClCompile Include="source\SwitchThemesCommon\Layouts\LayoutDeserializer.cpp" />
     <ClCompile Include="source\SwitchThemesCommon\Layouts\LayoutCompatibility.cpp" />
     <ClCompile Include="source\SwitchThemesCommon\Layouts\NewFirmFixes.cpp" />
     <ClCompile Include="source\SwitchThemesCommon\NXTheme.cpp" />
+    <ClCompile Include="source\SwitchThemesCommon\Patcher.cpp" />
     <ClCompile Include="source\SwitchThemesCommon\SarcLib\Sarc.cpp" />
     <ClCompile Include="source\SwitchThemesCommon\SarcLib\Yaz0.cpp" />
-    <ClCompile Include="source\SwitchThemesCommon\SwitchThemesCommon.cpp" />
+    <ClCompile Include="source\SwitchThemesCommon\Common.cpp" />
     <ClCompile Include="source\SwitchTools\hactool.cpp" />
     <ClCompile Include="source\SwitchTools\InjectorInstall.cpp" />
+    <ClCompile Include="source\SwitchTools\key_loader.cpp" />
     <ClCompile Include="source\SwitchTools\PatchMng.cpp" />
+    <ClCompile Include="source\SwitchTools\RomfsCache.cpp" />
     <ClCompile Include="source\UI\DialogPages.cpp" />
     <ClCompile Include="source\UI\glad.c" />
     <ClCompile Include="source\UI\imgui\imgui.cpp" />
@@ -140,7 +487,11 @@
     <ClCompile Include="source\Version.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Libs\hactool\source\LICENSE" />
     <None Include="Makefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Libs\mbedtls\source\CMakeLists.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -170,7 +521,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;MINIZ_NO_STDIO=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -180,11 +531,12 @@
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <EnableModules>false</EnableModules>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
-      <AdditionalIncludeDirectories>$(ProjectDir)Libs;$(SolutionDir)..\nx-include\;$(ProjectDir)Libs\hactool\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Libs;$(SolutionDir)..\nx-include\;$(ProjectDir)Libs\hactool\include;$(ProjectDir)Libs\mbedtls\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>false</TreatWarningAsError>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>

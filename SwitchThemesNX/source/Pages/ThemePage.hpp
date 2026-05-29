@@ -2,10 +2,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <filesystem>
-#include "../SwitchThemesCommon/SwitchThemesCommon.hpp"
+#include <unordered_map>
+#include <memory>
 #include "../UI/UI.hpp"
-#include "../fs.hpp"
 #include "ThemeEntry/ThemeEntry.hpp"
 
 class ThemesPage : public IPage
@@ -50,8 +49,8 @@ class ThemesPage : public IPage
 
 		std::vector<std::string> SelectedFiles;
 		
-		const std::string CommandsTextNormal = "A: Install theme  Y: Multiselect  L/R: Previous/Next page";
-		const std::string CommandsTextSelected = "A: Add/Remove to selection  Y: Clear selection  `+`: Install selected";
+		const std::string CommandsTextNormal = "A: Install theme    X: Preview    Y: Multiselect    L/R: Previous/Next page";
+		const std::string CommandsTextSelected = "A: Add/Remove to selection    Y: Clear selection   `+`: Install selected";
 
 		int LimitLoad = 25;
 

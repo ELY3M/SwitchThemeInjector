@@ -32,7 +32,20 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	Libs/SOIL source/SwitchTools source/SwitchTools/lockpick source/UI source/UI/imgui source/Platform source/Pages source/Pages/ThemeEntry source/Pages/RemoteInstall source/SwitchThemesCommon/SarcLib source/SwitchThemesCommon/Layouts source/SwitchThemesCommon/Layouts/Bflyt source/SwitchThemesCommon/Bntx source/SwitchThemesCommon/Bntx/DDSConv source/SwitchThemesCommon/BinaryReadWrite source/SwitchThemesCommon/Fonts source/SwitchThemesCommon source
+SOURCES		:=	Libs/SOIL2 Libs/stb_image Libs/zip \
+				source \
+				source/SwitchTools source/SwitchTools/lockpick \
+				source/UI source/UI/imgui \
+				source/Platform \
+				source/Pages source/Pages/ThemeEntry source/Pages/RemoteInstall \
+				source/SwitchThemesCommon \
+				source/SwitchThemesCommon/Generated \
+				source/SwitchThemesCommon/SarcLib \
+				source/SwitchThemesCommon/Layouts source/SwitchThemesCommon/Layouts/Bflyt \
+				source/SwitchThemesCommon/Bntx \
+				source/SwitchThemesCommon/BinaryReadWrite \
+				source/SwitchThemesCommon/Fonts
+				
 DATA		:=	data
 INCLUDES	:=	include Libs
 EXEFS_SRC	:=	exefs_src
@@ -40,7 +53,7 @@ ROMFS	:=	romfs
 
 APP_TITLE	:=	NXThemes Installer
 APP_AUTHOR	:=	exelix
-APP_VERSION := 2.8.3
+APP_VERSION := 2.9
 
 GITVER ?= Unknown
 #---------------------------------------------------------------------------------
@@ -51,7 +64,7 @@ ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 CFLAGS	:=	-O2 -ffunction-sections \
 			$(ARCH) $(DEFINES)
 
-CFLAGS	+=	$(INCLUDE) -D__SWITCH__ -Wall -Werror -DGITVER=\"$(GITVER)\" 
+CFLAGS	+=	$(INCLUDE) -D__SWITCH__ -Wall -Werror -DGITVER=\"$(GITVER)\"  -DMINIZ_NO_STDIO=1
 
 ifneq ($(DEVBUILD),)         
 	CFLAGS	+=	-DDEVBUILD=1
