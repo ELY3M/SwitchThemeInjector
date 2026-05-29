@@ -145,6 +145,26 @@ void fs::Delete(const std::string& path) { std::filesystem::remove(path); }
 
 void fs::CreateDirectory(const std::string& path) { std::filesystem::create_directories(path); }
 
+bool fs::CheckFlagFile(const std::string& name)
+{
+	return Exists(SYSTEMDATA_PATH ".flag_" + name);
+}
+
+void fs::SetFlagFile(const std::string& name, bool value)
+{
+	auto target = SYSTEMDATA_PATH ".flag_" + name;
+	try {
+		if (value && !fs::Exists(target))
+			fs::WriteFile(target, {});
+		else if (!value && fs::Exists(target))
+			fs::Delete(target);
+	}
+	catch (...)
+	{
+		// This is not critical, ignore errors
+	}
+}
+
 void fs::DeleteDirectory(const std::string& path) {
 	// remove_all fails for some reason so we must iterate manually.
 	if (!std::filesystem::is_directory(path))

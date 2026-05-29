@@ -54,6 +54,9 @@ namespace fs {
 	void CreateDirectory(const std::string& path);
 	void DeleteDirectory(const std::string& path);
 
+	bool CheckFlagFile(const std::string& name);
+	void SetFlagFile(const std::string& name, bool value);
+
 	constexpr std::string GetFileName(const std::string& path)
 	{
 		return path.substr(path.find_last_of("/\\") + 1);

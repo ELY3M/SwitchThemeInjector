@@ -52,16 +52,21 @@ void TabRenderer::Render(int X, int Y)
 	for (const IPage *page : Pages)
 	{
 		ImGui::SetCursorPosX(BaseLabelX);
-		float CursorY; //Used to draw selection marker
 		
 		bool CurrentSelected = (page == CurrentControl);
 		if (CurrentSelected)
 		{
 			ImGui::PushStyleColor(ImGuiCol_Text, Colors::Highlight); //Font color
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 12);
-			CursorY = ImGui::GetCursorPosY();
 		}
 
+		auto cursor = ImGui::GetCursorPos();
+		if (page->NotificationIcon)
+		{
+			auto len = ImGui::CalcTextSize(page->Name.c_str()).x;
+			ImGui::GetCurrentWindow()->DrawList->AddCircleFilled({ cursor.x + len + 12, cursor.y + 12 }, 5, 0xffc9ff00);
+		}
+		
 		if (ImGui::Button(page->Name.c_str(), ImVec2(250,0)))
 		{
 			SetFocused(count);
@@ -74,7 +79,7 @@ void TabRenderer::Render(int X, int Y)
 		if (CurrentSelected)
 		{
 			ImGui::PopStyleColor();
-			ImGui::GetCurrentWindow()->DrawList->AddRectFilled({ BaseLabelX, CursorY }, { BaseLabelX + 4, ImGui::GetCursorPosY() - 10}, 0xffc9ff00);
+			ImGui::GetCurrentWindow()->DrawList->AddRectFilled({ BaseLabelX, cursor.y }, { BaseLabelX + 4, ImGui::GetCursorPosY() - 10}, 0xffc9ff00);
 		}
 
 		if (!ControlHasFocus && GImGui->NavId == ImGui::GetID(page->Name.c_str()))

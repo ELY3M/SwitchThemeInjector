@@ -15,6 +15,7 @@ namespace Settings {
 SettingsPage::SettingsPage()
 {
 	Name = "Settings";
+	NotificationIcon = !fs::CheckFlagFile("sysmodule");
 	CheckSysmoduleInstalled();
 }
 
@@ -83,6 +84,12 @@ bool SettingsPage::RemoveSysmodule(bool dialogs)
 
 void SettingsPage::Render(int X, int Y)
 {
+	if (NotificationIcon)
+	{
+		NotificationIcon = false;
+		fs::SetFlagFile("sysmodule", true);
+	}
+
 	Utils::ImGuiSetupWin(Name.c_str(), X, Y, DefaultWinFlags);
 	ImGui::SetWindowSize(ImVec2(SCR_W - (float)X - 30, SCR_H - (float)Y - 70));
 	ImGui::PushFont(font25);

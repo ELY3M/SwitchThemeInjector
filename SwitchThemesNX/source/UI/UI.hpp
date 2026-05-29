@@ -97,12 +97,12 @@ class IPage : public IUIControlObj
 	public:
 		IPage() = default;
 		IPage(std::string_view name) : Name(name) {}
-		
-		TabRenderer* Parent;
-		std::string Name;
 		virtual ~IPage();
-
-		PageEvent FocusEvent;
+		
+		TabRenderer* Parent = nullptr;
+		std::string Name = "";
+		PageEvent FocusEvent = {};
+		bool NotificationIcon = false;
 };
 
 class TabRenderer : public IUIControlObj
